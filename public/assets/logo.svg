@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 255 64" role="img" aria-labelledby="title desc">
+<title id="title">FrankiFlow</title><desc id="desc">FrankiFlow – Mehr als Reinigung</desc>
+<g fill="none" stroke="#0fa9a0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M18 42c10-1 17-8 19-18 2 10 9 17 19 18-10 1-17 8-19 18-2-10-9-17-19-18Z"/>
+  <path d="M34 16c4 0 7-3 7-7 0 4 3 7 7 7-4 0-7 3-7 7 0-4-3-7-7-7Z"/>
+</g>
+<text x="70" y="35" font-size="28" font-family="Arial, Helvetica, sans-serif" font-weight="800" fill="#0b2134">Franki<tspan fill="#0fa9a0">Flow</tspan></text>
+<text x="72" y="52" font-size="9.5" font-family="Arial, Helvetica, sans-serif" font-weight="700" letter-spacing="2.1" fill="#617486">MEHR ALS REINIGUNG.</text>
+</svg>

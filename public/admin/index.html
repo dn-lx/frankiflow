@@ -1,0 +1,98 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FrankiFlow Admin</title><link rel="stylesheet" href="/assets/styles.css"><meta name="robots" content="noindex,nofollow"></head><body class="admin-body"><div id="loginView" class="login-wrap"><form id="loginForm" class="login-card"><a class="brand" href="/"><img src="/assets/frankiflow-logo.png" alt="FrankiFlow"></a><h1>Admin Login</h1><p>Website, Fotos, Preise, Anfragen und Zahlungen verwalten.</p><div class="field"><label>E-Mail</label><input id="loginEmail" type="email" value="info@frankiflow.de" required autocomplete="username"></div><div class="field" style="margin-top:12px"><label>Passwort</label><input id="loginPassword" type="password" required autocomplete="current-password"></div><button class="btn btn-primary" type="submit" style="width:100%;margin-top:18px">Anmelden</button><div id="loginNotice" class="notice hidden" style="margin-top:14px"></div></form></div><div id="adminView" class="admin-shell hidden"><aside class="admin-side"><a class="brand" href="/"><img src="/assets/frankiflow-logo.png" alt="FrankiFlow"></a><nav class="admin-nav"><button data-panel="dashboard" class="active">Übersicht</button><button data-panel="site">Website</button><button data-panel="photos">Fotos</button><button data-panel="pricing">Preise</button><button data-panel="checklists">Checklisten</button><button data-panel="leads">Anfragen</button><button data-panel="payments">Zahlungen</button><button data-panel="config">Import / Export</button></nav></aside><main class="admin-main"><div class="admin-top"><div><div class="muted" id="adminEmail"></div><h1 id="panelTitle">Übersicht</h1></div><div class="actions"><a class="btn btn-secondary btn-small" href="/" target="_blank">Website öffnen</a><button id="logoutBtn" class="btn btn-secondary btn-small">Abmelden</button></div></div><div id="setupNotice" class="notice error hidden" style="margin-bottom:16px"></div>
+<section class="admin-panel active" data-panel-view="dashboard"><div class="admin-grid"><div class="stat"><span class="muted">Neue Anfragen</span><strong id="statLeads">—</strong></div><div class="stat"><span class="muted">Aktive Fotos</span><strong id="statPhotos">—</strong></div><div class="stat"><span class="muted">Bezahlte Links</span><strong id="statPaid">—</strong></div></div><div class="admin-card"><h2>FrankiFlow CMS</h2><p>Diese Verwaltung nutzt Supabase Auth + RLS. Änderungen an Fotos, Preisen und Kundendaten sind nur für den hinterlegten FrankiFlow-Admin freigegeben.</p></div></section>
+<section class="admin-panel" data-panel-view="site"><form id="siteForm" class="admin-card"><h2>Website & Kontakt</h2><p class="muted">Öffentliche Website-Texte können getrennt auf Deutsch und Englisch gepflegt werden. Kontakt- und Rechtsangaben gelten für beide Sprachen.</p><h3 class="admin-subhead">Deutsch</h3><div class="form-grid"><div class="field full"><label>Hero Eyebrow</label><input name="hero_eyebrow"></div><div class="field full"><label>Hero Titel</label><input name="hero_title"></div><div class="field full"><label>Hero Untertitel</label><textarea name="hero_subtitle" rows="3"></textarea></div><div class="field"><label>Angebots-Titel</label><input name="offer_title"></div><div class="field"><label>Servicegebiet</label><input name="service_area"></div><div class="field full"><label>Angebots-Text</label><input name="offer_text"></div><div class="field"><label>Primärer Button</label><input name="primary_cta_label"></div><div class="field"><label>Sekundärer Button</label><input name="secondary_cta_label"></div></div><h3 class="admin-subhead">English</h3><div class="form-grid"><div class="field full"><label>Hero eyebrow (EN)</label><input name="hero_eyebrow_en"></div><div class="field full"><label>Hero title (EN)</label><input name="hero_title_en"></div><div class="field full"><label>Hero subtitle (EN)</label><textarea name="hero_subtitle_en" rows="3"></textarea></div><div class="field"><label>Offer title (EN)</label><input name="offer_title_en"></div><div class="field"><label>Service area (EN)</label><input name="service_area_en"></div><div class="field full"><label>Offer text (EN)</label><input name="offer_text_en"></div><div class="field"><label>Primary button (EN)</label><input name="primary_cta_label_en"></div><div class="field"><label>Secondary button (EN)</label><input name="secondary_cta_label_en"></div></div><h3 class="admin-subhead">Kontakt & Rechtliches</h3><div class="form-grid"><div class="field"><label>E-Mail</label><input name="email" type="email"></div><div class="field"><label>Telefon</label><input name="phone"></div><div class="field full"><label class="whatsapp-label">WhatsApp URL</label><input name="whatsapp_url"></div><div class="field"><label>Inhaber (Impressum)</label><input name="legal_owner"></div><div class="field"><label>PLZ / Stadt</label><input name="legal_postcode_city"></div><div class="field full"><label>Geschäftsanschrift (Impressum)</label><input name="legal_street" placeholder="Straße Hausnummer"></div></div><button class="btn btn-primary" type="submit" style="margin-top:16px">Änderungen speichern</button><span id="siteSaved" class="muted"></span></form></section>
+<section class="admin-panel" data-panel-view="photos"><div class="admin-card"><h2>Foto hochladen</h2><form id="photoForm"><div class="form-grid"><div class="field full"><label>Bilddatei</label><input id="photoFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" required></div><div class="field"><label>Titel</label><input id="photoTitle"></div><div class="field"><label>Kategorie</label><select id="photoCategory"><option value="general">Allgemein</option><option value="hero">Hero</option><option value="office">Büro</option><option value="home">Wohnung</option><option value="airbnb">Airbnb</option><option value="staircase">Treppenhaus</option><option value="commercial">Gewerbe</option></select></div><div class="field full"><label>Alternativtext</label><input id="photoAlt" placeholder="Beschreibung für Barrierefreiheit und SEO"></div><div class="field full"><label class="check"><input id="useAsHero" type="checkbox"> Nach Upload als Hero-Bild verwenden</label></div></div><button class="btn btn-primary" type="submit" style="margin-top:14px">Foto hochladen</button><span id="photoNotice" class="muted"></span></form></div><div class="admin-card"><h2>Aktuelle Fotos</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>Bild</th><th>Titel</th><th>Kategorie</th><th>Aktion</th></tr></thead><tbody id="photoRows"></tbody></table></div></div></section>
+<section class="admin-panel" data-panel-view="pricing">
+  <div class="pricing-settings-head">
+    <div>
+      <span class="admin-kicker">PREISRECHNER</span>
+      <h2>Live-Preisregeln</h2>
+      <p class="muted">Hier verwalten Sie alle Preisregeln des öffentlichen Preisrechners. Änderungen werden nach dem Speichern direkt aus Supabase geladen.</p>
+    </div>
+    <a class="btn btn-secondary" href="/preisrechner/?admin=1" target="_blank" rel="noopener">Rechner / Rechnung öffnen</a>
+  </div>
+  <form id="pricingConfigForm" class="pricing-settings">
+    <section class="pricing-section">
+      <div class="pricing-section-title"><span>01</span><div><h3>Allgemeine Kalkulation</h3><p>Grundlegende Quadratmeter- und Mindestpreislogik.</p></div></div>
+      <div class="pricing-grid two">
+        <label class="pricing-field"><span>Gradient pro m²</span><div class="pricing-input-suffix"><input id="generalGradient" type="number" step="0.0001" min="0"><em>€/m²</em></div></label>
+        <label class="pricing-field"><span>Mindestpreis pro Termin</span><div class="pricing-input-suffix"><input id="minimumCharge" type="number" step="0.01" min="0"><em>€</em></div></label>
+      </div>
+    </section>
+
+    <section class="pricing-section">
+      <div class="pricing-section-title"><span>02</span><div><h3>Leistungen</h3><p>Bezeichnung, Ein-Monats-Basis und Sichtbarkeit je Service.</p></div></div>
+      <div id="serviceAdminGrid" class="pricing-service-grid"></div>
+    </section>
+
+    <section class="pricing-section">
+      <div class="pricing-section-title"><span>03</span><div><h3>Vertragslaufzeiten</h3><p>Nur der Basisanteil wird reduziert; der m²-Anteil bleibt unverändert.</p></div></div>
+      <div id="contractAdminGrid" class="pricing-grid three"></div>
+    </section>
+
+    <section class="pricing-section">
+      <div class="pricing-section-title"><span>04</span><div><h3>Zusatzleistungen</h3><p>Fensterreinigung, Grundreinigung sowie Equipment und Reinigungsmittel.</p></div></div>
+      <div class="pricing-addon-grid">
+        <div class="pricing-mini-card">
+          <label class="pricing-toggle"><input id="windowEnabled" type="checkbox"><span class="pricing-switch"></span><strong>Fensterreinigung aktiv</strong></label>
+          <label class="pricing-field"><span>Basis</span><input id="windowBase" type="number" step="0.01"></label>
+          <label class="pricing-field"><span>Gradient €/Glas-m²</span><input id="windowGradient" type="number" step="0.01"></label>
+          <label class="pricing-field"><span>Mindestpreis</span><input id="windowMinimum" type="number" step="0.01"></label>
+        </div>
+        <div class="pricing-mini-card">
+          <label class="pricing-toggle"><input id="deepEnabled" type="checkbox"><span class="pricing-switch"></span><strong>Grundreinigung aktiv</strong></label>
+          <label class="pricing-field"><span>Bezeichnung</span><input id="deepAdminLabel"></label>
+          <label class="pricing-field"><span>Interner Kalkulationszuschlag</span><div class="pricing-input-suffix"><input id="deepSurcharge" type="number" step="0.1"><em>%</em></div><small>Nur intern. Der Prozentsatz wird dem Kunden nicht angezeigt.</small></label>
+        </div>
+        <div class="pricing-mini-card">
+          <label class="pricing-toggle"><input id="equipmentEnabled" type="checkbox"><span class="pricing-switch"></span><strong>Equipment aktiv</strong></label>
+          <label class="pricing-field"><span>Basis</span><input id="equipmentBase" type="number" step="0.01"></label>
+          <label class="pricing-field"><span>Gradient €/m²</span><input id="equipmentGradient" type="number" step="0.001"></label>
+        </div>
+      </div>
+    </section>
+
+    <section class="pricing-section">
+      <div class="pricing-section-title"><span>05</span><div><h3>Rabatt & MwSt.</h3><p>Neukundenangebot und Steuerdarstellung.</p></div></div>
+      <div class="pricing-addon-grid two-col">
+        <div class="pricing-mini-card">
+          <label class="pricing-toggle"><input id="promoEnabled" type="checkbox"><span class="pricing-switch"></span><strong>Neukundenangebot aktiv</strong></label>
+          <label class="pricing-field"><span>Bezeichnung</span><input id="promoLabel"></label>
+          <label class="pricing-field"><span>Rabatt im 1. Monat</span><div class="pricing-input-suffix"><input id="promoPct" type="number" step="0.1"><em>%</em></div></label>
+        </div>
+        <div class="pricing-mini-card">
+          <label class="pricing-toggle"><input id="vatEnabled" type="checkbox"><span class="pricing-switch"></span><strong>MwSt.-Option aktiv</strong></label>
+          <label class="pricing-field"><span>MwSt.-Satz</span><div class="pricing-input-suffix"><input id="vatPct" type="number" step="0.1"><em>%</em></div></label>
+          <label class="pricing-toggle compact"><input id="vatDefault" type="checkbox"><span class="pricing-switch"></span><strong>Standardmäßig hinzufügen</strong></label>
+        </div>
+      </div>
+    </section>
+
+    <div class="pricing-save-bar">
+      <div><strong id="pricingSaveState">Bereit</strong><small>Speichern veröffentlicht die Konfiguration sofort.</small></div>
+      <button class="btn btn-primary" type="submit">Alle Preisregeln speichern</button>
+    </div>
+  </form>
+</section>
+<section class="admin-panel" data-panel-view="checklists">
+  <div class="pricing-settings-head">
+    <div>
+      <span class="admin-kicker">LEISTUNGSUMFANG</span>
+      <h2>Checklisten · Deutsch & English</h2>
+      <p class="muted">Bearbeiten Sie die Leistungschecklisten, die Kunden im Preisrechner sehen und dem Angebot als PDF beigefügt werden. Deutsch und Englisch werden gemeinsam gespeichert.</p>
+    </div>
+  </div>
+  <div class="admin-card checklist-admin-card">
+    <div id="checklistServiceTabs" class="checklist-admin-tabs"></div>
+    <div id="checklistEditor"></div>
+    <div class="checklist-admin-actions">
+      <button id="addChecklistSection" class="btn btn-secondary" type="button">+ Bereich hinzufügen</button>
+      <button id="saveChecklist" class="btn btn-primary" type="button">Checkliste speichern</button>
+    </div>
+    <div id="checklistSaveState" class="notice hidden"></div>
+  </div>
+</section>
+<section class="admin-panel" data-panel-view="leads"><div class="admin-card"><h2>Anfragen</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>Datum</th><th>Kunde</th><th>Leistung</th><th>Richtwert</th><th>Status</th><th>Kontakt</th></tr></thead><tbody id="leadRows"></tbody></table></div></div></section>
+<section class="admin-panel" data-panel-view="payments"><div class="admin-card"><h2>Stripe Zahlungslink erstellen</h2><p class="muted">Nur nach bestätigtem Auftrag bzw. vereinbartem Betrag. Der Kunde bezahlt auf Stripe Checkout.</p><form id="paymentForm"><div class="form-grid"><div class="field"><label>Kunden-E-Mail</label><input id="payEmail" type="email" required></div><div class="field"><label>Betrag in EUR</label><input id="payAmount" type="number" min="1" step="0.01" required></div><div class="field full"><label>Beschreibung</label><input id="payDescription" required placeholder="z. B. Büroreinigung September – vereinbarte Leistung"></div><div class="field full"><label>Anfrage-ID optional</label><input id="payQuoteId"></div></div><button class="btn btn-primary" type="submit" style="margin-top:14px">Zahlungslink erzeugen</button><div id="paymentResult" class="notice hidden" style="margin-top:14px"></div></form></div><div class="admin-card"><h2>Zahlungen</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>Datum</th><th>E-Mail</th><th>Beschreibung</th><th>Betrag</th><th>Status</th><th>Link</th></tr></thead><tbody id="paymentRows"></tbody></table></div></div></section>
+<section class="admin-panel" data-panel-view="config"><div class="admin-card"><h2>Konfiguration exportieren</h2><p>Export enthält Website-Einstellungen und Preis-Konfiguration – keine Passwörter oder geheimen Schlüssel.</p><button id="exportBtn" class="btn btn-primary">JSON exportieren</button></div><div class="admin-card"><h2>Konfiguration importieren</h2><p class="muted">Importiert nur bekannte Website-/Preisfelder. Vorhandene Fotos, Kundendaten und Zahlungen werden nicht gelöscht.</p><input id="importFile" type="file" accept="application/json"><button id="importBtn" class="btn btn-secondary" style="margin-top:12px">JSON importieren</button><div id="importNotice" class="notice hidden" style="margin-top:14px"></div></div></section>
+</main></div><script type="module" src="/assets/admin.js"></script></body></html>
