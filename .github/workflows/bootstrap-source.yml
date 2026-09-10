@@ -1,0 +1,57 @@
+name: Bootstrap FrankiFlow website source
+
+on:
+  push:
+    paths:
+      - '.github/workflows/bootstrap-source.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download current FrankiFlow source package
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/frankiflow-source
+          mkdir -p /tmp/frankiflow-source
+          curl -L --fail --retry 3 'https://drive.google.com/uc?export=download&id=1JdUwh6TZEniqXbekfDiv6oP87EgZY-xI' -o /tmp/frankiflow-source.zip
+          unzip -q /tmp/frankiflow-source.zip -d /tmp/frankiflow-source
+          test -f /tmp/frankiflow-source/public/index.html
+          test -f /tmp/frankiflow-source/public/preisrechner/index.html
+          test -f /tmp/frankiflow-source/public/admin/index.html
+          test -f /tmp/frankiflow-source/netlify.toml
+
+      - name: Populate repository
+        run: |
+          set -euo pipefail
+          rsync -a \
+            --exclude='README.md' \
+            --exclude='DEPLOYMENT.md' \
+            /tmp/frankiflow-source/ ./
+          rm -f .github/workflows/bootstrap-source.yml
+
+      - name: Validate source
+        run: |
+          set -euo pipefail
+          node --check public/assets/app.js
+          node --check public/assets/pricing.js
+          node --check public/assets/admin.js
+          node --check public/assets/calculator.js
+          test -f public/assets/frankiflow-logo.png
+          test -f public/assets/frankiflow-hero.png
+
+      - name: Commit populated production source
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Populate current FrankiFlow production source'
+          git push origin main
