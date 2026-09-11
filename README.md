@@ -1,48 +1,22 @@
-# FrankiFlow Website
+# FrankiFlow
 
-Production source for **FrankiFlow Gebäudereinigung & Objektbetreuung**.
+FrankiFlow public website, price calculator and administration interface.
 
-- Production: https://frankiflow.de
-- Hosting: Netlify
-- Backend: shared Supabase project **FrankiFlow & FrankiHolz Backend**
-- Payments: Stripe Checkout through server-side Netlify Functions
-- Main public calculator: `/preisrechner/`
-- Admin: `/admin/`
+## Development workflow
 
-## Repository structure
+Production is deployed from `main`. UI and feature changes should be developed on a separate branch and reviewed through a Netlify Deploy Preview before merging.
 
-- `public/` — public website, calculator, admin UI, legal pages and SEO pages
-- `netlify/functions/` — server-side Stripe functions
-- `migrations/` — database schema/setup files kept with the source
-- `netlify.toml` — Netlify publish, functions, redirects and security headers
+## Current UI preview work
 
-## Production deployment rule
+The draft preview branch `work/ui-fixes-2026-09-11` contains the current review changes, including:
 
-`main` is the **production branch**. Netlify should deploy production only from `main`.
+- branded FrankiFlow white-circle favicon
+- service-card navigation fixes
+- clean service-page hero fallback when no service photo exists
+- compact admin logo presentation
+- slightly smaller homepage CTA text
+- remembered Property & Scope calculator values, defaulting to 80 m² / weekly / 1 month / new customer until the user changes them
+- quotation footer with the full FrankiFlow business name and founder line
+- removal of the “This calculation is non-binding” sentence from quotation printouts
 
-Future changes must be made on one temporary working branch, for example:
-
-`work/2026-09-calculator-improvements`
-
-Keep all related changes on that branch until they are finished and checked. Only then open/complete a pull request into `main`. Merging to `main` is the production release event and should cause one Netlify deployment.
-
-Do not use `main` for incremental experiments. To save Netlify build/deploy credits, disable automatic branch deploys and deploy previews in Netlify unless a preview is specifically needed.
-
-See `DEPLOYMENT.md` for the exact workflow.
-
-## Netlify settings
-
-- Production branch: `main`
-- Build command: none
-- Publish directory: `public`
-- Functions directory: `netlify/functions`
-
-The directories are also declared in `netlify.toml`.
-
-## Secrets
-
-Browser-safe Supabase values may exist in public configuration. Private credentials must remain in Netlify environment variables and must never be committed, including:
-
-- Supabase service/secret key
-- Stripe secret key
-- Stripe webhook signing secret
+Do not merge preview work into `main` until the preview has been approved.
