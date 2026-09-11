@@ -13,18 +13,31 @@ const text=(v:any,max=220)=>String(v??'').replace(/[\u0000-\u001f\u007f]/g,' ').
 const list=(v:any,max=40)=>Array.isArray(v)?v.slice(0,max):[];
 const isContractSavingRow=(label:string)=>/^(laufzeitvorteil|contract saving)/i.test(label);
 const isVisitPriceRow=(label:string)=>/^(preis pro termin|price per visit)$/i.test(label);
+const isContractDurationRow=(label:string)=>/^(vertragslaufzeit|contract duration)$/i.test(label);
+const isFrequencyRow=(label:string)=>/^(häufigkeit|frequency)$/i.test(label);
 const isDeepCleaningRow=(label:string)=>/^(grundreinigung|deep cleaning)$/i.test(label);
 const isWindowService=(label:string)=>/^(fensterreinigung|window cleaning)$/i.test(label);
+const isAppointmentsValue=(value:string)=>/(termine\s*\/\s*monat|visits\s*\/\s*month)/i.test(value);
 const sameLabel=(a:string,b:string)=>a.trim().toLocaleLowerCase()===b.trim().toLocaleLowerCase();
 
 function safePayload(raw:any){
   const language=raw?.language==='en'?'en':'de';
   const originalServiceLabel=text(raw?.service?.label,140);
-  const rawBreakdown=list(raw?.breakdown,30)
-    .map((r:any)=>({label:text(r?.label,180),value:text(r?.value,120)}));
+  const rawBreakdown=list(raw?.breakdown,30).map((r:any)=>({
+    label:text(r?.label,180),
+    value:text(r?.value,120)
+  }));
+
   const windowOnly=isWindowService(originalServiceLabel);
   const deepSelected=!windowOnly&&rawBreakdown.some((r:any)=>isDeepCleaningRow(r.label));
-  let breakdown=rawBreakdown.filter((r:any)=>!isContractSavingRow(r.label)&&!isVisitPriceRow(r.label));
+  const appointmentsRow=rawBreakdown.find((r:any)=>isFrequencyRow(r.label))||rawBreakdown.find((r:any)=>isAppointmentsValue(r.value));
+  const appointments=text(appointmentsRow?.value,80);
+
+  let breakdown=rawBreakdown.filter((r:any)=>
+    !isContractSavingRow(r.label)&&
+    !isVisitPriceRow(r.label)&&
+    !isContractDurationRow(r.label)
+  );
 
   if(deepSelected){
     breakdown=breakdown.filter((r:any)=>!isDeepCleaningRow(r.label)&&!sameLabel(r.label,originalServiceLabel));
@@ -33,24 +46,37 @@ function safePayload(raw:any){
   return {
     language,
     customer:{
-      name:text(raw?.customer?.name,120), company:text(raw?.customer?.company,120), email:text(raw?.customer?.email,160),
-      phone:text(raw?.customer?.phone,80), address:text(raw?.customer?.address,220)
+      name:text(raw?.customer?.name,120),
+      company:text(raw?.customer?.company,120),
+      email:text(raw?.customer?.email,160),
+      phone:text(raw?.customer?.phone,80),
+      address:text(raw?.customer?.address,220)
     },
     service:{
       label:deepSelected?(language==='de'?'Grundreinigung':'Deep cleaning'):originalServiceLabel,
-      area:text(raw?.service?.area,80), frequency:text(raw?.service?.frequency,120),
-      contract:text(raw?.service?.contract,120), vatStatus:text(raw?.service?.vatStatus,120),
-      windowOnly, deepSelected
+      area:text(raw?.service?.area,80),
+      frequency:text(raw?.service?.frequency,120),
+      appointments,
+      contract:text(raw?.service?.contract,120),
+      vatStatus:text(raw?.service?.vatStatus,120),
+      windowOnly,
+      deepSelected
     },
     prices:{
-      visit:text(raw?.prices?.visit,60), monthly:text(raw?.prices?.monthly,60), firstMonth:text(raw?.prices?.firstMonth,60),
-      discountLabel:text(raw?.prices?.discountLabel,120), hasPromotion:Boolean(raw?.prices?.hasPromotion)
+      visit:text(raw?.prices?.visit,60),
+      monthly:text(raw?.prices?.monthly,60),
+      firstMonth:text(raw?.prices?.firstMonth,60),
+      discountLabel:text(raw?.prices?.discountLabel,120),
+      hasPromotion:Boolean(raw?.prices?.hasPromotion)
     },
     breakdown,
     includeChecklist:Boolean(raw?.includeChecklist),
     checklist:list(raw?.checklist,10).map((g:any)=>({
-      title:text(g?.title,160), sections:list(g?.sections,20).map((s:any)=>({
-        title:text(s?.title,160), optional:Boolean(s?.optional), items:list(s?.items,60).map((i:any)=>text(i,220)).filter(Boolean)
+      title:text(g?.title,160),
+      sections:list(g?.sections,20).map((s:any)=>({
+        title:text(s?.title,160),
+        optional:Boolean(s?.optional),
+        items:list(s?.items,60).map((i:any)=>text(i,220)).filter(Boolean)
       }))
     }))
   };
@@ -99,7 +125,9 @@ function beginChecklistPage(doc:any,logo:Buffer,lang:string,title:string,continu
   drawLogoPlaque(doc,logo,42,9,94,94);
   doc.fillColor('#bfe9e5').font('Helvetica').fontSize(9).text(lang==='de'?'LEISTUNGSCHECKLISTE':'SERVICE CHECKLIST',352,27,{width:195,align:'right'});
   doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(13).text(title||'-',352,46,{width:195,align:'right'});
-  if(continuation)doc.fillColor('#bfe9e5').font('Helvetica').fontSize(8).text(lang==='de'?'Fortsetzung':'Continuation',352,67,{width:195,align:'right'});
+  if(continuation){
+    doc.fillColor('#bfe9e5').font('Helvetica').fontSize(8).text(lang==='de'?'Fortsetzung':'Continuation',352,67,{width:195,align:'right'});
+  }
   doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(16).text(title||'-',48,136,{width:499});
   return 166;
 }
@@ -190,7 +218,6 @@ function renderChecklist(doc:any,p:any,logo:Buffer){
       doc.roundedRect(x,y,columnWidth,noteHeight,8).fillColor(ICE).fill();
       doc.fillColor(MUTED).font('Helvetica').fontSize(7.4)
         .text(scopeNote,x+10,y+9,{width:columnWidth-20,lineGap:1.6});
-      y+=noteHeight+6;
     }
 
     drawFooter(doc);
@@ -204,12 +231,18 @@ function renderQuote(doc:any,p:any,logo:Buffer){
   const customerLines=[p.customer.company?p.customer.name:'',p.customer.address,p.customer.email,p.customer.phone].filter(Boolean);
   const customerDetails=customerLines.join('\n');
   const windowOnly=Boolean(p.service.windowOnly);
-  const priceRows=windowOnly
+  const discountPct=(String(p.prices.discountLabel||'').match(/\d+(?:[.,]\d+)?%/)||[])[0]||'';
+  const windowFirstMonthLabel=p.prices.hasPromotion
+    ?(de?`1. Monat als Neukunde${discountPct?` (${discountPct} Rabatt)`:''}`:`1st month as new customer${discountPct?` (${discountPct} discount)`:''}`)
+    :(de?'1. Monat':'First month');
+
+  const priceRows:any[]=windowOnly
     ?[
       {label:de?'Glasfläche':'Glass area',value:p.service.area||'—'},
+      ...(p.service.appointments?[{label:de?'Termine pro Monat':'Appointments per month',value:p.service.appointments}]:[]),
       {label:de?'Preis pro Termin':'Price per visit',value:p.prices.visit||'—'},
       {label:de?'Preis pro Monat':'Price per month',value:p.prices.monthly||'—'},
-      {label:de?'1. Monat':'First month',value:p.prices.firstMonth||p.prices.monthly||'—'}
+      {label:windowFirstMonthLabel,value:p.prices.firstMonth||p.prices.monthly||'—',highlight:p.prices.hasPromotion}
     ]
     :[
       {label:de?'Preis pro Termin':'Price per visit',value:p.prices.visit||'—'},
@@ -230,21 +263,19 @@ function renderQuote(doc:any,p:any,logo:Buffer){
   const customerTitleHeight=doc.heightOfString(customerTitle,{width:customerTitleWidth,lineGap:1});
   const customerDetailsY=customerTitleY+customerTitleHeight+5;
   doc.font('Helvetica').fontSize(8.2);
-  const customerDetailsHeight=customerDetails
-    ?doc.heightOfString(customerDetails,{width:customerTitleWidth,lineGap:2})
-    :0;
+  const customerDetailsHeight=customerDetails?doc.heightOfString(customerDetails,{width:customerTitleWidth,lineGap:2}):0;
   doc.font('Helvetica-Bold').fontSize(11);
   const contractHeight=doc.heightOfString(p.service.contract||'—',{width:165,align:'right'});
-  const customerLeftBottom=customerDetails
-    ?customerDetailsY+customerDetailsHeight
-    :customerTitleY+customerTitleHeight;
+  const customerLeftBottom=customerDetails?customerDetailsY+customerDetailsHeight:customerTitleY+customerTitleHeight;
   const customerRightBottom=175+contractHeight;
   const customerBoxHeight=Math.max(84,Math.ceil(Math.max(customerLeftBottom,customerRightBottom)-customerBoxY+18));
 
   doc.roundedRect(48,customerBoxY,499,customerBoxHeight,12).fillColor(ICE).fill();
   doc.fillColor(MUTED).font('Helvetica-Bold').fontSize(7.5).text(de?'ANGEBOT AN':'QUOTATION FOR',64,158);
   doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(15).text(customerTitle,64,customerTitleY,{width:customerTitleWidth,lineGap:1});
-  if(customerDetails)doc.fillColor(MUTED).font('Helvetica').fontSize(8.2).text(customerDetails,64,customerDetailsY,{width:customerTitleWidth,lineGap:2});
+  if(customerDetails){
+    doc.fillColor(MUTED).font('Helvetica').fontSize(8.2).text(customerDetails,64,customerDetailsY,{width:customerTitleWidth,lineGap:2});
+  }
   doc.fillColor(MUTED).font('Helvetica-Bold').fontSize(7.5).text(de?'VERTRAGSLAUFZEIT':'CONTRACT DURATION',360,158,{width:165,align:'right'});
   doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(11).text(p.service.contract||'—',360,175,{width:165,align:'right'});
 
@@ -255,7 +286,9 @@ function renderQuote(doc:any,p:any,logo:Buffer){
   const serviceMeta=windowOnly
     ?[p.service.vatStatus].filter(Boolean).join(' · ')
     :[p.service.area,p.service.frequency,p.service.vatStatus].filter(Boolean).join(' · ');
-  if(serviceMeta)doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(serviceMeta,48,serviceMetaY,{width:windowOnly?499:330});
+  if(serviceMeta){
+    doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(serviceMeta,48,serviceMetaY,{width:windowOnly?499:330});
+  }
 
   if(!windowOnly){
     doc.roundedRect(390,priceCardY,157,74,12).fillColor(TEAL_LIGHT).fill();
@@ -270,7 +303,7 @@ function renderQuote(doc:any,p:any,logo:Buffer){
     const y=doc.y;
     doc.moveTo(48,y+18).lineTo(547,y+18).strokeColor(LINE).lineWidth(.7).stroke();
     doc.fillColor(INK).font('Helvetica').fontSize(8.8).text(row.label,48,y,{width:340});
-    doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(8.8).text(row.value,400,y,{width:147,align:'right'});
+    doc.fillColor(row.highlight?TEAL:NAVY).font('Helvetica-Bold').fontSize(8.8).text(row.value,400,y,{width:147,align:'right'});
     doc.y=y+25;
   }
 
@@ -291,8 +324,10 @@ function renderQuote(doc:any,p:any,logo:Buffer){
     const promoNote=p.prices.hasPromotion
       ?(de?`${p.prices.discountLabel||'Neukundenrabatt'} gilt ausschließlich im ersten Vertragsmonat. Mindestpreise bleiben bestehen.`:`${p.prices.discountLabel||'New-customer discount'} applies only to the first contract month. Minimum prices remain in force.`)
       :'';
-    if(promoNote)doc.fillColor(MUTED).font('Helvetica').fontSize(7.8).text(promoNote,48,noteY,{width:499,lineGap:2});
-    if(promoNote)noteY+=24;
+    if(promoNote){
+      doc.fillColor(MUTED).font('Helvetica').fontSize(7.8).text(promoNote,48,noteY,{width:499,lineGap:2});
+      noteY+=24;
+    }
   }
 
   if(p.includeChecklist&&p.checklist.length){
