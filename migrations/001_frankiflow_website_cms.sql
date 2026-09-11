@@ -91,30 +91,10 @@ create table public.frankiflow_quote_requests (
   updated_at timestamptz not null default now()
 );
 
-create table public.frankiflow_payments (
-  id uuid primary key default gen_random_uuid(),
-  quote_request_id uuid references public.frankiflow_quote_requests(id) on delete set null,
-  description text not null,
-  amount_cents integer not null check (amount_cents > 0),
-  currency text not null default 'eur' check (char_length(currency) = 3),
-  customer_email text not null,
-  status text not null default 'created' check (status in ('created','checkout_open','paid','expired','failed','refunded')),
-  stripe_checkout_session_id text unique,
-  stripe_payment_intent_id text,
-  stripe_customer_id text,
-  checkout_url text,
-  metadata jsonb not null default '{}'::jsonb,
-  created_by uuid references auth.users(id),
-  created_at timestamptz not null default now(),
-  paid_at timestamptz,
-  updated_at timestamptz not null default now()
-);
-
 alter table public.frankiflow_site_settings enable row level security;
 alter table public.frankiflow_gallery enable row level security;
 alter table public.frankiflow_testimonials enable row level security;
 alter table public.frankiflow_quote_requests enable row level security;
-alter table public.frankiflow_payments enable row level security;
 
 create policy frankiflow_public_site_settings_read on public.frankiflow_site_settings for select to anon, authenticated using (true);
 create policy frankiflow_public_gallery_read on public.frankiflow_gallery for select to anon, authenticated using (active = true);
@@ -124,7 +104,6 @@ create policy frankiflow_admin_site_settings_all on public.frankiflow_site_setti
 create policy frankiflow_admin_gallery_all on public.frankiflow_gallery for all to authenticated using (private.frankiflow_is_admin()) with check (private.frankiflow_is_admin());
 create policy frankiflow_admin_testimonials_all on public.frankiflow_testimonials for all to authenticated using (private.frankiflow_is_admin()) with check (private.frankiflow_is_admin());
 create policy frankiflow_admin_quotes_all on public.frankiflow_quote_requests for all to authenticated using (private.frankiflow_is_admin()) with check (private.frankiflow_is_admin());
-create policy frankiflow_admin_payments_all on public.frankiflow_payments for all to authenticated using (private.frankiflow_is_admin()) with check (private.frankiflow_is_admin());
 
 create policy frankiflow_public_quote_insert on public.frankiflow_quote_requests for insert to anon, authenticated with check (status='new' and privacy_accepted=true);
 
@@ -134,7 +113,7 @@ create policy frankiflow_admin_pricing_config_all on public.pricing_config for a
 
 grant select on public.frankiflow_site_settings, public.frankiflow_gallery, public.frankiflow_testimonials to anon, authenticated;
 grant insert on public.frankiflow_quote_requests to anon, authenticated;
-grant select, insert, update, delete on public.frankiflow_site_settings, public.frankiflow_gallery, public.frankiflow_testimonials, public.frankiflow_quote_requests, public.frankiflow_payments to authenticated;
+grant select, insert, update, delete on public.frankiflow_site_settings, public.frankiflow_gallery, public.frankiflow_testimonials, public.frankiflow_quote_requests to authenticated;
 grant select on public.pricing_admin_users to authenticated;
 grant select, insert, update, delete on public.pricing_config to authenticated;
 
