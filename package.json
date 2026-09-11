@@ -2,7 +2,7 @@
   "name": "frankiflow-netlify",
   "private": true,
   "version": "1.0.0",
-  "description": "FrankiFlow Gebäudereinigung & Objektbetreuung — Netlify + Supabase + Stripe-ready",
+  "description": "FrankiFlow Gebäudereinigung & Objektbetreuung — Netlify + Supabase",
   "scripts": {
     "dev": "netlify dev",
     "check": "node --check public/assets/app.js && node --check public/assets/pricing.js && node --check public/assets/admin.js"
