@@ -5,14 +5,15 @@ Production source for **FrankiFlow Gebäudereinigung & Objektbetreuung**.
 - Production: https://frankiflow.de
 - Hosting: Netlify
 - Backend: shared Supabase project **FrankiFlow & FrankiHolz Backend**
-- Payments: Stripe Checkout through server-side Netlify Functions
 - Main public calculator: `/preisrechner/`
 - Admin: `/admin/`
+
+FrankiFlow does **not** use Stripe Checkout or an integrated payment system. Customer payments are handled outside this website.
 
 ## Repository structure
 
 - `public/` — public website, calculator, admin UI, legal pages and SEO pages
-- `netlify/functions/` — server-side Stripe functions
+- `netlify/functions/` — non-payment server-side helpers such as quotation PDF/media handling
 - `migrations/` — database schema/setup files kept with the source
 - `netlify.toml` — Netlify publish, functions, redirects and security headers
 
@@ -39,10 +40,6 @@ See `DEPLOYMENT.md` for the exact workflow.
 
 The directories are also declared in `netlify.toml`.
 
-## Secrets
+## Configuration
 
-Browser-safe Supabase values may exist in public configuration. Private credentials must remain in Netlify environment variables and must never be committed, including:
-
-- Supabase service/secret key
-- Stripe secret key
-- Stripe webhook signing secret
+Browser-safe Supabase values may exist in public configuration. Payment-provider secrets and checkout credentials are not required by FrankiFlow.
