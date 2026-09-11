@@ -13,25 +13,40 @@ const text=(v:any,max=220)=>String(v??'').replace(/[\u0000-\u001f\u007f]/g,' ').
 const list=(v:any,max=40)=>Array.isArray(v)?v.slice(0,max):[];
 const isContractSavingRow=(label:string)=>/^(laufzeitvorteil|contract saving)/i.test(label);
 const isVisitPriceRow=(label:string)=>/^(preis pro termin|price per visit)$/i.test(label);
+const isDeepCleaningRow=(label:string)=>/^(grundreinigung|deep cleaning)$/i.test(label);
+const isWindowService=(label:string)=>/^(fensterreinigung|window cleaning)$/i.test(label);
+const sameLabel=(a:string,b:string)=>a.trim().toLocaleLowerCase()===b.trim().toLocaleLowerCase();
 
 function safePayload(raw:any){
+  const language=raw?.language==='en'?'en':'de';
+  const originalServiceLabel=text(raw?.service?.label,140);
+  const rawBreakdown=list(raw?.breakdown,30)
+    .map((r:any)=>({label:text(r?.label,180),value:text(r?.value,120)}));
+  const windowOnly=isWindowService(originalServiceLabel);
+  const deepSelected=!windowOnly&&rawBreakdown.some((r:any)=>isDeepCleaningRow(r.label));
+  let breakdown=rawBreakdown.filter((r:any)=>!isContractSavingRow(r.label)&&!isVisitPriceRow(r.label));
+
+  if(deepSelected){
+    breakdown=breakdown.filter((r:any)=>!isDeepCleaningRow(r.label)&&!sameLabel(r.label,originalServiceLabel));
+  }
+
   return {
-    language: raw?.language==='en'?'en':'de',
+    language,
     customer:{
       name:text(raw?.customer?.name,120), company:text(raw?.customer?.company,120), email:text(raw?.customer?.email,160),
       phone:text(raw?.customer?.phone,80), address:text(raw?.customer?.address,220)
     },
     service:{
-      label:text(raw?.service?.label,140), area:text(raw?.service?.area,80), frequency:text(raw?.service?.frequency,120),
-      contract:text(raw?.service?.contract,120), vatStatus:text(raw?.service?.vatStatus,120)
+      label:deepSelected?(language==='de'?'Grundreinigung':'Deep cleaning'):originalServiceLabel,
+      area:text(raw?.service?.area,80), frequency:text(raw?.service?.frequency,120),
+      contract:text(raw?.service?.contract,120), vatStatus:text(raw?.service?.vatStatus,120),
+      windowOnly, deepSelected
     },
     prices:{
       visit:text(raw?.prices?.visit,60), monthly:text(raw?.prices?.monthly,60), firstMonth:text(raw?.prices?.firstMonth,60),
       discountLabel:text(raw?.prices?.discountLabel,120), hasPromotion:Boolean(raw?.prices?.hasPromotion)
     },
-    breakdown:list(raw?.breakdown,30)
-      .map((r:any)=>({label:text(r?.label,180),value:text(r?.value,120)}))
-      .filter((r:any)=>!isContractSavingRow(r.label)&&!isVisitPriceRow(r.label)),
+    breakdown,
     includeChecklist:Boolean(raw?.includeChecklist),
     checklist:list(raw?.checklist,10).map((g:any)=>({
       title:text(g?.title,160), sections:list(g?.sections,20).map((s:any)=>({
@@ -96,8 +111,12 @@ function renderChecklist(doc:any,p:any,logo:Buffer){
   const columnX=[48,307];
   const columnWidth=240;
   const fullColumnHeight=bottomY-topY;
+  const scopeNote=lang==='de'
+    ?'Die Checkliste beschreibt den Standard-Leistungsumfang für die gewählte Reinigung. Maßgeblich sind die konkret vereinbarten Leistungen und die Gegebenheiten vor Ort.'
+    :'This checklist describes the standard service scope for the selected cleaning. The specifically agreed services and on-site conditions remain decisive.';
 
-  for(const group of p.checklist){
+  for(let groupIndex=0;groupIndex<p.checklist.length;groupIndex++){
+    const group=p.checklist[groupIndex];
     doc.addPage();
     let column=0;
     let y=beginChecklistPage(doc,logo,lang,group.title||'-');
@@ -161,6 +180,19 @@ function renderChecklist(doc:any,p:any,logo:Buffer){
       }
       y+=9;
     }
+
+    if(groupIndex===p.checklist.length-1){
+      doc.font('Helvetica').fontSize(7.4);
+      const noteTextHeight=doc.heightOfString(scopeNote,{width:columnWidth-20,lineGap:1.6});
+      const noteHeight=noteTextHeight+18;
+      if(y+noteHeight>bottomY)moveToNextColumnOrPage();
+      const x=columnX[column];
+      doc.roundedRect(x,y,columnWidth,noteHeight,8).fillColor(ICE).fill();
+      doc.fillColor(MUTED).font('Helvetica').fontSize(7.4)
+        .text(scopeNote,x+10,y+9,{width:columnWidth-20,lineGap:1.6});
+      y+=noteHeight+6;
+    }
+
     drawFooter(doc);
   }
 }
@@ -171,10 +203,18 @@ function renderQuote(doc:any,p:any,logo:Buffer){
   const customerTitle=p.customer.company||p.customer.name||'—';
   const customerLines=[p.customer.company?p.customer.name:'',p.customer.address,p.customer.email,p.customer.phone].filter(Boolean);
   const customerDetails=customerLines.join('\n');
-  const priceRows=[
-    {label:de?'Preis pro Termin':'Price per visit',value:p.prices.visit||'—'},
-    ...p.breakdown
-  ];
+  const windowOnly=Boolean(p.service.windowOnly);
+  const priceRows=windowOnly
+    ?[
+      {label:de?'Glasfläche':'Glass area',value:p.service.area||'—'},
+      {label:de?'Preis pro Termin':'Price per visit',value:p.prices.visit||'—'},
+      {label:de?'Preis pro Monat':'Price per month',value:p.prices.monthly||'—'},
+      {label:de?'1. Monat':'First month',value:p.prices.firstMonth||p.prices.monthly||'—'}
+    ]
+    :[
+      {label:de?'Preis pro Termin':'Price per visit',value:p.prices.visit||'—'},
+      ...p.breakdown
+    ];
 
   doc.addPage();
   doc.fillColor(NAVY).rect(0,0,595,118).fill();
@@ -211,15 +251,19 @@ function renderQuote(doc:any,p:any,logo:Buffer){
   const serviceTitleY=customerBoxY+customerBoxHeight+28;
   const serviceMetaY=serviceTitleY+26;
   const priceCardY=serviceTitleY-10;
-  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(18).text(p.service.label||'-',48,serviceTitleY,{width:330});
-  const serviceMeta=[p.service.area,p.service.frequency,p.service.vatStatus].filter(Boolean).join(' · ');
-  if(serviceMeta)doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(serviceMeta,48,serviceMetaY,{width:330});
+  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(18).text(p.service.label||'-',48,serviceTitleY,{width:windowOnly?499:330});
+  const serviceMeta=windowOnly
+    ?[p.service.vatStatus].filter(Boolean).join(' · ')
+    :[p.service.area,p.service.frequency,p.service.vatStatus].filter(Boolean).join(' · ');
+  if(serviceMeta)doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(serviceMeta,48,serviceMetaY,{width:windowOnly?499:330});
 
-  doc.roundedRect(390,priceCardY,157,74,12).fillColor(TEAL_LIGHT).fill();
-  doc.fillColor(TEAL).font('Helvetica-Bold').fontSize(7.5).text(p.prices.hasPromotion?(de?'1. VERTRAGSMONAT':'1ST CONTRACT MONTH'):(de?'MONATLICH':'MONTHLY'),404,priceCardY+14,{width:129,align:'right'});
-  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(22).text(p.prices.hasPromotion?p.prices.firstMonth:p.prices.monthly,404,priceCardY+30,{width:129,align:'right'});
+  if(!windowOnly){
+    doc.roundedRect(390,priceCardY,157,74,12).fillColor(TEAL_LIGHT).fill();
+    doc.fillColor(TEAL).font('Helvetica-Bold').fontSize(7.5).text(p.prices.hasPromotion?(de?'1. VERTRAGSMONAT':'1ST CONTRACT MONTH'):(de?'MONATLICH':'MONTHLY'),404,priceCardY+14,{width:129,align:'right'});
+    doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(22).text(p.prices.hasPromotion?p.prices.firstMonth:p.prices.monthly,404,priceCardY+30,{width:129,align:'right'});
+  }
 
-  doc.y=serviceTitleY+90;
+  doc.y=serviceTitleY+(windowOnly?62:90);
   doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(10).text(de?'PREISÜBERSICHT':'PRICE OVERVIEW',48,doc.y);
   doc.moveDown(.7);
   for(const row of priceRows.slice(0,8)){
@@ -230,25 +274,29 @@ function renderQuote(doc:any,p:any,logo:Buffer){
     doc.y=y+25;
   }
 
-  const boxY=Math.min(Math.max(doc.y+8,525),590);
-  doc.roundedRect(48,boxY,499,74,10).fillColor('#fbfdfd').strokeColor(LINE).lineWidth(.8).fillAndStroke();
-  const sy=boxY+15;
-  doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(de?'Preis pro Termin':'Price per visit',64,sy,{width:150});
-  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(12).text(p.prices.visit||'—',64,sy+16,{width:150});
-  doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(de?'Regulärer Monat':'Regular month',225,sy,{width:150});
-  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(12).text(p.prices.monthly||'—',225,sy+16,{width:150});
-  if(p.prices.hasPromotion){
-    doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(de?'1. Monat nach Rabatt':'1st month after discount',386,sy,{width:145,align:'right'});
-    doc.fillColor(TEAL).font('Helvetica-Bold').fontSize(12).text(p.prices.firstMonth||'—',386,sy+16,{width:145,align:'right'});
+  let noteY=doc.y+12;
+  if(!windowOnly){
+    const boxY=Math.min(Math.max(doc.y+8,525),590);
+    doc.roundedRect(48,boxY,499,74,10).fillColor('#fbfdfd').strokeColor(LINE).lineWidth(.8).fillAndStroke();
+    const sy=boxY+15;
+    doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(de?'Preis pro Termin':'Price per visit',64,sy,{width:150});
+    doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(12).text(p.prices.visit||'—',64,sy+16,{width:150});
+    doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(de?'Regulärer Monat':'Regular month',225,sy,{width:150});
+    doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(12).text(p.prices.monthly||'—',225,sy+16,{width:150});
+    if(p.prices.hasPromotion){
+      doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(de?'1. Monat nach Rabatt':'1st month after discount',386,sy,{width:145,align:'right'});
+      doc.fillColor(TEAL).font('Helvetica-Bold').fontSize(12).text(p.prices.firstMonth||'—',386,sy+16,{width:145,align:'right'});
+    }
+    noteY=boxY+90;
+    const promoNote=p.prices.hasPromotion
+      ?(de?`${p.prices.discountLabel||'Neukundenrabatt'} gilt ausschließlich im ersten Vertragsmonat. Mindestpreise bleiben bestehen.`:`${p.prices.discountLabel||'New-customer discount'} applies only to the first contract month. Minimum prices remain in force.`)
+      :'';
+    if(promoNote)doc.fillColor(MUTED).font('Helvetica').fontSize(7.8).text(promoNote,48,noteY,{width:499,lineGap:2});
+    if(promoNote)noteY+=24;
   }
 
-  const noteY=boxY+90;
-  const promoNote=p.prices.hasPromotion
-    ?(de?`${p.prices.discountLabel||'Neukundenrabatt'} gilt ausschließlich im ersten Vertragsmonat. Mindestpreise bleiben bestehen.`:`${p.prices.discountLabel||'New-customer discount'} applies only to the first contract month. Minimum prices remain in force.`)
-    :'';
-  if(promoNote)doc.fillColor(MUTED).font('Helvetica').fontSize(7.8).text(promoNote,48,noteY,{width:499,lineGap:2});
   if(p.includeChecklist&&p.checklist.length){
-    doc.fillColor(TEAL).font('Helvetica-Bold').fontSize(8).text(de?'Leistungscheckliste beigefügt':'Service checklist attached',48,noteY+(promoNote?24:0));
+    doc.fillColor(TEAL).font('Helvetica-Bold').fontSize(8).text(de?'Leistungscheckliste beigefügt':'Service checklist attached',48,noteY);
   }
   drawFooter(doc);
 }
