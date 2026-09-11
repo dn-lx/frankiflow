@@ -85,40 +85,81 @@ function beginChecklistPage(doc:any,logo:Buffer,lang:string,title:string,continu
   doc.fillColor('#bfe9e5').font('Helvetica').fontSize(9).text(lang==='de'?'LEISTUNGSCHECKLISTE':'SERVICE CHECKLIST',352,27,{width:195,align:'right'});
   doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(13).text(title||'-',352,46,{width:195,align:'right'});
   if(continuation)doc.fillColor('#bfe9e5').font('Helvetica').fontSize(8).text(lang==='de'?'Fortsetzung':'Continuation',352,67,{width:195,align:'right'});
-  doc.y=136;
-  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(16).text(title||'-',48,doc.y,{width:499});
-  doc.moveDown(.6);
-}
-
-function ensureChecklistSpace(doc:any,needed:number,logo:Buffer,lang:string,title:string){
-  if(doc.y+needed<=685)return;
-  drawFooter(doc);
-  doc.addPage();
-  beginChecklistPage(doc,logo,lang,title,true);
+  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(16).text(title||'-',48,136,{width:499});
+  return 166;
 }
 
 function renderChecklist(doc:any,p:any,logo:Buffer){
   const lang=p.language;
+  const topY=166;
+  const bottomY=687;
+  const columnX=[48,307];
+  const columnWidth=240;
+  const fullColumnHeight=bottomY-topY;
+
   for(const group of p.checklist){
     doc.addPage();
-    beginChecklistPage(doc,logo,lang,group.title||'-');
+    let column=0;
+    let y=beginChecklistPage(doc,logo,lang,group.title||'-');
+
+    const moveToNextColumnOrPage=()=>{
+      if(column===0){
+        column=1;
+        y=topY;
+        return;
+      }
+      drawFooter(doc);
+      doc.addPage();
+      column=0;
+      y=beginChecklistPage(doc,logo,lang,group.title||'-',true);
+    };
+
+    const measureSection=(section:any)=>{
+      doc.font('Helvetica-Bold').fontSize(10);
+      let height=doc.heightOfString(section.title||'-',{width:columnWidth,lineGap:1})+6;
+      if(section.optional){
+        doc.font('Helvetica').fontSize(7.2);
+        height+=doc.heightOfString(lang==='de'?'Nur nach ausdrücklicher Vereinbarung':'Only when specifically agreed',{width:columnWidth,lineGap:1})+5;
+      }
+      doc.font('Helvetica').fontSize(8.5);
+      for(const item of section.items){
+        height+=doc.heightOfString(item,{width:columnWidth-18,lineGap:1.5})+6;
+      }
+      return height+9;
+    };
 
     for(const section of group.sections){
-      ensureChecklistSpace(doc,74,logo,lang,group.title||'-');
-      doc.fillColor(section.optional?'#8a6220':TEAL).font('Helvetica-Bold').fontSize(10.5).text(section.title||'-',48,doc.y,{width:499});
+      const sectionHeight=measureSection(section);
+      if(sectionHeight<=fullColumnHeight&&y+sectionHeight>bottomY)moveToNextColumnOrPage();
+
+      let x=columnX[column];
+      doc.fillColor(section.optional?'#8a6220':TEAL).font('Helvetica-Bold').fontSize(10)
+        .text(section.title||'-',x,y,{width:columnWidth,lineGap:1});
+      y+=doc.heightOfString(section.title||'-',{width:columnWidth,lineGap:1})+5;
+
       if(section.optional){
-        doc.fillColor('#8a6220').font('Helvetica').fontSize(7.5).text(lang==='de'?'Nur nach ausdrücklicher Vereinbarung':'Only when specifically agreed',48,doc.y+2,{width:499});
-        doc.moveDown(.25);
+        const optionalLabel=lang==='de'?'Nur nach ausdrücklicher Vereinbarung':'Only when specifically agreed';
+        doc.fillColor('#8a6220').font('Helvetica').fontSize(7.2).text(optionalLabel,x,y,{width:columnWidth,lineGap:1});
+        y+=doc.heightOfString(optionalLabel,{width:columnWidth,lineGap:1})+5;
       }
-      doc.moveDown(.35);
+
       for(const item of section.items){
-        ensureChecklistSpace(doc,24,logo,lang,group.title||'-');
-        const y=doc.y;
-        doc.circle(55,y+4,2.1).fillColor(section.optional?'#b89446':TEAL).fill();
-        doc.fillColor(INK).font('Helvetica').fontSize(9).text(item,66,y,{width:470,lineGap:2});
-        doc.moveDown(.25);
+        doc.font('Helvetica').fontSize(8.5);
+        const itemHeight=doc.heightOfString(item,{width:columnWidth-18,lineGap:1.5});
+        if(y+itemHeight+8>bottomY){
+          moveToNextColumnOrPage();
+          x=columnX[column];
+          const continuationLabel=`${section.title||'-'} ${lang==='de'?'(Fortsetzung)':'(cont.)'}`;
+          doc.fillColor(section.optional?'#8a6220':TEAL).font('Helvetica-Bold').fontSize(8.5)
+            .text(continuationLabel,x,y,{width:columnWidth,lineGap:1});
+          y+=doc.heightOfString(continuationLabel,{width:columnWidth,lineGap:1})+5;
+        }
+        x=columnX[column];
+        doc.circle(x+4,y+4,1.8).fillColor(section.optional?'#b89446':TEAL).fill();
+        doc.fillColor(INK).font('Helvetica').fontSize(8.5).text(item,x+14,y,{width:columnWidth-14,lineGap:1.5});
+        y+=itemHeight+6;
       }
-      doc.moveDown(.55);
+      y+=9;
     }
     drawFooter(doc);
   }
@@ -232,7 +273,7 @@ export default async(req:Request)=>{
     const filename=`FrankiFlow-${p.language==='de'?'Angebot':'Quotation'}-${stamp}.pdf`;
     return new Response(new Uint8Array(buffer),{status:200,headers:{
       'Content-Type':'application/pdf',
-      'Content-Disposition':`attachment; filename=\"${filename}\"`,
+      'Content-Disposition':`attachment; filename="${filename}"`,
       'Cache-Control':'no-store'
     }});
   }catch(err){
