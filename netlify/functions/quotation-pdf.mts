@@ -10,6 +10,7 @@ const LINE='#dce6eb';
 
 const text=(v:any,max=220)=>String(v??'').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim().slice(0,max);
 const list=(v:any,max=40)=>Array.isArray(v)?v.slice(0,max):[];
+const isContractSavingRow=(label:string)=>/^(laufzeitvorteil auf basisanteil|contract saving on base component)$/i.test(label);
 
 function safePayload(raw:any){
   return {
@@ -26,7 +27,9 @@ function safePayload(raw:any){
       visit:text(raw?.prices?.visit,60), monthly:text(raw?.prices?.monthly,60), firstMonth:text(raw?.prices?.firstMonth,60),
       discountLabel:text(raw?.prices?.discountLabel,120), hasPromotion:Boolean(raw?.prices?.hasPromotion)
     },
-    breakdown:list(raw?.breakdown,30).map((r:any)=>({label:text(r?.label,180),value:text(r?.value,120)})),
+    breakdown:list(raw?.breakdown,30)
+      .map((r:any)=>({label:text(r?.label,180),value:text(r?.value,120)}))
+      .filter((r:any)=>!isContractSavingRow(r.label)),
     includeChecklist:Boolean(raw?.includeChecklist),
     checklist:list(raw?.checklist,10).map((g:any)=>({
       title:text(g?.title,160), sections:list(g?.sections,20).map((s:any)=>({
@@ -46,7 +49,7 @@ function collectPdf(doc:any):Promise<Buffer>{
 }
 
 function drawFooter(doc:any){
-  const y=748;
+  const y=720;
   doc.moveTo(48,y).lineTo(547,y).strokeColor(LINE).lineWidth(1).stroke();
   doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(10).text('FrankiFlow Gebäudereinigung & Objektbetreuung',48,y+12,{width:315});
   doc.fillColor(MUTED).font('Helvetica').fontSize(7.5).text('Inura Devasurendra · Gründer / Founder',48,y+28,{width:315});
@@ -56,7 +59,7 @@ function drawFooter(doc:any){
 }
 
 function ensureSpace(doc:any,needed=70){
-  if(doc.y+needed>725){doc.addPage();doc.y=54;}
+  if(doc.y+needed>690){doc.addPage();doc.y=54;}
 }
 
 function renderChecklist(doc:any,p:any){
