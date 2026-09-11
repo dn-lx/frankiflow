@@ -85,40 +85,81 @@ function beginChecklistPage(doc:any,logo:Buffer,lang:string,title:string,continu
   doc.fillColor('#bfe9e5').font('Helvetica').fontSize(9).text(lang==='de'?'LEISTUNGSCHECKLISTE':'SERVICE CHECKLIST',352,27,{width:195,align:'right'});
   doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(13).text(title||'-',352,46,{width:195,align:'right'});
   if(continuation)doc.fillColor('#bfe9e5').font('Helvetica').fontSize(8).text(lang==='de'?'Fortsetzung':'Continuation',352,67,{width:195,align:'right'});
-  doc.y=136;
-  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(16).text(title||'-',48,doc.y,{width:499});
-  doc.moveDown(.6);
-}
-
-function ensureChecklistSpace(doc:any,needed:number,logo:Buffer,lang:string,title:string){
-  if(doc.y+needed<=685)return;
-  drawFooter(doc);
-  doc.addPage();
-  beginChecklistPage(doc,logo,lang,title,true);
+  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(16).text(title||'-',48,136,{width:499});
+  return 166;
 }
 
 function renderChecklist(doc:any,p:any,logo:Buffer){
   const lang=p.language;
+  const topY=166;
+  const bottomY=687;
+  const columnX=[48,307];
+  const columnWidth=240;
+  const fullColumnHeight=bottomY-topY;
+
   for(const group of p.checklist){
     doc.addPage();
-    beginChecklistPage(doc,logo,lang,group.title||'-');
+    let column=0;
+    let y=beginChecklistPage(doc,logo,lang,group.title||'-');
+
+    const moveToNextColumnOrPage=()=>{
+      if(column===0){
+        column=1;
+        y=topY;
+        return;
+      }
+      drawFooter(doc);
+      doc.addPage();
+      column=0;
+      y=beginChecklistPage(doc,logo,lang,group.title||'-',true);
+    };
+
+    const measureSection=(section:any)=>{
+      doc.font('Helvetica-Bold').fontSize(10);
+      let height=doc.heightOfString(section.title||'-',{width:columnWidth,lineGap:1})+6;
+      if(section.optional){
+        doc.font('Helvetica').fontSize(7.2);
+        height+=doc.heightOfString(lang==='de'?'Nur nach ausdrücklicher Vereinbarung':'Only when specifically agreed',{width:columnWidth,lineGap:1})+5;
+      }
+      doc.font('Helvetica').fontSize(8.5);
+      for(const item of section.items){
+        height+=doc.heightOfString(item,{width:columnWidth-18,lineGap:1.5})+6;
+      }
+      return height+9;
+    };
 
     for(const section of group.sections){
-      ensureChecklistSpace(doc,74,logo,lang,group.title||'-');
-      doc.fillColor(section.optional?'#8a6220':TEAL).font('Helvetica-Bold').fontSize(10.5).text(section.title||'-',48,doc.y,{width:499});
+      const sectionHeight=measureSection(section);
+      if(sectionHeight<=fullColumnHeight&&y+sectionHeight>bottomY)moveToNextColumnOrPage();
+
+      let x=columnX[column];
+      doc.fillColor(section.optional?'#8a6220':TEAL).font('Helvetica-Bold').fontSize(10)
+        .text(section.title||'-',x,y,{width:columnWidth,lineGap:1});
+      y+=doc.heightOfString(section.title||'-',{width:columnWidth,lineGap:1})+5;
+
       if(section.optional){
-        doc.fillColor('#8a6220').font('Helvetica').fontSize(7.5).text(lang==='de'?'Nur nach ausdrücklicher Vereinbarung':'Only when specifically agreed',48,doc.y+2,{width:499});
-        doc.moveDown(.25);
+        const optionalLabel=lang==='de'?'Nur nach ausdrücklicher Vereinbarung':'Only when specifically agreed';
+        doc.fillColor('#8a6220').font('Helvetica').fontSize(7.2).text(optionalLabel,x,y,{width:columnWidth,lineGap:1});
+        y+=doc.heightOfString(optionalLabel,{width:columnWidth,lineGap:1})+5;
       }
-      doc.moveDown(.35);
+
       for(const item of section.items){
-        ensureChecklistSpace(doc,24,logo,lang,group.title||'-');
-        const y=doc.y;
-        doc.circle(55,y+4,2.1).fillColor(section.optional?'#b89446':TEAL).fill();
-        doc.fillColor(INK).font('Helvetica').fontSize(9).text(item,66,y,{width:470,lineGap:2});
-        doc.moveDown(.25);
+        doc.font('Helvetica').fontSize(8.5);
+        const itemHeight=doc.heightOfString(item,{width:columnWidth-18,lineGap:1.5});
+        if(y+itemHeight+8>bottomY){
+          moveToNextColumnOrPage();
+          x=columnX[column];
+          const continuationLabel=`${section.title||'-'} ${lang==='de'?'(Fortsetzung)':'(cont.)'}`;
+          doc.fillColor(section.optional?'#8a6220':TEAL).font('Helvetica-Bold').fontSize(8.5)
+            .text(continuationLabel,x,y,{width:columnWidth,lineGap:1});
+          y+=doc.heightOfString(continuationLabel,{width:columnWidth,lineGap:1})+5;
+        }
+        x=columnX[column];
+        doc.circle(x+4,y+4,1.8).fillColor(section.optional?'#b89446':TEAL).fill();
+        doc.fillColor(INK).font('Helvetica').fontSize(8.5).text(item,x+14,y,{width:columnWidth-14,lineGap:1.5});
+        y+=itemHeight+6;
       }
-      doc.moveDown(.55);
+      y+=9;
     }
     drawFooter(doc);
   }
@@ -129,6 +170,7 @@ function renderQuote(doc:any,p:any,logo:Buffer){
   const de=lang==='de';
   const customerTitle=p.customer.company||p.customer.name||'—';
   const customerLines=[p.customer.company?p.customer.name:'',p.customer.address,p.customer.email,p.customer.phone].filter(Boolean);
+  const customerDetails=customerLines.join('\n');
   const priceRows=[
     {label:de?'Preis pro Termin':'Price per visit',value:p.prices.visit||'—'},
     ...p.breakdown
@@ -141,22 +183,43 @@ function renderQuote(doc:any,p:any,logo:Buffer){
   doc.fillColor('#d6e3ea').font('Helvetica').fontSize(9).text(new Intl.DateTimeFormat(de?'de-DE':'en-GB').format(new Date()),382,57,{width:165,align:'right'});
   doc.fillColor('#bfe9e5').fontSize(8.5).text('FrankiFlow Gebäudereinigung & Objektbetreuung',270,82,{width:277,align:'right'});
 
-  doc.roundedRect(48,142,499,84,12).fillColor(ICE).fill();
+  const customerBoxY=142;
+  const customerTitleY=174;
+  const customerTitleWidth=270;
+  doc.font('Helvetica-Bold').fontSize(15);
+  const customerTitleHeight=doc.heightOfString(customerTitle,{width:customerTitleWidth,lineGap:1});
+  const customerDetailsY=customerTitleY+customerTitleHeight+5;
+  doc.font('Helvetica').fontSize(8.2);
+  const customerDetailsHeight=customerDetails
+    ?doc.heightOfString(customerDetails,{width:customerTitleWidth,lineGap:2})
+    :0;
+  doc.font('Helvetica-Bold').fontSize(11);
+  const contractHeight=doc.heightOfString(p.service.contract||'—',{width:165,align:'right'});
+  const customerLeftBottom=customerDetails
+    ?customerDetailsY+customerDetailsHeight
+    :customerTitleY+customerTitleHeight;
+  const customerRightBottom=175+contractHeight;
+  const customerBoxHeight=Math.max(84,Math.ceil(Math.max(customerLeftBottom,customerRightBottom)-customerBoxY+18));
+
+  doc.roundedRect(48,customerBoxY,499,customerBoxHeight,12).fillColor(ICE).fill();
   doc.fillColor(MUTED).font('Helvetica-Bold').fontSize(7.5).text(de?'ANGEBOT AN':'QUOTATION FOR',64,158);
-  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(15).text(customerTitle,64,174,{width:270});
-  if(customerLines.length)doc.fillColor(MUTED).font('Helvetica').fontSize(8.2).text(customerLines.join('\n'),64,196,{width:270,lineGap:2});
+  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(15).text(customerTitle,64,customerTitleY,{width:customerTitleWidth,lineGap:1});
+  if(customerDetails)doc.fillColor(MUTED).font('Helvetica').fontSize(8.2).text(customerDetails,64,customerDetailsY,{width:customerTitleWidth,lineGap:2});
   doc.fillColor(MUTED).font('Helvetica-Bold').fontSize(7.5).text(de?'VERTRAGSLAUFZEIT':'CONTRACT DURATION',360,158,{width:165,align:'right'});
   doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(11).text(p.service.contract||'—',360,175,{width:165,align:'right'});
 
-  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(18).text(p.service.label||'-',48,254,{width:330});
+  const serviceTitleY=customerBoxY+customerBoxHeight+28;
+  const serviceMetaY=serviceTitleY+26;
+  const priceCardY=serviceTitleY-10;
+  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(18).text(p.service.label||'-',48,serviceTitleY,{width:330});
   const serviceMeta=[p.service.area,p.service.frequency,p.service.vatStatus].filter(Boolean).join(' · ');
-  if(serviceMeta)doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(serviceMeta,48,280,{width:330});
+  if(serviceMeta)doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(serviceMeta,48,serviceMetaY,{width:330});
 
-  doc.roundedRect(390,244,157,74,12).fillColor(TEAL_LIGHT).fill();
-  doc.fillColor(TEAL).font('Helvetica-Bold').fontSize(7.5).text(p.prices.hasPromotion?(de?'1. VERTRAGSMONAT':'1ST CONTRACT MONTH'):(de?'MONATLICH':'MONTHLY'),404,258,{width:129,align:'right'});
-  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(22).text(p.prices.hasPromotion?p.prices.firstMonth:p.prices.monthly,404,274,{width:129,align:'right'});
+  doc.roundedRect(390,priceCardY,157,74,12).fillColor(TEAL_LIGHT).fill();
+  doc.fillColor(TEAL).font('Helvetica-Bold').fontSize(7.5).text(p.prices.hasPromotion?(de?'1. VERTRAGSMONAT':'1ST CONTRACT MONTH'):(de?'MONATLICH':'MONTHLY'),404,priceCardY+14,{width:129,align:'right'});
+  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(22).text(p.prices.hasPromotion?p.prices.firstMonth:p.prices.monthly,404,priceCardY+30,{width:129,align:'right'});
 
-  doc.y=344;
+  doc.y=serviceTitleY+90;
   doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(10).text(de?'PREISÜBERSICHT':'PRICE OVERVIEW',48,doc.y);
   doc.moveDown(.7);
   for(const row of priceRows.slice(0,8)){
