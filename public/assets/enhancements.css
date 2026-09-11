@@ -1,9 +1,15 @@
 :root{--ff-hero-title-size:64px}
 .hero h1{font-size:clamp(40px,5.15vw,var(--ff-hero-title-size));}
 
-/* Admin brand: keep the white plate fitted to the actual logo instead of a wide block. */
-.admin-side .brand{display:inline-flex;align-items:center;justify-content:center;width:max-content;max-width:100%;padding:7px 9px;border-radius:12px;background:#fff}
-.admin-side .brand img{width:164px;max-width:100%;height:auto;object-fit:contain}
+/* Admin brand: keep the white plate compact so the complete logo stays sharp and readable. */
+.admin-side .brand,.login-card .brand{display:inline-flex;align-items:center;justify-content:center;width:max-content;max-width:100%;height:auto;overflow:visible;padding:6px 8px;border-radius:12px;background:#fff}
+.admin-side .brand img{width:138px;max-width:100%;height:auto;object-fit:contain}
+.login-card .brand img{width:150px;max-width:100%;height:auto;object-fit:contain}
+
+/* Service tiles open their service detail page; the CTA remains an independent action. */
+.service-card{cursor:pointer}
+.service-card .card-link{position:relative;z-index:2}
+.service-card:focus-visible{outline:3px solid rgba(15,169,160,.34);outline-offset:4px}
 
 /* Modern, consistent file chooser across admin and calculator surfaces. */
 input[type="file"]{width:100%;padding:8px;border:1px dashed #b8cbd5;border-radius:14px;background:#f8fbfc;color:#607486;cursor:pointer;transition:.2s border-color,.2s background,.2s box-shadow}
@@ -19,7 +25,7 @@ input[type="file"]::file-selector-button:hover{background:#061a2a;transform:tran
 .ff-photo-help{margin:0 0 14px;padding:12px 14px;border-radius:13px;background:var(--aqua);border:1px solid #ccefeb;color:#436371;font-size:13px}
 .ff-payment-extra{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}.ff-payment-check{display:flex;align-items:center;gap:9px;margin-top:12px;font-size:13px;font-weight:750}.ff-payment-check input{width:auto}.ff-stripe-card{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:15px 16px;margin-bottom:16px;border:1px solid var(--line);border-radius:16px;background:#f8fbfc}.ff-stripe-status{font-size:12px;color:var(--ink-soft)}.ff-stripe-status.ok{color:#27704f}.ff-stripe-status.warn{color:#8a6220}.ff-mail-setting{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:end;margin-bottom:16px}.ff-email-sent{font-size:11px;color:#27704f;font-weight:800}.ff-email-waiting{font-size:11px;color:#8a6220;font-weight:800}
 
-/* Service-page photography managed from Admin > Photos. The endpoint falls back to the branded hero image until a category photo is uploaded. */
+/* Service-page photography managed from Admin > Photos. Until a category photo exists, the endpoint is transparent so no brand/logo artwork is used as a background. */
 html:has(link[rel="canonical"][href*="/bueroreinigung-frankfurt/"]) .seo-page-hero,html:has(link[rel="canonical"][href*="/en/office-cleaning-frankfurt/"]) .seo-page-hero{background:linear-gradient(110deg,rgba(7,29,44,.88),rgba(10,73,78,.60)),url('/api/media/page-photo?category=office') center/cover no-repeat}
 html:has(link[rel="canonical"][href*="/wohnungsreinigung-frankfurt/"]) .seo-page-hero,html:has(link[rel="canonical"][href*="/en/home-cleaning-frankfurt/"]) .seo-page-hero{background:linear-gradient(110deg,rgba(7,29,44,.88),rgba(10,73,78,.60)),url('/api/media/page-photo?category=home') center/cover no-repeat}
 html:has(link[rel="canonical"][href*="/airbnb-reinigung-frankfurt/"]) .seo-page-hero,html:has(link[rel="canonical"][href*="/en/airbnb-cleaning-frankfurt/"]) .seo-page-hero{background:linear-gradient(110deg,rgba(7,29,44,.88),rgba(10,73,78,.60)),url('/api/media/page-photo?category=airbnb') center/cover no-repeat}

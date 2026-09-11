@@ -1,0 +1,8 @@
+/* Small UI refinements requested for the public homepage. */
+.site-header .nav-actions .btn-primary{font-size:14px}
+.hero-ctas .btn{font-size:14px}
+
+@media(max-width:680px){
+  .site-header .nav-actions .btn-primary{font-size:12px}
+  .hero-ctas .btn{font-size:14px}
+}
