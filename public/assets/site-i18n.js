@@ -8,11 +8,6 @@ Object.assign(translations,{
   'Neukundenangebot':'new-customer offer',
   'Neukundenangebot aktiv':'New-customer offer enabled',
   'Neukundenrabatt':'new-customer discount',
-  'Zahlungsmonat':'Billing month',
-  'Rechnungsnummer':'Invoice number',
-  'Zahlungs-E-Mail senden':'Send payment email',
-  'Zahlungseingang':'Payment received',
-  'Benachrichtigungs-E-Mail':'Notification email',
   'Foto-Zielseite':'Photo target page',
   'Startseite – Galerie':'Homepage – gallery',
   'Startseite – Hero':'Homepage – hero',
@@ -23,6 +18,5 @@ Object.assign(translations,{
   'Englisch':'English',
   'Text suchen':'Search copy',
   'Alle Übersetzungen speichern':'Save all translations',
-  'Hero-Titelgröße':'Hero title size',
-  'Stripe-Verbindung testen':'Test Stripe connection'
+  'Hero-Titelgröße':'Hero title size'
 });
