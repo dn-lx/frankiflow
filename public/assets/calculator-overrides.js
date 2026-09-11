@@ -94,6 +94,35 @@ function installPrintTweaks(){
   patchPrintSheet();
 }
 
+function installCalculatorHeaderTheme(){
+  if(document.querySelector('#ff-calculator-header-theme'))return;
+  const style=document.createElement('style');
+  style.id='ff-calculator-header-theme';
+  style.textContent=`
+    .calc-header{
+      background:linear-gradient(135deg,rgba(8,73,88,.98),rgba(8,112,116,.98))!important;
+      border-bottom-color:rgba(255,255,255,.14)!important;
+      box-shadow:0 8px 26px rgba(5,42,53,.14);
+    }
+    .calc-header .calc-brand{
+      background:rgba(255,255,255,.97);
+      border-radius:13px;
+      padding:3px 10px;
+      height:58px;
+      box-shadow:0 6px 18px rgba(0,0,0,.10);
+    }
+    .calc-header .calc-back{color:#ecfffd!important}
+    .calc-header .calc-back:hover{color:#ffffff!important}
+    .calc-header .language-switch{
+      background:rgba(255,255,255,.14)!important;
+      border:1px solid rgba(255,255,255,.18);
+    }
+    .calc-header .language-switch button{color:#d9f5f3!important}
+    .calc-header .language-switch button.active{background:#ffffff!important;color:#074757!important}
+  `;
+  document.head.append(style);
+}
+
 function selectedText(selector){
   const el=document.querySelector(selector);
   if(!el)return '';
@@ -106,20 +135,98 @@ function fieldValue(selector){
   return el&&'value' in el?String(el.value||'').trim():'';
 }
 
+function currentServiceKey(){
+  return document.querySelector('.service-choice input:checked')?.value||'';
+}
+
+function appointmentsPerMonth(lang,rawRows){
+  const row=rawRows.find(item=>/(termine\s*\/\s*monat|visits\s*\/\s*month)/i.test(item.value||''));
+  if(row?.value)return row.value;
+  const map={once:1,monthly:1,biweekly:2,weekly1:4,weekly2:8,weekly3:12,weekly4:16,weekly5:20};
+  const count=map[fieldValue('#frequency')];
+  if(!count)return selectedText('#frequency');
+  return lang==='de'?`${count} Termine/Monat`:`${count} visits/month`;
+}
+
+function serviceAreaLabel(lang,serviceKey,deepSelected,serviceLabel){
+  if(deepSelected)return lang==='de'?'Grundreinigungsfläche':'Deep cleaning area';
+  const labels={
+    de:{
+      buero:'Büroreinigungsfläche',
+      wohnung:'Wohnungsreinigungsfläche',
+      airbnb:'Ferienwohnungs-/Airbnb-Reinigungsfläche',
+      treppenhaus:'Treppenhaus-Reinigungsfläche',
+      fenster:'Glasfläche'
+    },
+    en:{
+      buero:'Office cleaning area',
+      wohnung:'Home cleaning area',
+      airbnb:'Holiday rental / Airbnb cleaning area',
+      treppenhaus:'Stairwell cleaning area',
+      fenster:'Glass area'
+    }
+  };
+  return labels[lang]?.[serviceKey]||(lang==='de'?`${serviceLabel||'Reinigung'} – Fläche`:`${serviceLabel||'Cleaning'} area`);
+}
+
+function firstMonthPrintLabel(lang,hasPromotion,discountLabel){
+  if(!hasPromotion)return lang==='de'?'1. Monat':'First month';
+  const pct=(String(discountLabel||'').match(/\d+(?:[.,]\d+)?%/)||[])[0]||'';
+  return lang==='de'
+    ?`1. Monat als Neukunde${pct?` (${pct} Rabatt)`:''}`
+    :`1st month as new customer${pct?` (${pct} discount)`:''}`;
+}
+
 function quotationPayload(){
   const lang=document.querySelector('[data-lang].active')?.dataset.lang==='en'?'en':'de';
   const serviceLabel=document.querySelector('.service-choice.active strong')?.textContent?.trim()||
     document.querySelector('.service-choice input:checked')?.closest('.service-choice')?.querySelector('strong')?.textContent?.trim()||'';
+  const serviceKey=currentServiceKey();
   const area=fieldValue('#areaSqm');
   const windowArea=fieldValue('#windowSqm');
-  const windowOnly=document.querySelector('.service-choice.active')?.classList.contains('service-window-choice')||false;
+  const windowOnly=document.querySelector('.service-choice.active')?.classList.contains('service-window-choice')||serviceKey==='fenster';
+  const deepSelected=!windowOnly&&Boolean(document.querySelector('#deepCleaning')?.checked);
   const areaText=windowOnly
     ?(windowArea?`${windowArea} m² ${lang==='de'?'Glas':'glass'}`:'')
     :(area?`${area} m²`: '');
-  const breakdown=[...document.querySelectorAll('#breakdownRows .breakdown-row')].map(row=>({
+
+  const rawRows=[...document.querySelectorAll('#breakdownRows .breakdown-row')].map(row=>({
     label:row.querySelector('span')?.textContent?.trim()||'',
     value:row.querySelector('b')?.textContent?.trim()||''
   })).filter(row=>row.label||row.value);
+
+  const promotionBox=document.querySelector('#promotionBox');
+  const hasPromotion=promotionBox?!promotionBox.classList.contains('hidden'):false;
+  const visitPrice=selectedText('#visitPrice');
+  const monthlyPrice=selectedText('#monthlyPrice');
+  const firstMonthPrice=selectedText('#firstMonthPrice')||monthlyPrice;
+  const discountLabel=selectedText('#discountLabel');
+  const appointments=appointmentsPerMonth(lang,rawRows);
+  const areaLabel=serviceAreaLabel(lang,serviceKey,deepSelected,serviceLabel);
+  const frequencyLabel=lang==='de'?'Termine pro Monat':'Appointments per month';
+  const monthlyLabel=lang==='de'?'Preis pro Monat':'Price per month';
+  const firstMonthLabel=firstMonthPrintLabel(lang,hasPromotion,discountLabel);
+
+  const extraRows=rawRows.filter(row=>{
+    const label=(row.label||'').toLowerCase();
+    const value=(row.value||'').toLowerCase();
+    if(/vertragslaufzeit|contract duration|laufzeitvorteil|contract saving/.test(label))return false;
+    if(/allgemeine reinigung|general cleaning|grundreinigung|deep cleaning/.test(label))return false;
+    if(label===serviceLabel.toLowerCase())return false;
+    if(/häufigkeit|frequency/.test(label))return false;
+    if(/termine\s*\/\s*monat|visits\s*\/\s*month/.test(value))return false;
+    if(/preis pro termin|price per visit|preis pro monat|price per month/.test(label))return false;
+    return true;
+  });
+
+  const breakdown=[
+    ...(deepSelected?[{label:lang==='de'?'Grundreinigung':'Deep cleaning',value:appointments}]:[]),
+    {label:areaLabel,value:areaText||'—'},
+    {label:frequencyLabel,value:appointments||'—'},
+    {label:monthlyLabel,value:monthlyPrice||'—'},
+    {label:firstMonthLabel,value:firstMonthPrice||monthlyPrice||'—'},
+    ...extraRows
+  ];
 
   const checklist=[...document.querySelectorAll('#checklistPreview .checklist-screen-group')].map(group=>({
     title:group.querySelector(':scope > h3')?.textContent?.trim()||'',
@@ -130,7 +237,6 @@ function quotationPayload(){
     }))
   }));
 
-  const promotionBox=document.querySelector('#promotionBox');
   return {
     language:lang,
     customer:{
@@ -144,15 +250,16 @@ function quotationPayload(){
       label:serviceLabel,
       area:areaText,
       frequency:selectedText('#frequency'),
+      appointments,
       contract:selectedText('#contractMonths'),
       vatStatus:selectedText('#vatStatus')
     },
     prices:{
-      visit:selectedText('#visitPrice'),
-      monthly:selectedText('#monthlyPrice'),
-      firstMonth:selectedText('#firstMonthPrice'),
-      discountLabel:selectedText('#discountLabel'),
-      hasPromotion:promotionBox?!promotionBox.classList.contains('hidden'):false
+      visit:visitPrice,
+      monthly:monthlyPrice,
+      firstMonth:firstMonthPrice,
+      discountLabel,
+      hasPromotion
     },
     breakdown,
     includeChecklist:Boolean(document.querySelector('#includeChecklist')?.checked),
@@ -215,6 +322,7 @@ function installDirectPdfDownload(){
 }
 
 if(location.pathname.includes('/preisrechner/')){
+  installCalculatorHeaderTheme();
   installDirectPdfDownload();
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded',()=>{
