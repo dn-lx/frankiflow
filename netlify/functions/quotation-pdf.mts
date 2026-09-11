@@ -253,6 +253,25 @@ function renderQuote(doc:any,p:any,logo:Buffer){
   drawFooter(doc);
 }
 
+function filenamePart(value:string,fallback:string){
+  const cleaned=String(value||fallback)
+    .normalize('NFKC')
+    .replace(/[<>:"/\\|?*\u0000-\u001f]/g,' ')
+    .replace(/\s+/g,' ')
+    .trim()
+    .replace(/\s/g,'-')
+    .replace(/-+/g,'-');
+  return (cleaned||fallback).slice(0,70);
+}
+
+function asciiFilename(value:string){
+  return value
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^A-Za-z0-9._-]/g,'-')
+    .replace(/-+/g,'-');
+}
+
 export default async(req:Request)=>{
   if(req.method!=='POST')return new Response('Method not allowed',{status:405,headers:{Allow:'POST'}});
   try{
@@ -270,10 +289,14 @@ export default async(req:Request)=>{
     doc.end();
     const buffer=await done;
     const stamp=new Date().toISOString().slice(0,10);
-    const filename=`FrankiFlow-${p.language==='de'?'Angebot':'Quotation'}-${stamp}.pdf`;
+    const customer=filenamePart(p.customer.company||p.customer.name,p.language==='de'?'Kunde':'Customer');
+    const service=filenamePart(p.service.label,p.language==='de'?'Leistung':'Service');
+    const filename=`FrankiFlow-${p.language==='de'?'Angebot':'Quotation'}-${customer}-${service}-${stamp}.pdf`;
+    const fallbackFilename=asciiFilename(filename);
+    const encodedFilename=encodeURIComponent(filename);
     return new Response(new Uint8Array(buffer),{status:200,headers:{
       'Content-Type':'application/pdf',
-      'Content-Disposition':`attachment; filename="${filename}"`,
+      'Content-Disposition':`attachment; filename="${fallbackFilename}"; filename*=UTF-8''${encodedFilename}`,
       'Cache-Control':'no-store'
     }});
   }catch(err){

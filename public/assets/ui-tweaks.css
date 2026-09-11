@@ -2,7 +2,98 @@
 .site-header .nav-actions .btn-primary{font-size:14px}
 .hero-ctas .btn{font-size:14px}
 
+/*
+ * Mobile-only refinement layer.
+ * Keep the established desktop composition untouched while making the
+ * homepage calmer, more legible and more space-efficient on phones.
+ */
 @media(max-width:680px){
-  .site-header .nav-actions .btn-primary{font-size:12px}
-  .hero-ctas .btn{font-size:14px}
+  .container{width:min(100% - 32px,var(--max))}
+
+  /* Header: keep all controls on one clean row. */
+  .site-header .nav{height:66px;gap:8px}
+  .site-header .brand{width:92px;height:62px;flex:0 0 92px;overflow:visible}
+  .site-header .brand img{width:64px;height:64px;object-fit:contain;object-position:left center}
+  .site-header .nav-actions{gap:6px;margin-left:auto}
+  .site-header .nav-actions .ff-language-switch{margin:0}
+  .site-header .language-switch{padding:2px;border-radius:9px}
+  .site-header .language-switch button{padding:5px 7px;font-size:11px;border-radius:7px}
+  .site-header .nav-actions .btn-primary{font-size:11px;padding:9px 10px;border-radius:11px;white-space:nowrap;box-shadow:none}
+  .site-header .nav-actions .btn-primary span[aria-hidden="true"]{display:none}
+  .site-header .menu-btn{width:36px;height:36px;padding:0;display:grid;place-items:center;border-radius:10px;font-size:17px;flex:0 0 36px}
+  .site-header .nav-links.open{top:66px;padding:18px 16px;gap:18px}
+
+  /* Hero: smaller type and tighter rhythm avoids awkward 5–6 line headings. */
+  .hero{padding:44px 0 52px}
+  .hero-grid{gap:26px}
+  .hero-copy{max-width:none}
+  .hero-kicker{padding:6px 10px;font-size:10px;letter-spacing:.07em}
+  .hero h1{font-size:clamp(36px,10.2vw,43px);line-height:1.015;letter-spacing:-.047em;margin:18px 0 18px;max-width:100%}
+  .hero .lead{font-size:15.5px;line-height:1.55;margin:0}
+  .hero-ctas{gap:9px;margin:24px 0 21px}
+  .hero-ctas .btn{font-size:13px;min-height:48px;padding:12px 16px;border-radius:13px}
+  .trust-row{gap:8px;font-size:11px;line-height:1.35}
+  .trust-row span:before{width:17px;height:17px;font-size:10px;margin-right:6px}
+
+  /* Hero visual: keep the desktop concept, but remove oversized empty space. */
+  .hero-visual{min-height:365px;max-width:520px;margin:4px auto 0}
+  .hero-photo{inset:0 6px 8px;border-radius:24px}
+  .hero-dashboard{left:22px;right:0;top:34px;padding:14px;border-radius:18px;box-shadow:0 18px 38px rgba(12,38,58,.16)}
+  .dashboard-top{gap:8px;margin-bottom:12px}
+  .dashboard-top h3{font-size:17px;margin-top:2px}
+  .mini-label{font-size:8px}
+  .status-badge{padding:5px 8px;font-size:9px;gap:5px}
+  .status-badge i{width:6px;height:6px}
+  .dashboard-price-card{padding:14px;border-radius:16px}
+  .dashboard-price-card>span{font-size:9px}
+  .dashboard-price-card strong{font-size:19px;margin:5px 0 2px}
+  .dashboard-price-card small{font-size:9px}
+  .dashboard-price-card a{margin-top:13px;padding:9px 10px;font-size:11px}
+  .dashboard-services{gap:7px;margin-top:9px}
+  .dashboard-services>div{padding:7px 9px;gap:8px;border-radius:12px}
+  .dashboard-services>div:nth-child(3){display:none}
+  .service-dot{width:26px;height:26px;border-radius:8px;font-size:8px}
+  .dashboard-services b{font-size:10px}
+  .dashboard-services small{font-size:8px}
+  .floating-offer{left:0;bottom:20px;padding:10px 13px;border-radius:14px}
+  .floating-offer span{font-size:7px}
+  .floating-offer strong{font-size:17px;margin:2px 0}
+  .floating-offer small{font-size:9px}
+  .floating-trust{right:0;top:8px;padding:9px 11px;border-radius:14px;gap:7px}
+  .floating-icon{width:28px;height:28px;border-radius:9px;font-size:12px}
+  .floating-trust strong{font-size:10px}
+  .floating-trust small{font-size:8px}
+
+  /* Continue the same visual scale below the fold. */
+  .section{padding:62px 0}
+  .section-head{margin-bottom:28px}
+  .modern-head h2,.why-copy h2,.contact-copy h2{font-size:34px;line-height:1.04;letter-spacing:-.04em}
+  .section-head p{font-size:14px;line-height:1.6;margin-top:14px}
+  .service-card{padding:21px;min-height:245px;border-radius:20px}
+  .service-card h3{font-size:22px;margin:26px 0 8px}
+  .service-card p{font-size:14px;line-height:1.55}
+  .calculator-banner{padding:27px 20px;border-radius:23px;gap:27px}
+  .calculator-banner h2{font-size:34px;line-height:1.04}
+  .calculator-banner p{font-size:14px;line-height:1.6}
+  .calculator-benefits{gap:8px;font-size:11px}
+  .preview-content{padding:19px}
+  .modern-contact{padding:25px 18px;border-radius:23px}
+}
+
+@media(max-width:430px){
+  .container{width:min(100% - 28px,var(--max))}
+  .site-header .brand{width:78px;flex-basis:78px}
+  .site-header .brand img{width:61px;height:61px}
+  .site-header .nav-actions{gap:5px}
+  .site-header .nav-actions .btn-primary{font-size:10px;padding:9px 8px}
+  .site-header .language-switch button{padding:5px 6px;font-size:10px}
+  .site-header .menu-btn{width:34px;height:34px;flex-basis:34px}
+
+  .hero{padding-top:38px}
+  .hero h1{font-size:36px;line-height:1.02}
+  .hero .lead{font-size:15px}
+  .hero-visual{min-height:350px}
+  .hero-dashboard{left:17px;top:31px;padding:13px}
+  .floating-trust{right:-2px}
+  .modern-head h2,.why-copy h2,.contact-copy h2,.calculator-banner h2{font-size:32px}
 }

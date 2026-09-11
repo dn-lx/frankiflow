@@ -9,7 +9,10 @@ function applyFrankiFlowFavicon(){
 if(typeof document!=='undefined'){
   applyFrankiFlowFavicon();
   setTimeout(applyFrankiFlowFavicon,0);
-  if(location.pathname.includes('/preisrechner/')) import('./calculator-overrides.js?v=20260911-pdf1');
+  if(location.pathname.includes('/preisrechner/')){
+    import('./calculator-overrides.js?v=20260911-pdf1');
+    import('./calculator-mobile-island.js?v=20260911-mobile1');
+  }
 }
 
 export const FRANKIFLOW_CONFIG = Object.freeze({
