@@ -6,6 +6,41 @@ const $=(s,p=document)=>p.querySelector(s); const $$=(s,p=document)=>[...p.query
 let copyRows=[];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
+function installFavicon(){
+  let link=$('link[rel~="icon"]');
+  if(!link){link=document.createElement('link');link.rel='icon';document.head.append(link)}
+  link.href='/assets/frankiflow-favicon.svg?v=20260911';
+  link.type='image/svg+xml';
+}
+
+function setupServiceCards(){
+  for(const card of $$('.service-card')){
+    const cta=card.querySelector('.card-link');
+    const serviceUrl=cta?.getAttribute('href');
+    if(!serviceUrl||serviceUrl==='/preisrechner/'||serviceUrl.startsWith('#'))continue;
+    card.dataset.serviceUrl=serviceUrl;
+    card.tabIndex=0;
+    card.setAttribute('role','link');
+    const title=card.querySelector('h3')?.textContent?.trim();
+    if(title)card.setAttribute('aria-label',`${title} – ${tr('Serviceseite öffnen','Open service page')}`);
+
+    const ctaText=(cta?.textContent||'').toLowerCase();
+    if(cta&&(ctaText.includes('preis berechnen')||ctaText.includes('calculate price'))){
+      cta.href='/preisrechner/';
+      cta.setAttribute('aria-label',tr('Preisrechner öffnen','Open price calculator'));
+    }else if(cta&&(ctaText.includes('anfragen')||ctaText.includes('request'))){
+      cta.href=getLanguage()==='en'?'/en/#kontakt':'/#kontakt';
+    }
+
+    const openService=()=>{window.location.href=serviceUrl};
+    card.addEventListener('click',e=>{if(e.target.closest('a,button,input,select,textarea,label'))return;openService()});
+    card.addEventListener('keydown',e=>{
+      if(e.target!==card)return;
+      if(e.key==='Enter'||e.key===' '){e.preventDefault();openService()}
+    });
+  }
+}
+
 function replaceExactCopy(root=document){
   const lang=getLanguage();
   const reverse=new Map(Object.entries(translations).map(([de,en])=>[String(en),de]));
@@ -65,6 +100,8 @@ async function renderHomepageGallery(){
   wrap.innerHTML='';for(const item of data){const {data:url}=supabase.storage.from(FRANKIFLOW_CONFIG.mediaBucket).getPublicUrl(item.storage_path);const fig=document.createElement('figure');fig.innerHTML=`<img loading="lazy" src="${url.publicUrl}" alt="${esc(item.alt_text||item.title||'FrankiFlow Reinigung')}">${item.title?`<figcaption>${esc(item.title)}</figcaption>`:''}`;wrap.append(fig)}section.classList.remove('hidden');
 }
 
+installFavicon();
+setupServiceCards();
 const quote=$('#quoteForm');if(quote)quote.addEventListener('submit',sendEnquiry,true);
 window.addEventListener('frankiflow:language',()=>setTimeout(()=>replaceExactCopy(document),0));
 await Promise.allSettled([loadEnhancementSettings(),renderHomepageGallery()]);
