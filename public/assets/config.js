@@ -8,6 +8,7 @@ function applyFrankiFlowFavicon(){
 if(typeof document!=='undefined'){
   applyFrankiFlowFavicon();
   setTimeout(applyFrankiFlowFavicon,0);
+  if(location.pathname.includes('/preisrechner/')) import('./calculator-overrides.js');
 }
 
 export const FRANKIFLOW_CONFIG = Object.freeze({
