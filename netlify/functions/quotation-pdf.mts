@@ -2,6 +2,7 @@ import PDFDocument from 'pdfkit';
 import { getFrankiFlowLogoBuffer } from './frankiflow-logo.mts';
 
 const NAVY='#071f38';
+const PRINT_NAVY='#06223a';
 const TEAL='#0aa5a6';
 const TEAL_LIGHT='#e9f8f5';
 const ICE='#f4f8fa';
@@ -18,6 +19,11 @@ const isFrequencyRow=(label:string)=>/^(häufigkeit|frequency)$/i.test(label);
 const isDeepCleaningRow=(label:string)=>/^(grundreinigung|deep cleaning)$/i.test(label);
 const isWindowService=(label:string)=>/^(fensterreinigung|window cleaning)$/i.test(label);
 const isAppointmentsValue=(value:string)=>/(termine\s*\/\s*monat|visits\s*\/\s*month)/i.test(value);
+const isAppointmentsRow=(label:string)=>/^(termine pro monat|appointments per month)$/i.test(label);
+const isMonthlyPriceRow=(label:string)=>/^(preis pro monat|price per month)$/i.test(label);
+const isFirstMonthRow=(label:string)=>/^(1\.\s*monat|first month|1st month)/i.test(label);
+const isEquipmentRow=(label:string)=>/(reinigungsmittel|equipment|materials)/i.test(label);
+const isAreaRow=(label:string)=>/(fläche|area)$/i.test(label);
 const sameLabel=(a:string,b:string)=>a.trim().toLocaleLowerCase()===b.trim().toLocaleLowerCase();
 
 function safePayload(raw:any){
@@ -30,8 +36,8 @@ function safePayload(raw:any){
 
   const windowOnly=isWindowService(originalServiceLabel);
   const deepSelected=!windowOnly&&rawBreakdown.some((r:any)=>isDeepCleaningRow(r.label));
-  const appointmentsRow=rawBreakdown.find((r:any)=>isFrequencyRow(r.label))||rawBreakdown.find((r:any)=>isAppointmentsValue(r.value));
-  const appointments=text(appointmentsRow?.value,80);
+  const appointmentsRow=rawBreakdown.find((r:any)=>isAppointmentsRow(r.label))||rawBreakdown.find((r:any)=>isFrequencyRow(r.label))||rawBreakdown.find((r:any)=>isAppointmentsValue(r.value));
+  const appointments=text(raw?.service?.appointments||appointmentsRow?.value,80);
 
   let breakdown=rawBreakdown.filter((r:any)=>
     !isContractSavingRow(r.label)&&
@@ -92,17 +98,22 @@ function collectPdf(doc:any):Promise<Buffer>{
 }
 
 async function loadFrankiFlowLogo(req:Request):Promise<Buffer>{
-  try{
-    const logoUrl=new URL('/assets/frankiflow-logo.png',req.url);
-    const response=await fetch(logoUrl,{headers:{Accept:'image/png'}});
-    if(!response.ok)throw new Error(`Logo request failed: ${response.status}`);
-    const bytes=await response.arrayBuffer();
-    if(bytes.byteLength<10000)throw new Error('Logo response was unexpectedly small');
-    return Buffer.from(bytes);
-  }catch(error){
-    console.warn('Falling back to embedded FrankiFlow logo',error);
-    return getFrankiFlowLogoBuffer();
+  const sources=[
+    'https://drive.google.com/uc?export=download&id=1bI4R5oPVvjml_siio5E36Rd0igXfxjUP',
+    new URL('/assets/frankiflow-logo.png',req.url).toString()
+  ];
+  for(const source of sources){
+    try{
+      const response=await fetch(source,{headers:{Accept:'image/png,image/*'},redirect:'follow'});
+      if(!response.ok)throw new Error(`Logo request failed: ${response.status}`);
+      const bytes=await response.arrayBuffer();
+      if(bytes.byteLength<10000)throw new Error('Logo response was unexpectedly small');
+      return Buffer.from(bytes);
+    }catch(error){
+      console.warn('FrankiFlow print logo source failed',source,error);
+    }
   }
+  return getFrankiFlowLogoBuffer();
 }
 
 function drawFooter(doc:any){
@@ -116,12 +127,11 @@ function drawFooter(doc:any){
 }
 
 function drawLogoPlaque(doc:any,logo:Buffer,x=42,y=10,w=96,h=96){
-  doc.roundedRect(x,y,w,h,10).fillColor('#ffffff').fill();
-  doc.image(logo,x+7,y+7,{fit:[w-14,h-14],align:'center',valign:'center'});
+  doc.image(logo,x,y,{fit:[w,h],align:'center',valign:'center'});
 }
 
 function beginChecklistPage(doc:any,logo:Buffer,lang:string,title:string,continuation=false){
-  doc.fillColor(NAVY).rect(0,0,595,112).fill();
+  doc.fillColor(PRINT_NAVY).rect(0,0,595,112).fill();
   drawLogoPlaque(doc,logo,42,9,94,94);
   doc.fillColor('#bfe9e5').font('Helvetica').fontSize(9).text(lang==='de'?'LEISTUNGSCHECKLISTE':'SERVICE CHECKLIST',352,27,{width:195,align:'right'});
   doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(13).text(title||'-',352,46,{width:195,align:'right'});
@@ -224,6 +234,33 @@ function renderChecklist(doc:any,p:any,logo:Buffer){
   }
 }
 
+function orderPriceRows(p:any,de:boolean){
+  const areaRows=p.breakdown.filter((r:any)=>isAreaRow(r.label));
+  const appointmentRows=p.breakdown.filter((r:any)=>isAppointmentsRow(r.label)||isFrequencyRow(r.label));
+  const equipmentRows=p.breakdown.filter((r:any)=>isEquipmentRow(r.label));
+  const monthlyRows=p.breakdown.filter((r:any)=>isMonthlyPriceRow(r.label));
+  const firstMonthRows=p.breakdown.filter((r:any)=>isFirstMonthRow(r.label));
+  const reserved=new Set([...areaRows,...appointmentRows,...equipmentRows,...monthlyRows,...firstMonthRows]);
+  const otherRows=p.breakdown.filter((r:any)=>!reserved.has(r));
+  const discountPct=(String(p.prices.discountLabel||'').match(/\d+(?:[.,]\d+)?%/)||[])[0]||'';
+  const firstMonthLabel=p.prices.hasPromotion
+    ?(de?`1. Monat als Neukunde${discountPct?` (${discountPct} Rabatt)`:''}`:`1st month as new customer${discountPct?` (${discountPct} discount)`:''}`)
+    :(de?'1. Monat':'First month');
+
+  const fallbackArea={label:p.service.windowOnly?(de?'Glasfläche':'Glass area'):(de?'Reinigungsfläche':'Cleaning area'),value:p.service.area||'—'};
+  const fallbackAppointments={label:de?'Termine pro Monat':'Appointments per month',value:p.service.appointments||p.service.frequency||'—'};
+
+  return [
+    ...(areaRows.length?areaRows:[fallbackArea]),
+    ...(appointmentRows.length?appointmentRows:[fallbackAppointments]),
+    {label:de?'Preis pro Termin':'Price per visit',value:p.prices.visit||'—'},
+    ...equipmentRows,
+    ...otherRows,
+    ...(monthlyRows.length?monthlyRows:[{label:de?'Preis pro Monat':'Price per month',value:p.prices.monthly||'—'}]),
+    ...(firstMonthRows.length?firstMonthRows:[{label:firstMonthLabel,value:p.prices.firstMonth||p.prices.monthly||'—',highlight:p.prices.hasPromotion}])
+  ].map((row:any)=>isFirstMonthRow(row.label)?{...row,label:firstMonthLabel,highlight:p.prices.hasPromotion}:row);
+}
+
 function renderQuote(doc:any,p:any,logo:Buffer){
   const lang=p.language;
   const de=lang==='de';
@@ -231,26 +268,14 @@ function renderQuote(doc:any,p:any,logo:Buffer){
   const customerLines=[p.customer.company?p.customer.name:'',p.customer.address,p.customer.email,p.customer.phone].filter(Boolean);
   const customerDetails=customerLines.join('\n');
   const windowOnly=Boolean(p.service.windowOnly);
+  const priceRows:any[]=orderPriceRows(p,de);
   const discountPct=(String(p.prices.discountLabel||'').match(/\d+(?:[.,]\d+)?%/)||[])[0]||'';
-  const windowFirstMonthLabel=p.prices.hasPromotion
+  const firstMonthSummaryLabel=p.prices.hasPromotion
     ?(de?`1. Monat als Neukunde${discountPct?` (${discountPct} Rabatt)`:''}`:`1st month as new customer${discountPct?` (${discountPct} discount)`:''}`)
     :(de?'1. Monat':'First month');
 
-  const priceRows:any[]=windowOnly
-    ?[
-      {label:de?'Glasfläche':'Glass area',value:p.service.area||'—'},
-      ...(p.service.appointments?[{label:de?'Termine pro Monat':'Appointments per month',value:p.service.appointments}]:[]),
-      {label:de?'Preis pro Termin':'Price per visit',value:p.prices.visit||'—'},
-      {label:de?'Preis pro Monat':'Price per month',value:p.prices.monthly||'—'},
-      {label:windowFirstMonthLabel,value:p.prices.firstMonth||p.prices.monthly||'—',highlight:p.prices.hasPromotion}
-    ]
-    :[
-      {label:de?'Preis pro Termin':'Price per visit',value:p.prices.visit||'—'},
-      ...p.breakdown
-    ];
-
   doc.addPage();
-  doc.fillColor(NAVY).rect(0,0,595,118).fill();
+  doc.fillColor(PRINT_NAVY).rect(0,0,595,118).fill();
   drawLogoPlaque(doc,logo,42,10,98,98);
   doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(16).text(de?'ANGEBOT':'QUOTATION',382,30,{width:165,align:'right'});
   doc.fillColor('#d6e3ea').font('Helvetica').fontSize(9).text(new Intl.DateTimeFormat(de?'de-DE':'en-GB').format(new Date()),382,57,{width:165,align:'right'});
@@ -299,7 +324,7 @@ function renderQuote(doc:any,p:any,logo:Buffer){
   doc.y=serviceTitleY+(windowOnly?62:90);
   doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(10).text(de?'PREISÜBERSICHT':'PRICE OVERVIEW',48,doc.y);
   doc.moveDown(.7);
-  for(const row of priceRows.slice(0,8)){
+  for(const row of priceRows.slice(0,9)){
     const y=doc.y;
     doc.moveTo(48,y+18).lineTo(547,y+18).strokeColor(LINE).lineWidth(.7).stroke();
     doc.fillColor(INK).font('Helvetica').fontSize(8.8).text(row.label,48,y,{width:340});
@@ -307,27 +332,25 @@ function renderQuote(doc:any,p:any,logo:Buffer){
     doc.y=y+25;
   }
 
-  let noteY=doc.y+12;
-  if(!windowOnly){
-    const boxY=Math.min(Math.max(doc.y+8,525),590);
-    doc.roundedRect(48,boxY,499,74,10).fillColor('#fbfdfd').strokeColor(LINE).lineWidth(.8).fillAndStroke();
-    const sy=boxY+15;
-    doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(de?'Preis pro Termin':'Price per visit',64,sy,{width:150});
-    doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(12).text(p.prices.visit||'—',64,sy+16,{width:150});
-    doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(de?'Regulärer Monat':'Regular month',225,sy,{width:150});
-    doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(12).text(p.prices.monthly||'—',225,sy+16,{width:150});
-    if(p.prices.hasPromotion){
-      doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(de?'1. Monat nach Rabatt':'1st month after discount',386,sy,{width:145,align:'right'});
-      doc.fillColor(TEAL).font('Helvetica-Bold').fontSize(12).text(p.prices.firstMonth||'—',386,sy+16,{width:145,align:'right'});
-    }
-    noteY=boxY+90;
-    const promoNote=p.prices.hasPromotion
-      ?(de?`${p.prices.discountLabel||'Neukundenrabatt'} gilt ausschließlich im ersten Vertragsmonat. Mindestpreise bleiben bestehen.`:`${p.prices.discountLabel||'New-customer discount'} applies only to the first contract month. Minimum prices remain in force.`)
-      :'';
-    if(promoNote){
-      doc.fillColor(MUTED).font('Helvetica').fontSize(7.8).text(promoNote,48,noteY,{width:499,lineGap:2});
-      noteY+=24;
-    }
+  const boxY=Math.min(Math.max(doc.y+8,525),590);
+  doc.roundedRect(48,boxY,499,74,10).fillColor('#fbfdfd').strokeColor(LINE).lineWidth(.8).fillAndStroke();
+  const sy=boxY+15;
+  doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(de?'Preis pro Termin':'Price per visit',64,sy,{width:150});
+  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(12).text(p.prices.visit||'—',64,sy+16,{width:150});
+  doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(de?'Regulärer Monat':'Regular month',225,sy,{width:150});
+  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(12).text(p.prices.monthly||'—',225,sy+16,{width:150});
+  if(p.prices.hasPromotion){
+    doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(firstMonthSummaryLabel,386,sy,{width:145,align:'right'});
+    doc.fillColor(TEAL).font('Helvetica-Bold').fontSize(12).text(p.prices.firstMonth||'—',386,sy+16,{width:145,align:'right'});
+  }
+
+  let noteY=boxY+90;
+  const promoNote=p.prices.hasPromotion
+    ?(de?`${p.prices.discountLabel||'Neukundenrabatt'} gilt ausschließlich im ersten Vertragsmonat. Mindestpreise bleiben bestehen.`:`${p.prices.discountLabel||'New-customer discount'} applies only to the first contract month. Minimum prices remain in force.`)
+    :'';
+  if(promoNote){
+    doc.fillColor(MUTED).font('Helvetica').fontSize(7.8).text(promoNote,48,noteY,{width:499,lineGap:2});
+    noteY+=24;
   }
 
   if(p.includeChecklist&&p.checklist.length){
@@ -339,7 +362,7 @@ function renderQuote(doc:any,p:any,logo:Buffer){
 function filenamePart(value:string,fallback:string){
   const cleaned=String(value||fallback)
     .normalize('NFKC')
-    .replace(/[<>:"/\\|?*\u0000-\u001f]/g,' ')
+    .replace(/[<>:\"/\\|?*\u0000-\u001f]/g,' ')
     .replace(/\s+/g,' ')
     .trim()
     .replace(/\s/g,'-')
@@ -379,7 +402,7 @@ export default async(req:Request)=>{
     const encodedFilename=encodeURIComponent(filename);
     return new Response(new Uint8Array(buffer),{status:200,headers:{
       'Content-Type':'application/pdf',
-      'Content-Disposition':`attachment; filename="${fallbackFilename}"; filename*=UTF-8''${encodedFilename}`,
+      'Content-Disposition':`attachment; filename=\"${fallbackFilename}\"; filename*=UTF-8''${encodedFilename}`,
       'Cache-Control':'no-store'
     }});
   }catch(err){
