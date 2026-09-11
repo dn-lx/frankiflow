@@ -44,16 +44,16 @@ async function loadEnhancementSettings(){
 async function sendEnquiry(e){
   e.preventDefault();e.stopImmediatePropagation();
   const form=e.currentTarget,notice=$('#quoteNotice');if(!notice)return;
-  notice.className='notice hidden';const fd=new FormData(form);
-  const payload={service_key:fd.get('service_key')||'general',frequency_key:null,area_sqm:null,contract_months:null,window_sqm:0,equipment_by_frankiflow:false,deep_cleaning:false,estimated_monthly:null,customer_name:fd.get('customer_name'),customer_email:fd.get('customer_email'),customer_phone:fd.get('customer_phone')||'',postcode:fd.get('postcode')||'',company_name:fd.get('company_name')||'',message:fd.get('message')||'',privacy_accepted:fd.get('privacy_accepted')==='on',status:'new'};
+  notice.className='notice hidden';const fd=new FormData(form);const quoteId=crypto.randomUUID();
+  const payload={id:quoteId,service_key:fd.get('service_key')||'general',frequency_key:null,area_sqm:null,contract_months:null,window_sqm:0,equipment_by_frankiflow:false,deep_cleaning:false,estimated_monthly:null,customer_name:fd.get('customer_name'),customer_email:fd.get('customer_email'),customer_phone:fd.get('customer_phone')||'',postcode:fd.get('postcode')||'',company_name:fd.get('company_name')||'',message:fd.get('message')||'',privacy_accepted:fd.get('privacy_accepted')==='on',status:'new'};
   if(!payload.privacy_accepted){notice.textContent=tr('Bitte stimmen Sie der Datenschutzerklärung zu.','Please accept the privacy policy.');notice.className='notice error';return}
   const btn=form.querySelector('button[type=submit]'),old=btn?.innerHTML;if(btn){btn.disabled=true;btn.textContent=tr('Wird gesendet …','Sending …')}
-  const {data,error}=await supabase.from('frankiflow_quote_requests').insert(payload).select('id,customer_email').single();
+  const {error}=await supabase.from('frankiflow_quote_requests').insert(payload);
   if(btn){btn.disabled=false;btn.innerHTML=old||tr('Anfrage senden','Send enquiry')}
   if(error){notice.innerHTML=tr(`Die Online-Anfrage konnte nicht gesendet werden. Schreiben Sie uns bitte direkt an <a href="mailto:${FRANKIFLOW_CONFIG.defaultEmail}">${FRANKIFLOW_CONFIG.defaultEmail}</a>.`,`The online enquiry could not be sent. Please email us directly at <a href="mailto:${FRANKIFLOW_CONFIG.defaultEmail}">${FRANKIFLOW_CONFIG.defaultEmail}</a>.`);notice.className='notice error';return}
   form.reset();notice.textContent=tr('Vielen Dank! Ihre Anfrage ist eingegangen. Eine Bestätigung wurde per E-Mail gesendet. Wir melden uns so schnell wie möglich persönlich bei Ihnen.','Thank you! We received your enquiry. A confirmation was sent by email and we will contact you personally as soon as possible.');notice.className='notice';
   try{
-    const r=await fetch(`${FRANKIFLOW_CONFIG.supabaseUrl}/functions/v1/frankiflow-email`,{method:'POST',headers:{'Content-Type':'application/json','apikey':FRANKIFLOW_CONFIG.supabasePublishableKey},body:JSON.stringify({event_type:'enquiry_received',quote_request_id:data.id,customer_email:data.customer_email,language:getLanguage()})});
+    const r=await fetch(`${FRANKIFLOW_CONFIG.supabaseUrl}/functions/v1/frankiflow-email`,{method:'POST',headers:{'Content-Type':'application/json','apikey':FRANKIFLOW_CONFIG.supabasePublishableKey},body:JSON.stringify({event_type:'enquiry_received',quote_request_id:quoteId,customer_email:payload.customer_email,language:getLanguage()})});
     if(!r.ok)console.warn('FrankiFlow acknowledgement email failed',await r.text());
   }catch(err){console.warn('FrankiFlow acknowledgement email failed',err)}
 }
