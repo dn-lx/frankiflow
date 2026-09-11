@@ -129,6 +129,7 @@ function renderQuote(doc:any,p:any,logo:Buffer){
   const de=lang==='de';
   const customerTitle=p.customer.company||p.customer.name||'—';
   const customerLines=[p.customer.company?p.customer.name:'',p.customer.address,p.customer.email,p.customer.phone].filter(Boolean);
+  const customerDetails=customerLines.join('\n');
   const priceRows=[
     {label:de?'Preis pro Termin':'Price per visit',value:p.prices.visit||'—'},
     ...p.breakdown
@@ -141,22 +142,43 @@ function renderQuote(doc:any,p:any,logo:Buffer){
   doc.fillColor('#d6e3ea').font('Helvetica').fontSize(9).text(new Intl.DateTimeFormat(de?'de-DE':'en-GB').format(new Date()),382,57,{width:165,align:'right'});
   doc.fillColor('#bfe9e5').fontSize(8.5).text('FrankiFlow Gebäudereinigung & Objektbetreuung',270,82,{width:277,align:'right'});
 
-  doc.roundedRect(48,142,499,84,12).fillColor(ICE).fill();
+  const customerBoxY=142;
+  const customerTitleY=174;
+  const customerTitleWidth=270;
+  doc.font('Helvetica-Bold').fontSize(15);
+  const customerTitleHeight=doc.heightOfString(customerTitle,{width:customerTitleWidth,lineGap:1});
+  const customerDetailsY=customerTitleY+customerTitleHeight+5;
+  doc.font('Helvetica').fontSize(8.2);
+  const customerDetailsHeight=customerDetails
+    ?doc.heightOfString(customerDetails,{width:customerTitleWidth,lineGap:2})
+    :0;
+  doc.font('Helvetica-Bold').fontSize(11);
+  const contractHeight=doc.heightOfString(p.service.contract||'—',{width:165,align:'right'});
+  const customerLeftBottom=customerDetails
+    ?customerDetailsY+customerDetailsHeight
+    :customerTitleY+customerTitleHeight;
+  const customerRightBottom=175+contractHeight;
+  const customerBoxHeight=Math.max(84,Math.ceil(Math.max(customerLeftBottom,customerRightBottom)-customerBoxY+18));
+
+  doc.roundedRect(48,customerBoxY,499,customerBoxHeight,12).fillColor(ICE).fill();
   doc.fillColor(MUTED).font('Helvetica-Bold').fontSize(7.5).text(de?'ANGEBOT AN':'QUOTATION FOR',64,158);
-  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(15).text(customerTitle,64,174,{width:270});
-  if(customerLines.length)doc.fillColor(MUTED).font('Helvetica').fontSize(8.2).text(customerLines.join('\n'),64,196,{width:270,lineGap:2});
+  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(15).text(customerTitle,64,customerTitleY,{width:customerTitleWidth,lineGap:1});
+  if(customerDetails)doc.fillColor(MUTED).font('Helvetica').fontSize(8.2).text(customerDetails,64,customerDetailsY,{width:customerTitleWidth,lineGap:2});
   doc.fillColor(MUTED).font('Helvetica-Bold').fontSize(7.5).text(de?'VERTRAGSLAUFZEIT':'CONTRACT DURATION',360,158,{width:165,align:'right'});
   doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(11).text(p.service.contract||'—',360,175,{width:165,align:'right'});
 
-  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(18).text(p.service.label||'-',48,254,{width:330});
+  const serviceTitleY=customerBoxY+customerBoxHeight+28;
+  const serviceMetaY=serviceTitleY+26;
+  const priceCardY=serviceTitleY-10;
+  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(18).text(p.service.label||'-',48,serviceTitleY,{width:330});
   const serviceMeta=[p.service.area,p.service.frequency,p.service.vatStatus].filter(Boolean).join(' · ');
-  if(serviceMeta)doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(serviceMeta,48,280,{width:330});
+  if(serviceMeta)doc.fillColor(MUTED).font('Helvetica').fontSize(8.5).text(serviceMeta,48,serviceMetaY,{width:330});
 
-  doc.roundedRect(390,244,157,74,12).fillColor(TEAL_LIGHT).fill();
-  doc.fillColor(TEAL).font('Helvetica-Bold').fontSize(7.5).text(p.prices.hasPromotion?(de?'1. VERTRAGSMONAT':'1ST CONTRACT MONTH'):(de?'MONATLICH':'MONTHLY'),404,258,{width:129,align:'right'});
-  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(22).text(p.prices.hasPromotion?p.prices.firstMonth:p.prices.monthly,404,274,{width:129,align:'right'});
+  doc.roundedRect(390,priceCardY,157,74,12).fillColor(TEAL_LIGHT).fill();
+  doc.fillColor(TEAL).font('Helvetica-Bold').fontSize(7.5).text(p.prices.hasPromotion?(de?'1. VERTRAGSMONAT':'1ST CONTRACT MONTH'):(de?'MONATLICH':'MONTHLY'),404,priceCardY+14,{width:129,align:'right'});
+  doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(22).text(p.prices.hasPromotion?p.prices.firstMonth:p.prices.monthly,404,priceCardY+30,{width:129,align:'right'});
 
-  doc.y=344;
+  doc.y=serviceTitleY+90;
   doc.fillColor(NAVY).font('Helvetica-Bold').fontSize(10).text(de?'PREISÜBERSICHT':'PRICE OVERVIEW',48,doc.y);
   doc.moveDown(.7);
   for(const row of priceRows.slice(0,8)){
@@ -210,7 +232,7 @@ export default async(req:Request)=>{
     const filename=`FrankiFlow-${p.language==='de'?'Angebot':'Quotation'}-${stamp}.pdf`;
     return new Response(new Uint8Array(buffer),{status:200,headers:{
       'Content-Type':'application/pdf',
-      'Content-Disposition':`attachment; filename="${filename}"`,
+      'Content-Disposition':`attachment; filename=\"${filename}\"`,
       'Cache-Control':'no-store'
     }});
   }catch(err){
