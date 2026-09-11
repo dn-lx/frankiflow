@@ -2,6 +2,7 @@ import PDFDocument from 'pdfkit';
 import { getFrankiFlowLogoBuffer } from './frankiflow-logo.mts';
 
 const NAVY='#071f38';
+const PRINT_NAVY='#06223a';
 const TEAL='#0aa5a6';
 const TEAL_LIGHT='#e9f8f5';
 const ICE='#f4f8fa';
@@ -97,17 +98,22 @@ function collectPdf(doc:any):Promise<Buffer>{
 }
 
 async function loadFrankiFlowLogo(req:Request):Promise<Buffer>{
-  try{
-    const logoUrl=new URL('/assets/frankiflow-logo.png',req.url);
-    const response=await fetch(logoUrl,{headers:{Accept:'image/png'}});
-    if(!response.ok)throw new Error(`Logo request failed: ${response.status}`);
-    const bytes=await response.arrayBuffer();
-    if(bytes.byteLength<10000)throw new Error('Logo response was unexpectedly small');
-    return Buffer.from(bytes);
-  }catch(error){
-    console.warn('Falling back to embedded FrankiFlow logo',error);
-    return getFrankiFlowLogoBuffer();
+  const sources=[
+    'https://drive.google.com/uc?export=download&id=1bI4R5oPVvjml_siio5E36Rd0igXfxjUP',
+    new URL('/assets/frankiflow-logo.png',req.url).toString()
+  ];
+  for(const source of sources){
+    try{
+      const response=await fetch(source,{headers:{Accept:'image/png,image/*'},redirect:'follow'});
+      if(!response.ok)throw new Error(`Logo request failed: ${response.status}`);
+      const bytes=await response.arrayBuffer();
+      if(bytes.byteLength<10000)throw new Error('Logo response was unexpectedly small');
+      return Buffer.from(bytes);
+    }catch(error){
+      console.warn('FrankiFlow print logo source failed',source,error);
+    }
   }
+  return getFrankiFlowLogoBuffer();
 }
 
 function drawFooter(doc:any){
@@ -121,12 +127,11 @@ function drawFooter(doc:any){
 }
 
 function drawLogoPlaque(doc:any,logo:Buffer,x=42,y=10,w=96,h=96){
-  doc.roundedRect(x,y,w,h,10).fillColor('#ffffff').fill();
-  doc.image(logo,x+7,y+7,{fit:[w-14,h-14],align:'center',valign:'center'});
+  doc.image(logo,x,y,{fit:[w,h],align:'center',valign:'center'});
 }
 
 function beginChecklistPage(doc:any,logo:Buffer,lang:string,title:string,continuation=false){
-  doc.fillColor(NAVY).rect(0,0,595,112).fill();
+  doc.fillColor(PRINT_NAVY).rect(0,0,595,112).fill();
   drawLogoPlaque(doc,logo,42,9,94,94);
   doc.fillColor('#bfe9e5').font('Helvetica').fontSize(9).text(lang==='de'?'LEISTUNGSCHECKLISTE':'SERVICE CHECKLIST',352,27,{width:195,align:'right'});
   doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(13).text(title||'-',352,46,{width:195,align:'right'});
@@ -270,7 +275,7 @@ function renderQuote(doc:any,p:any,logo:Buffer){
     :(de?'1. Monat':'First month');
 
   doc.addPage();
-  doc.fillColor(NAVY).rect(0,0,595,118).fill();
+  doc.fillColor(PRINT_NAVY).rect(0,0,595,118).fill();
   drawLogoPlaque(doc,logo,42,10,98,98);
   doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(16).text(de?'ANGEBOT':'QUOTATION',382,30,{width:165,align:'right'});
   doc.fillColor('#d6e3ea').font('Helvetica').fontSize(9).text(new Intl.DateTimeFormat(de?'de-DE':'en-GB').format(new Date()),382,57,{width:165,align:'right'});
