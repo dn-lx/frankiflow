@@ -16,4 +16,6 @@ Netlify should be configured with `main` as the production branch. Keep automati
 
 ## Before merging to main
 
-Check the homepage, DE/EN pages, Preisrechner calculations, window-only calculations, checklist preview/PDF output, admin login/editing, legal pages, responsive layout, and any changed Stripe/Supabase behavior.
+Check the homepage, DE/EN pages, Preisrechner calculations, window-only calculations, checklist preview/PDF output, admin login/editing, legal pages, responsive layout, and changed Supabase behavior.
+
+FrankiFlow has no integrated Stripe/payment workflow, so no Stripe or checkout verification is required.
