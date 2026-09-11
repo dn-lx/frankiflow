@@ -9,8 +9,9 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 function installFavicon(){
   let link=$('link[rel~="icon"]');
   if(!link){link=document.createElement('link');link.rel='icon';document.head.append(link)}
-  link.href='/assets/frankiflow-favicon.svg?v=20260911';
-  link.type='image/svg+xml';
+  link.href='/assets/frankiflow-favicon-32.png?v=20260911d';
+  link.type='image/png';
+  link.sizes='32x32';
 }
 
 function setupServiceCards(){

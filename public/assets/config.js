@@ -1,8 +1,9 @@
 function applyFrankiFlowFavicon(){
   let icon=document.querySelector('link[rel~="icon"]');
   if(!icon){icon=document.createElement('link');icon.rel='icon';document.head.append(icon)}
-  icon.href='/assets/frankiflow-favicon.svg?v=20260911b';
-  icon.type='image/svg+xml';
+  icon.href='/assets/frankiflow-favicon-32.png?v=20260911d';
+  icon.type='image/png';
+  icon.sizes='32x32';
 }
 
 if(typeof document!=='undefined'){
