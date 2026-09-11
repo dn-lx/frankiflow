@@ -6,5 +6,8 @@
   "scripts": {
     "dev": "netlify dev",
     "check": "node --check public/assets/app.js && node --check public/assets/pricing.js && node --check public/assets/admin.js"
+  },
+  "dependencies": {
+    "pdfkit": "^0.17.2"
   }
 }
