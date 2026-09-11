@@ -50,6 +50,20 @@ function collectPdf(doc:any):Promise<Buffer>{
   });
 }
 
+async function loadFrankiFlowLogo(req:Request):Promise<Buffer>{
+  try{
+    const logoUrl=new URL('/assets/frankiflow-logo.png',req.url);
+    const response=await fetch(logoUrl,{headers:{Accept:'image/png'}});
+    if(!response.ok)throw new Error(`Logo request failed: ${response.status}`);
+    const bytes=await response.arrayBuffer();
+    if(bytes.byteLength<10000)throw new Error('Logo response was unexpectedly small');
+    return Buffer.from(bytes);
+  }catch(error){
+    console.warn('Falling back to embedded FrankiFlow logo',error);
+    return getFrankiFlowLogoBuffer();
+  }
+}
+
 function drawFooter(doc:any){
   const y=710;
   doc.moveTo(48,y).lineTo(547,y).strokeColor(LINE).lineWidth(1).stroke();
@@ -62,7 +76,7 @@ function drawFooter(doc:any){
 
 function drawLogoPlaque(doc:any,logo:Buffer,x=42,y=10,w=96,h=96){
   doc.roundedRect(x,y,w,h,10).fillColor('#ffffff').fill();
-  doc.image(logo,x+9,y+9,{fit:[w-18,h-18],align:'center',valign:'center'});
+  doc.image(logo,x+7,y+7,{fit:[w-14,h-14],align:'center',valign:'center'});
 }
 
 function beginChecklistPage(doc:any,logo:Buffer,lang:string,title:string,continuation=false){
@@ -180,7 +194,7 @@ export default async(req:Request)=>{
   if(req.method!=='POST')return new Response('Method not allowed',{status:405,headers:{Allow:'POST'}});
   try{
     const p=safePayload(await req.json());
-    const logo=getFrankiFlowLogoBuffer();
+    const logo=await loadFrankiFlowLogo(req);
     const doc=new PDFDocument({
       size:'A4',
       autoFirstPage:false,
