@@ -94,7 +94,128 @@ function installPrintTweaks(){
   patchPrintSheet();
 }
 
+function selectedText(selector){
+  const el=document.querySelector(selector);
+  if(!el)return '';
+  if(el instanceof HTMLSelectElement)return el.selectedOptions[0]?.textContent?.trim()||'';
+  return el.textContent?.trim()||'';
+}
+
+function fieldValue(selector){
+  const el=document.querySelector(selector);
+  return el&&'value' in el?String(el.value||'').trim():'';
+}
+
+function quotationPayload(){
+  const lang=document.querySelector('[data-lang].active')?.dataset.lang==='en'?'en':'de';
+  const serviceLabel=document.querySelector('.service-choice.active strong')?.textContent?.trim()||
+    document.querySelector('.service-choice input:checked')?.closest('.service-choice')?.querySelector('strong')?.textContent?.trim()||'';
+  const area=fieldValue('#areaSqm');
+  const windowArea=fieldValue('#windowSqm');
+  const windowOnly=document.querySelector('.service-choice.active')?.classList.contains('service-window-choice')||false;
+  const areaText=windowOnly
+    ?(windowArea?`${windowArea} m² ${lang==='de'?'Glas':'glass'}`:'')
+    :(area?`${area} m²`: '');
+  const breakdown=[...document.querySelectorAll('#breakdownRows .breakdown-row')].map(row=>({
+    label:row.querySelector('span')?.textContent?.trim()||'',
+    value:row.querySelector('b')?.textContent?.trim()||''
+  })).filter(row=>row.label||row.value);
+
+  const checklist=[...document.querySelectorAll('#checklistPreview .checklist-screen-group')].map(group=>({
+    title:group.querySelector(':scope > h3')?.textContent?.trim()||'',
+    sections:[...group.querySelectorAll('.checklist-screen-section')].map(section=>({
+      title:section.querySelector('h4')?.textContent?.trim()||'',
+      optional:section.classList.contains('optional-section'),
+      items:[...section.querySelectorAll('.checklist-screen-item em')].map(item=>item.textContent?.trim()||'').filter(Boolean)
+    }))
+  }));
+
+  const promotionBox=document.querySelector('#promotionBox');
+  return {
+    language:lang,
+    customer:{
+      name:fieldValue('#customerName'),
+      company:fieldValue('#customerCompany'),
+      email:fieldValue('#customerEmail'),
+      phone:fieldValue('#customerPhone'),
+      address:fieldValue('#customerAddress')
+    },
+    service:{
+      label:serviceLabel,
+      area:areaText,
+      frequency:selectedText('#frequency'),
+      contract:selectedText('#contractMonths'),
+      vatStatus:selectedText('#vatStatus')
+    },
+    prices:{
+      visit:selectedText('#visitPrice'),
+      monthly:selectedText('#monthlyPrice'),
+      firstMonth:selectedText('#firstMonthPrice'),
+      discountLabel:selectedText('#discountLabel'),
+      hasPromotion:promotionBox?!promotionBox.classList.contains('hidden'):false
+    },
+    breakdown,
+    includeChecklist:Boolean(document.querySelector('#includeChecklist')?.checked),
+    checklist
+  };
+}
+
+function filenameFromDisposition(value){
+  const match=String(value||'').match(/filename="?([^";]+)"?/i);
+  return match?.[1]||`FrankiFlow-Angebot-${new Date().toISOString().slice(0,10)}.pdf`;
+}
+
+async function downloadQuotationPdf(button){
+  if(button.dataset.pdfBusy==='1')return;
+  const original=button.textContent;
+  const lang=document.querySelector('[data-lang].active')?.dataset.lang==='en'?'en':'de';
+  button.dataset.pdfBusy='1';
+  button.disabled=true;
+  button.textContent=lang==='de'?'PDF wird erstellt …':'Creating PDF …';
+  try{
+    const response=await fetch('/api/pdf/quotation',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(quotationPayload())
+    });
+    if(!response.ok){
+      const detail=await response.text().catch(()=>String(response.status));
+      throw new Error(detail||`HTTP ${response.status}`);
+    }
+    const blob=await response.blob();
+    if(blob.type!=='application/pdf'||blob.size<1000)throw new Error('Invalid PDF response');
+    const url=URL.createObjectURL(blob);
+    const link=document.createElement('a');
+    link.href=url;
+    link.download=filenameFromDisposition(response.headers.get('Content-Disposition'));
+    link.style.display='none';
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),30000);
+  }catch(error){
+    console.error('FrankiFlow quotation PDF download failed',error);
+    alert(lang==='de'?'Das PDF konnte nicht erstellt werden. Bitte versuchen Sie es erneut.':'The PDF could not be created. Please try again.');
+  }finally{
+    button.disabled=false;
+    button.dataset.pdfBusy='0';
+    button.textContent=original;
+  }
+}
+
+function installDirectPdfDownload(){
+  document.addEventListener('click',event=>{
+    const button=event.target instanceof Element?event.target.closest('#printQuote'):null;
+    if(!button)return;
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    downloadQuotationPdf(button);
+  },true);
+}
+
 if(location.pathname.includes('/preisrechner/')){
+  installDirectPdfDownload();
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded',()=>{
       installScopePersistence();
