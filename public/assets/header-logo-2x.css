@@ -1,0 +1,30 @@
+/* FrankiFlow public header logo: use the approved transparent Drive artwork at a stronger visual scale. */
+.site-header .nav{
+  min-height:118px;
+  height:auto;
+  padding:14px 0;
+}
+.site-header .brand{
+  width:410px;
+  max-width:34vw;
+}
+.site-header .brand img{
+  width:100%;
+  height:auto;
+  display:block;
+}
+
+@media(max-width:1180px){
+  .site-header .nav{min-height:104px;padding:12px 0}
+  .site-header .brand{width:320px;max-width:31vw}
+}
+
+@media(max-width:900px){
+  .site-header .nav{min-height:94px;padding:10px 0}
+  .site-header .brand{width:260px;max-width:48vw}
+}
+
+@media(max-width:620px){
+  .site-header .nav{min-height:86px;padding:8px 0}
+  .site-header .brand{width:230px;max-width:58vw}
+}
