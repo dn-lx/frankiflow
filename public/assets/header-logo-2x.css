@@ -1,14 +1,20 @@
-/* FrankiFlow public header logo: width is the controlling dimension; responsive caps prevent layout breakage. */
-:root{--ff-header-logo-width:260px}
+/* FrankiFlow public header logo: width is configurable and header height scales with it. */
+:root{--ff-header-logo-width:260px;--ff-header-height:104px}
+.site-header{
+  min-height:var(--ff-header-height);
+  overflow:visible;
+}
 .site-header .nav{
-  min-height:88px;
+  min-height:var(--ff-header-height);
   height:auto;
   padding:8px 0;
+  overflow:visible;
 }
 .site-header .brand{
   width:min(var(--ff-header-logo-width),34vw);
   max-width:100%;
   flex:0 0 auto;
+  overflow:visible;
 }
 .site-header .brand img{
   width:100%;
@@ -20,16 +26,19 @@
 }
 
 @media(max-width:1180px){
-  .site-header .nav{min-height:84px;padding:8px 0}
+  .site-header{min-height:min(var(--ff-header-height),104px)}
+  .site-header .nav{min-height:min(var(--ff-header-height),104px);padding:8px 0}
   .site-header .brand{width:min(var(--ff-header-logo-width),260px,30vw)}
 }
 
 @media(max-width:900px){
-  .site-header .nav{min-height:78px;padding:7px 0}
+  .site-header{min-height:min(var(--ff-header-height),92px)}
+  .site-header .nav{min-height:min(var(--ff-header-height),92px);padding:7px 0}
   .site-header .brand{width:min(var(--ff-header-logo-width),220px,42vw)}
 }
 
 @media(max-width:620px){
-  .site-header .nav{min-height:72px;padding:6px 0}
+  .site-header{min-height:76px}
+  .site-header .nav{min-height:76px;padding:6px 0}
   .site-header .brand{width:min(var(--ff-header-logo-width),180px,50vw)}
 }
