@@ -1,30 +1,38 @@
-/* FrankiFlow public header logo: use the approved transparent Drive artwork at a stronger visual scale. */
+/* FrankiFlow public header logo: configurable desktop width with safe responsive caps. */
+:root{--ff-header-logo-width:260px}
 .site-header .nav{
-  min-height:118px;
+  min-height:96px;
   height:auto;
-  padding:14px 0;
+  padding:9px 0;
 }
 .site-header .brand{
-  width:410px;
-  max-width:34vw;
+  width:min(var(--ff-header-logo-width),30vw);
+  max-width:100%;
+  flex:0 0 auto;
 }
 .site-header .brand img{
   width:100%;
   height:auto;
+  max-height:82px;
+  object-fit:contain;
+  object-position:left center;
   display:block;
 }
 
 @media(max-width:1180px){
-  .site-header .nav{min-height:104px;padding:12px 0}
-  .site-header .brand{width:320px;max-width:31vw}
+  .site-header .nav{min-height:90px;padding:8px 0}
+  .site-header .brand{width:min(var(--ff-header-logo-width),240px,29vw)}
+  .site-header .brand img{max-height:76px}
 }
 
 @media(max-width:900px){
-  .site-header .nav{min-height:94px;padding:10px 0}
-  .site-header .brand{width:260px;max-width:48vw}
+  .site-header .nav{min-height:84px;padding:8px 0}
+  .site-header .brand{width:min(var(--ff-header-logo-width),220px,42vw)}
+  .site-header .brand img{max-height:70px}
 }
 
 @media(max-width:620px){
-  .site-header .nav{min-height:86px;padding:8px 0}
-  .site-header .brand{width:230px;max-width:58vw}
+  .site-header .nav{min-height:76px;padding:7px 0}
+  .site-header .brand{width:min(var(--ff-header-logo-width),190px,52vw)}
+  .site-header .brand img{max-height:62px}
 }
