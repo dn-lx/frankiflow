@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: staging
+      url: https://staging.frankiflow.de
 
     steps:
       - name: Checkout develop
@@ -33,6 +34,7 @@ jobs:
         with:
           token: ${{ secrets.SHIP_TOKEN }}
           path: ./public
+          domain: staging.frankiflow.de
           labels: staging,frankiflow,develop
 
       - name: Show staging URL
