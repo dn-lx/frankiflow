@@ -1,4 +1,4 @@
-name: Deploy develop to ShipStatic
+name: Deploy develop to GitHub Pages
 
 on:
   push:
@@ -8,9 +8,11 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 concurrency:
-  group: frankiflow-develop-staging
+  group: frankiflow-develop-pages
   cancel-in-progress: true
 
 jobs:
@@ -18,33 +20,24 @@ jobs:
     name: Deploy staging
     runs-on: ubuntu-latest
     environment:
-      name: staging
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout develop
-        uses: actions/checkout@v7
+        uses: actions/checkout@v6
 
       - name: Validate JavaScript
         run: npm run check
 
-      - name: Deploy public folder to ShipStatic
-        id: shipstatic
-        uses: shipstatic/action@v2
-        with:
-          token: ${{ secrets.SHIP_TOKEN }}
-          path: ./public
-          labels: staging,frankiflow,develop
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
 
-      - name: Show staging URL
-        run: |
-          echo "### FrankiFlow staging deployment" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Branch: \`develop\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Commit: \`${GITHUB_SHA}\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- URL: ${{ steps.shipstatic.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
-          if [ -n "${{ steps.shipstatic.outputs.expires }}" ]; then
-            echo "- Temporary deployment expiry: ${{ steps.shipstatic.outputs.expires }}" >> "$GITHUB_STEP_SUMMARY"
-          fi
-          if [ -n "${{ steps.shipstatic.outputs.claim }}" ]; then
-            echo "- Claim URL: ${{ steps.shipstatic.outputs.claim }}" >> "$GITHUB_STEP_SUMMARY"
-          fi
+      - name: Upload public folder
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./public
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
