@@ -3,8 +3,8 @@ import { FRANKIFLOW_CONFIG } from './config.js';
 const DEFAULT_WIDTH=260;
 const MIN_WIDTH=120;
 const MAX_WIDTH=340;
-const MIN_HEADER_HEIGHT=78;
-const MAX_HEADER_HEIGHT=132;
+const MIN_HEADER_HEIGHT=108;
+const MAX_HEADER_HEIGHT=176;
 
 export function normalizeHeaderLogoWidth(value){
   const parsed=Number(value);
@@ -14,7 +14,7 @@ export function normalizeHeaderLogoWidth(value){
 
 export function headerHeightForLogoWidth(value){
   const width=normalizeHeaderLogoWidth(value);
-  return Math.min(MAX_HEADER_HEIGHT,Math.max(MIN_HEADER_HEIGHT,Math.round(width*.34+16)));
+  return Math.min(MAX_HEADER_HEIGHT,Math.max(MIN_HEADER_HEIGHT,Math.round(width*.42+30)));
 }
 
 export function applyHeaderLogoWidth(value){
