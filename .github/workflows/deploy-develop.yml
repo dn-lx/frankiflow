@@ -10,16 +10,16 @@ permissions:
   contents: read
 
 concurrency:
-  group: frankiflow-develop-staging
+  group: frankiflow-develop
   cancel-in-progress: true
 
 jobs:
   deploy:
-    name: Deploy staging
+    name: Deploy development
     runs-on: ubuntu-latest
     environment:
       name: staging
-      url: ${{ steps.shipstatic.outputs.url }}
+      url: https://frankiflow.shipstatic.com
 
     steps:
       - name: Checkout develop
@@ -34,16 +34,16 @@ jobs:
         with:
           token: ${{ secrets.SHIP_TOKEN }}
           path: ./public
-          domain: ${{ vars.SHIP_DOMAIN || secrets.SHIP_DOMAIN }}
-          labels: staging,frankiflow,develop
+          domain: frankiflow.shipstatic.com
+          labels: development,frankiflow,develop
 
-      - name: Show staging URL
+      - name: Show development URL
         run: |
-          echo "### FrankiFlow staging deployment" >> "$GITHUB_STEP_SUMMARY"
+          echo "### FrankiFlow development deployment" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "- Branch: \`develop\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Commit: \`${GITHUB_SHA}\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- URL: ${{ steps.shipstatic.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- URL: https://frankiflow.shipstatic.com" >> "$GITHUB_STEP_SUMMARY"
           if [ -n "${{ steps.shipstatic.outputs.expires }}" ]; then
             echo "- Expiry: ${{ steps.shipstatic.outputs.expires }}" >> "$GITHUB_STEP_SUMMARY"
           else
