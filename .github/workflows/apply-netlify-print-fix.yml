@@ -1,0 +1,53 @@
+name: Apply Netlify print fix
+
+on:
+  push:
+    branches:
+      - fix/netlify-print
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fix branch
+        uses: actions/checkout@v6
+        with:
+          ref: fix/netlify-print
+
+      - name: Apply synchronous print fix and cache bust
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          js = Path('public/assets/calculator.js')
+          text = js.read_text()
+          old = "  setTimeout(()=>window.print(),120);"
+          new = "  void $('#printSheet').offsetHeight;\n  window.print();"
+          if old not in text:
+              raise SystemExit('Expected delayed print call not found')
+          js.write_text(text.replace(old, new, 1))
+
+          html = Path('public/preisrechner/index.html')
+          h = html.read_text()
+          old_script = '<script src="/assets/calculator.js" type="module"></script>'
+          new_script = '<script src="/assets/calculator.js?v=20260912-print-fix1" type="module"></script>'
+          if old_script not in h:
+              raise SystemExit('Expected calculator script tag not found')
+          html.write_text(h.replace(old_script, new_script, 1))
+          PY
+
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/assets/calculator.js public/preisrechner/index.html
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Fix calculator print activation on Netlify"
+          git push origin HEAD:fix/netlify-print
