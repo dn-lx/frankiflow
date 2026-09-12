@@ -1,7 +1,9 @@
 .ff-logo-size-setting{margin-top:18px;padding:18px;border:1px solid #dbe7eb;border-radius:18px;background:linear-gradient(135deg,#f8fbfc,#fff)}
-.ff-logo-setting-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,380px);gap:22px;align-items:center}
-.ff-logo-preview{min-height:180px;border:1px solid #dce8ec;border-radius:16px;background:#fff;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:18px;padding:16px;overflow:auto}
-.ff-logo-preview span{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#648090}
+.ff-logo-setting-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,420px);gap:22px;align-items:center}
+.ff-logo-preview{border:1px solid #dce8ec;border-radius:16px;background:#f6f9fb;display:flex;flex-direction:column;align-items:stretch;gap:12px;padding:14px;overflow:auto}
+.ff-logo-preview>span{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#648090}
+.ff-logo-preview-stage{display:flex;align-items:center;justify-content:flex-start;width:max-content;min-width:100%;padding:8px 14px;background:#fff;border:1px solid #e1e9ee;border-radius:12px;transition:min-height .15s ease}
 .ff-logo-preview img{display:block;height:auto;max-width:none;max-height:none;object-fit:contain;transition:width .15s ease}
+.ff-logo-height-readout{margin-top:10px;font-size:12px;color:#648090}.ff-logo-height-readout strong{color:#18364a}
 .ff-logo-size-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}.ff-logo-size-state{font-size:13px;font-weight:800;color:#58707f}.ff-logo-size-state.error{color:#b42318}
-@media(max-width:1020px){.ff-logo-setting-grid{grid-template-columns:1fr}.ff-logo-preview{min-height:150px;max-width:100%}}
+@media(max-width:1020px){.ff-logo-setting-grid{grid-template-columns:1fr}.ff-logo-preview{max-width:100%}}
