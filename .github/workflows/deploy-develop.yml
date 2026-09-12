@@ -1,3 +1,4 @@
+# Publishes develop to the repository's current GitHub Pages URL.
 name: Deploy develop to GitHub Pages
 
 on:
