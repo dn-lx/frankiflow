@@ -1,0 +1,49 @@
+name: Deploy develop to ShipStatic
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frankiflow-develop-staging
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy staging
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+
+    steps:
+      - name: Checkout develop
+        uses: actions/checkout@v6
+
+      - name: Validate JavaScript
+        run: npm run check
+
+      - name: Deploy public folder to ShipStatic
+        id: shipstatic
+        uses: shipstatic/action@v2
+        with:
+          token: ${{ secrets.SHIP_TOKEN }}
+          path: ./public
+          labels: staging,frankiflow,develop
+
+      - name: Show staging URL
+        run: |
+          echo "### FrankiFlow staging deployment" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Branch: \`develop\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Commit: \`${GITHUB_SHA}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- URL: ${{ steps.shipstatic.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "${{ steps.shipstatic.outputs.expires }}" ]; then
+            echo "- Expiry: ${{ steps.shipstatic.outputs.expires }}" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "- Expiry: none (authenticated deployment)" >> "$GITHUB_STEP_SUMMARY"
+          fi
