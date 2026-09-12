@@ -46,6 +46,11 @@ function setState(message,isError=false){
   state.classList.toggle('error',isError);
 }
 
+function previewChange(widthValue,heightValue){
+  syncHeaderControls(widthValue,heightValue);
+  setState(tr('Nicht gespeichert','Not Saved'));
+}
+
 async function loadHeaderSettings(){
   const {data,error}=await supabase.from('frankiflow_site_settings').select('header_logo_width_px,header_height_px').eq('id',1).maybeSingle();
   if(error){setState(tr('Header-Einstellungen konnten nicht geladen werden.','Could Not Load Header Settings.'),true);return}
@@ -67,12 +72,6 @@ async function saveHeaderSettings(){
   if(error){setState(`${tr('Fehler','Error')}: ${error.message}`,true);return false}
   setState(`${tr('Gespeichert','Saved')} ✓ · ${synced.width}px / ${synced.height}px`);
   return true;
-}
-
-function markChanged(){
-  const values=currentValues();
-  syncHeaderControls(values.width,values.height);
-  setState(tr('Nicht gespeichert','Not Saved'));
 }
 
 function mountHeaderControls(){
@@ -103,9 +102,16 @@ function mountHeaderControls(){
     </div>`;
   submit?.before(box);
 
-  ['#headerLogoSize','#headerLogoSizeNumber','#headerHeightSize','#headerHeightSizeNumber'].forEach(selector=>{
-    $(selector)?.addEventListener('input',markChanged);
-  });
+  const logoRange=$('#headerLogoSize');
+  const logoNumber=$('#headerLogoSizeNumber');
+  const heightRange=$('#headerHeightSize');
+  const heightNumber=$('#headerHeightSizeNumber');
+
+  logoRange?.addEventListener('input',()=>previewChange(logoRange.value,heightRange?.value??170));
+  logoNumber?.addEventListener('input',()=>previewChange(logoNumber.value,heightRange?.value??170));
+  heightRange?.addEventListener('input',()=>previewChange(logoRange?.value??260,heightRange.value));
+  heightNumber?.addEventListener('input',()=>previewChange(logoRange?.value??260,heightNumber.value));
+
   $('#saveHeaderLogoSize')?.addEventListener('click',saveHeaderSettings);
   form.addEventListener('submit',async()=>{await saveHeaderSettings()});
   loadHeaderSettings();
