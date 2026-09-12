@@ -1,21 +1,26 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
 import { FRANKIFLOW_CONFIG } from './config.js';
 import { tr } from './site-i18n.js';
-import { normalizeHeaderLogoWidth } from './header-logo-settings.js';
+import { headerHeightForLogoWidth, normalizeHeaderLogoWidth } from './header-logo-settings.js';
 
 const supabase=createClient(FRANKIFLOW_CONFIG.supabaseUrl,FRANKIFLOW_CONFIG.supabasePublishableKey);
 const $=(s,p=document)=>p.querySelector(s);
 
 function syncLogoControl(value){
   const width=normalizeHeaderLogoWidth(value);
+  const headerHeight=headerHeightForLogoWidth(width);
   const range=$('#headerLogoSize');
   const number=$('#headerLogoSizeNumber');
   const label=$('#headerLogoSizeValue');
+  const headerLabel=$('#headerHeightValue');
   const preview=$('#headerLogoPreview img');
+  const previewStage=$('#headerLogoPreviewStage');
   if(range)range.value=String(width);
   if(number)number.value=String(width);
   if(label)label.textContent=String(width);
+  if(headerLabel)headerLabel.textContent=String(headerHeight);
   if(preview)preview.style.width=`${width}px`;
+  if(previewStage)previewStage.style.minHeight=`${headerHeight}px`;
   return width;
 }
 
@@ -54,11 +59,12 @@ function mountLogoSizeControl(){
     <div class="ff-logo-setting-grid">
       <div>
         <div class="ff-inline-setting-head"><strong>${tr('Header-Logo-Größe','Header Logo Size')}</strong><span><b id="headerLogoSizeValue">260</b> px</span></div>
-        <div class="ff-range-row"><input id="headerLogoSize" type="range" min="180" max="340" step="5" value="260"><input id="headerLogoSizeNumber" type="number" min="180" max="340" step="5" value="260"></div>
-        <div class="muted">${tr('Empfohlen: 240–280 px. Die Vorschau zeigt jetzt die echte Desktop-Breite. Tablet und Mobil werden weiterhin automatisch begrenzt.','Recommended: 240–280 px. The Preview now shows the actual Desktop Width. Tablet and Mobile are still capped automatically.')}</div>
+        <div class="ff-range-row"><input id="headerLogoSize" type="range" min="120" max="340" step="5" value="260"><input id="headerLogoSizeNumber" type="number" min="120" max="340" step="5" value="260"></div>
+        <div class="muted">${tr('Bereich: 120–340 px. Die Header-Höhe wächst automatisch mit dem Logo; Tablet und Mobil werden weiterhin sinnvoll begrenzt.','Range: 120–340 px. Header Height now grows automatically with the Logo; Tablet and Mobile remain safely capped.')}</div>
+        <div class="ff-logo-height-readout">${tr('Berechnete Header-Höhe','Calculated Header Height')}: <strong><span id="headerHeightValue">104</span> px</strong></div>
         <div class="ff-logo-size-actions"><button type="button" id="saveHeaderLogoSize" class="btn btn-secondary btn-small">${tr('Logo-Größe speichern','Save Logo Size')}</button><span id="headerLogoSizeState" class="ff-logo-size-state">${tr('Bereit','Ready')}</span></div>
       </div>
-      <div class="ff-logo-preview" id="headerLogoPreview"><span>${tr('Vorschau','Preview')}</span><img src="/assets/frankiflow-logo.png" alt="FrankiFlow"></div>
+      <div class="ff-logo-preview" id="headerLogoPreview"><span>${tr('Vorschau','Preview')}</span><div class="ff-logo-preview-stage" id="headerLogoPreviewStage"><img src="/assets/frankiflow-logo.png" alt="FrankiFlow"></div></div>
     </div>`;
   submit?.before(box);
 
