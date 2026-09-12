@@ -1,4 +1,5 @@
 import { FRANKIFLOW_CONFIG } from './config.js';
+import { normalizeEnglishUi, translateDom } from './site-i18n.js';
 
 const CATEGORY_BY_PATH=[
   [/\/bueroreinigung-frankfurt\/?$|\/en\/office-cleaning-frankfurt\/?$/, 'office'],
@@ -16,6 +17,12 @@ function serviceCategory(pathname){
 function publicStorageUrl(path){
   const encoded=String(path).split('/').map(encodeURIComponent).join('/');
   return `${FRANKIFLOW_CONFIG.supabaseUrl.replace(/\/$/,'')}/storage/v1/object/public/${encodeURIComponent(FRANKIFLOW_CONFIG.mediaBucket)}/${encoded}`;
+}
+
+function normalizePageLanguage(){
+  const lang=document.documentElement.lang==='en'?'en':'de';
+  if(lang==='en')translateDom(document,'en');
+  normalizeEnglishUi(document,lang);
 }
 
 async function loadServiceHeroPhoto(){
@@ -51,4 +58,5 @@ async function loadServiceHeroPhoto(){
   }
 }
 
+normalizePageLanguage();
 loadServiceHeroPhoto();
