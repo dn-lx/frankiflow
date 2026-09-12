@@ -1,6 +1,7 @@
 import { FRANKIFLOW_CONFIG } from './config.js';
 import { supabase } from './pricing.js';
 import { getLanguage, initI18n, mountLanguageSwitch, translateDom, tr } from './site-i18n.js';
+import { loadHeaderLogoWidth } from './header-logo-settings.js';
 
 const $=(s,p=document)=>p.querySelector(s); const $$=(s,p=document)=>[...p.querySelectorAll(s)];
 let siteSettings=null;
@@ -53,4 +54,4 @@ function bindUI(){const menu=$('.menu-btn'),nav=$('.nav-links');menu?.addEventLi
 
 mountLanguageSwitch($('.nav-actions'),{prepend:true});initI18n();
 window.addEventListener('frankiflow:language',applySiteLanguage);
-await Promise.allSettled([loadSite(),loadGallery()]);bindUI();applySiteLanguage();
+await Promise.allSettled([loadSite(),loadGallery(),loadHeaderLogoWidth()]);bindUI();applySiteLanguage();
