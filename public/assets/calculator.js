@@ -313,7 +313,8 @@ function printDoc(type,billing=null,invoiceNumber=null){
   </div>
   ${includeChecklist?buildChecklistPrintPages(customerPrimary,customerSecondary):''}`;
   $('#printSheet').setAttribute('aria-hidden','false');
-  setTimeout(()=>window.print(),120);
+  void $('#printSheet').offsetHeight;
+  window.print();
 }
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 async function callAdmin(action){
