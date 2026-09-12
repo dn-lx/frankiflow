@@ -34,7 +34,7 @@ jobs:
         with:
           token: ${{ secrets.SHIP_TOKEN }}
           path: ./public
-          domain: ${{ vars.SHIP_DOMAIN }}
+          domain: ${{ vars.SHIP_DOMAIN || secrets.SHIP_DOMAIN }}
           labels: staging,frankiflow,develop
 
       - name: Show staging URL
