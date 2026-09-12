@@ -1,6 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
 import { FRANKIFLOW_CONFIG } from './config.js';
 import { getLanguage, initI18n, mountLanguageSwitch, setLanguage } from './site-i18n.js';
+import { loadHeaderLogoWidth } from './header-logo-settings.js';
 
 const supabase=createClient(FRANKIFLOW_CONFIG.supabaseUrl,FRANKIFLOW_CONFIG.supabasePublishableKey);
 const $=(s,p=document)=>p.querySelector(s), $$=(s,p=document)=>[...p.querySelectorAll(s)];
@@ -64,5 +65,5 @@ initI18n();
 mountLanguageSwitch($('#aboutNavActions'),{prepend:true});
 bindMenu();
 renderUi();
-await loadAbout();
+await Promise.allSettled([loadAbout(),loadHeaderLogoWidth()]);
 window.addEventListener('frankiflow:language',()=>renderUi());
