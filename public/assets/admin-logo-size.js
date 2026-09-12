@@ -8,7 +8,7 @@ const $=(s,p=document)=>p.querySelector(s);
 
 function currentValues(){
   return {
-    width:normalizeHeaderLogoWidth($('#headerLogoSize')?.value??260),
+    width:normalizeHeaderLogoWidth($('#headerLogoSize')?.value??120),
     height:normalizeHeaderHeight($('#headerHeightSize')?.value??170)
   };
 }
@@ -54,7 +54,7 @@ function previewChange(widthValue,heightValue){
 async function loadHeaderSettings(){
   const {data,error}=await supabase.from('frankiflow_site_settings').select('header_logo_width_px,header_height_px').eq('id',1).maybeSingle();
   if(error){setState(tr('Header-Einstellungen konnten nicht geladen werden.','Could Not Load Header Settings.'),true);return}
-  syncHeaderControls(data?.header_logo_width_px??260,data?.header_height_px??170);
+  syncHeaderControls(data?.header_logo_width_px??120,data?.header_height_px??170);
 }
 
 async function saveHeaderSettings(){
@@ -84,19 +84,19 @@ function mountHeaderControls(){
     <div class="ff-logo-setting-grid">
       <div class="ff-header-controls">
         <div class="ff-header-control-block">
-          <div class="ff-inline-setting-head"><strong>${tr('Header-Logo-Größe','Header Logo Size')}</strong><span><b id="headerLogoSizeValue">260</b> px</span></div>
-          <div class="ff-range-row"><input id="headerLogoSize" type="range" min="120" max="340" step="5" value="260"><input id="headerLogoSizeNumber" type="number" min="120" max="340" step="5" value="260"></div>
-          <div class="muted">${tr('Bereich: 120–340 px.','Range: 120–340 px.')}</div>
+          <div class="ff-inline-setting-head"><strong>${tr('Header-Logo-Größe','Header Logo Size')}</strong><span><b id="headerLogoSizeValue">120</b> px</span></div>
+          <div class="ff-range-row"><input id="headerLogoSize" type="range" min="90" max="250" step="5" value="120"><input id="headerLogoSizeNumber" type="number" min="90" max="250" step="5" value="120"></div>
+          <div class="muted">${tr('Bereich: 90–250 px. Die Einstellung gilt auch für die mobile Ansicht.','Range: 90–250 px. This Setting also applies to the Mobile View.')}</div>
         </div>
 
         <div class="ff-header-control-block">
           <div class="ff-inline-setting-head"><strong>${tr('Header-Höhe','Header Height')}</strong><span><b id="headerHeightSizeValue">170</b> px</span></div>
-          <div class="ff-range-row"><input id="headerHeightSize" type="range" min="120" max="240" step="5" value="170"><input id="headerHeightSizeNumber" type="number" min="120" max="240" step="5" value="170"></div>
-          <div class="muted">${tr('Bereich: 120–240 px. Für große Logos wird automatisch eine sichere Mindesthöhe verwendet.','Range: 120–240 px. A safe minimum is automatically used for very large Logos.')}</div>
+          <div class="ff-range-row"><input id="headerHeightSize" type="range" min="90" max="250" step="5" value="170"><input id="headerHeightSizeNumber" type="number" min="90" max="250" step="5" value="170"></div>
+          <div class="muted">${tr('Bereich: 90–250 px. Für ein großes Logo wird automatisch die nötige Mindesthöhe verwendet.','Range: 90–250 px. A large Logo automatically gets the minimum Height it needs.')}</div>
         </div>
 
         <div class="ff-logo-height-readout">${tr('Tatsächlich angewendete Header-Höhe','Applied Header Height')}: <strong><span id="headerHeightAppliedValue">170</span> px</strong></div>
-        <div class="ff-logo-size-actions"><button type="button" id="saveHeaderLogoSize" class="btn btn-secondary btn-small">${tr('Header-Einstellungen speichern','Save Header Settings')}</button><span id="headerLogoSizeState" class="ff-logo-size-state">${tr('Bereit','Ready')}</span></div>
+        <div class="ff-logo-size-actions"><span class="muted">${tr('Diese Werte werden mit „Änderungen speichern“ gespeichert.','These Values are saved with “Save Changes”.')}</span><span id="headerLogoSizeState" class="ff-logo-size-state">${tr('Bereit','Ready')}</span></div>
       </div>
       <div class="ff-logo-preview" id="headerLogoPreview"><span>${tr('Vorschau','Preview')}</span><div class="ff-logo-preview-stage" id="headerLogoPreviewStage"><img src="/assets/frankiflow-logo.png" alt="FrankiFlow"></div></div>
     </div>`;
@@ -109,10 +109,9 @@ function mountHeaderControls(){
 
   logoRange?.addEventListener('input',()=>previewChange(logoRange.value,heightRange?.value??170));
   logoNumber?.addEventListener('input',()=>previewChange(logoNumber.value,heightRange?.value??170));
-  heightRange?.addEventListener('input',()=>previewChange(logoRange?.value??260,heightRange.value));
-  heightNumber?.addEventListener('input',()=>previewChange(logoRange?.value??260,heightNumber.value));
+  heightRange?.addEventListener('input',()=>previewChange(logoRange?.value??120,heightRange.value));
+  heightNumber?.addEventListener('input',()=>previewChange(logoRange?.value??120,heightNumber.value));
 
-  $('#saveHeaderLogoSize')?.addEventListener('click',saveHeaderSettings);
   form.addEventListener('submit',async()=>{await saveHeaderSettings()});
   loadHeaderSettings();
 }

@@ -1,5 +1,5 @@
-/* FrankiFlow public header: logo width and desktop header height are independently configurable. */
-:root{--ff-header-logo-width:260px;--ff-header-height:170px}
+/* FrankiFlow public header: logo width and header height are configurable across desktop and mobile. */
+:root{--ff-header-logo-width:120px;--ff-header-height:170px}
 .site-header{
   min-height:var(--ff-header-height);
   overflow:visible;
@@ -26,19 +26,20 @@
 }
 
 @media(max-width:1180px){
-  .site-header{min-height:min(var(--ff-header-height),150px)}
-  .site-header .nav{min-height:min(var(--ff-header-height),150px);padding:14px 0}
-  .site-header .brand{width:min(var(--ff-header-logo-width),260px,30vw)}
+  .site-header{min-height:var(--ff-header-height)}
+  .site-header .nav{min-height:var(--ff-header-height);height:auto;padding:14px 0}
+  .site-header .brand{width:min(var(--ff-header-logo-width),34vw)}
 }
 
 @media(max-width:900px){
-  .site-header{min-height:min(var(--ff-header-height),112px)}
-  .site-header .nav{min-height:min(var(--ff-header-height),112px);padding:10px 0}
-  .site-header .brand{width:min(var(--ff-header-logo-width),220px,42vw)}
+  .site-header{min-height:var(--ff-header-height)}
+  .site-header .nav{min-height:var(--ff-header-height);height:auto;padding:10px 0}
+  .site-header .brand{width:min(var(--ff-header-logo-width),46vw)}
 }
 
 @media(max-width:620px){
-  .site-header{min-height:82px}
-  .site-header .nav{min-height:82px;padding:8px 0}
-  .site-header .brand{width:min(var(--ff-header-logo-width),180px,50vw)}
+  .site-header{min-height:var(--ff-header-height)}
+  .site-header .nav{min-height:var(--ff-header-height);height:auto;padding:8px 0}
+  .site-header .brand{width:min(var(--ff-header-logo-width),55vw);height:auto;flex-basis:auto}
+  .site-header .brand img{width:100%;height:auto;max-height:none}
 }
