@@ -31,6 +31,7 @@ jobs:
         id: shipstatic
         uses: shipstatic/action@v2
         with:
+          token: ${{ secrets.SHIP_TOKEN }}
           path: ./public
           labels: staging,frankiflow,develop
 
