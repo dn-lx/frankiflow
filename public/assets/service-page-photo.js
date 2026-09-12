@@ -1,5 +1,6 @@
 import { FRANKIFLOW_CONFIG } from './config.js';
 import { normalizeEnglishUi, translateDom } from './site-i18n.js';
+import { loadHeaderLogoWidth } from './header-logo-settings.js';
 
 const CATEGORY_BY_PATH=[
   [/\/bueroreinigung-frankfurt\/?$|\/en\/office-cleaning-frankfurt\/?$/, 'office'],
@@ -44,4 +45,4 @@ async function loadServiceHeroPhoto(){
 }
 
 normalizePageLanguage();
-loadServiceHeroPhoto();
+Promise.allSettled([loadServiceHeroPhoto(),loadHeaderLogoWidth()]);
