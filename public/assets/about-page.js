@@ -1,69 +1,16 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
 import { FRANKIFLOW_CONFIG } from './config.js';
-import { getLanguage, initI18n, mountLanguageSwitch } from './site-i18n.js';
-import { loadHeaderLogoWidth } from './header-logo-settings.js';
-
 const supabase=createClient(FRANKIFLOW_CONFIG.supabaseUrl,FRANKIFLOW_CONFIG.supabasePublishableKey);
 const $=(s,p=document)=>p.querySelector(s), $$=(s,p=document)=>[...p.querySelectorAll(s)];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const LANG_KEY='frankiflow-lang';
+let currentLang=new URLSearchParams(location.search).get('lang')||localStorage.getItem(LANG_KEY)||'de';if(!['de','en'].includes(currentLang))currentLang='de';
 let aboutData=null;
-
-const ui={
-  de:{home:'Startseite',services:'Leistungen',about:'Über uns',contact:'Kontakt',calculator:'Preis berechnen',company:'FrankiFlow',footerServices:'Leistungen',footerLegal:'Kontakt & Rechtliches',footerBrand:'Gebäudereinigung & Objektbetreuung<br/>Frankfurt am Main & Umgebung',copyright:'© 2026 FrankiFlow. Mehr als Reinigung.',loading:'Inhalt wird geladen …',legal:'Impressum',privacy:'Datenschutz',frankiholz:'FrankiHolz Unterkunft ↗',openCalc:'Preisrechner'},
-  en:{home:'Home',services:'Services',about:'About Us',contact:'Contact',calculator:'Calculate Price',company:'FrankiFlow',footerServices:'Services',footerLegal:'Contact & Legal',footerBrand:'Cleaning & Property Care<br/>Frankfurt am Main & Surrounding Areas',copyright:'© 2026 FrankiFlow. More Than Cleaning.',loading:'Loading content …',legal:'Legal Notice',privacy:'Privacy Policy',frankiholz:'FrankiHolz Accommodation ↗',openCalc:'Price Calculator'}
-};
-
+const ui={de:{home:'Startseite',services:'Leistungen',about:'Über uns',contact:'Kontakt',faq:'FAQ',accommodations:'Accommodations',calculator:'Preis berechnen',heroEyebrow:'Über uns',heroTitle:'Die Geschichte hinter <span class="teal-text">FrankiFlow.</span>',heroLead:'Persönlicher Service, Qualitätsmanagement und Technologie – aufgebaut in Frankfurt am Main.',contactCta:'Kontakt aufnehmen',calcCta:'Preis berechnen',principlesEyebrow:'WOFÜR WIR STEHEN',principlesTitle:'Einfacher Service. Klare Standards.',p1:'Persönlicher Kontakt',p2:'Transparente Abläufe',p3:'Zuverlässige Qualität',p4:'Nachhaltiges Wachstum',storyEyebrow:'Unsere Geschichte',storyTitle:'Wie FrankiFlow <span class="teal-text">entstanden ist.</span>',storyLead:'Von der Idee, Dienstleistungen einfacher zu machen, bis zur Verbindung von Service und eigener Technologie.',ctaEyebrow:'FrankiFlow',ctaTitle:'Service, auf den Sie sich verlassen können.',ctaLead:'Lernen Sie unseren Ansatz kennen oder berechnen Sie direkt einen unverbindlichen Richtpreis.',calcCta2:'Preis berechnen',contactCta2:'Angebot anfragen',company:'FrankiFlow',footerServices:'Leistungen',footerLegal:'Kontakt & Rechtliches',footerBrand:'Gebäudereinigung & Objektbetreuung<br/>Frankfurt am Main & Umgebung',copyright:'© 2026 FrankiFlow. Mehr als Reinigung.',loading:'Inhalt wird geladen …',legal:'Impressum',privacy:'Datenschutz',openCalc:'Preisrechner'},en:{home:'Home',services:'Services',about:'About Us',contact:'Contact',faq:'FAQ',accommodations:'Accommodations',calculator:'Calculate Price',heroEyebrow:'About Us',heroTitle:'The story behind <span class="teal-text">FrankiFlow.</span>',heroLead:'Personal service, quality management and technology – built in Frankfurt am Main.',contactCta:'Contact us',calcCta:'Calculate price',principlesEyebrow:'WHAT WE STAND FOR',principlesTitle:'Simple service. Clear standards.',p1:'Personal contact',p2:'Transparent processes',p3:'Reliable quality',p4:'Sustainable growth',storyEyebrow:'Our Story',storyTitle:'How FrankiFlow <span class="teal-text">began.</span>',storyLead:'From the idea of making everyday services easier to combining personal service with our own technology.',ctaEyebrow:'FrankiFlow',ctaTitle:'Service you can rely on.',ctaLead:'Discover our approach or calculate a non-binding price estimate directly.',calcCta2:'Calculate price',contactCta2:'Request a quote',company:'FrankiFlow',footerServices:'Services',footerLegal:'Contact & Legal',footerBrand:'Cleaning & Property Care<br/>Frankfurt am Main & Surrounding Areas',copyright:'© 2026 FrankiFlow. More Than Cleaning.',loading:'Loading content …',legal:'Legal Notice',privacy:'Privacy Policy',openCalc:'Price Calculator'}};
 function splitParagraphs(text=''){return String(text).split(/\n\s*\n/g).map(x=>x.trim()).filter(Boolean)}
-
-function renderUi(){
-  const lang=getLanguage()==='en'?'en':'de',t=ui[lang];
-  document.documentElement.lang=lang;
-  $('[data-about-nav="home"]').textContent=t.home;
-  $('[data-about-nav="services"]').textContent=t.services;
-  $('[data-about-nav="about"]').textContent=t.about;
-  $('[data-about-nav="contact"]').textContent=t.contact;
-  $('[data-about-nav="calculator"]').innerHTML=`${t.calculator} <span aria-hidden="true">↗</span>`;
-  $('#aboutFooterCompany').textContent=t.company;
-  $('#aboutFooterHome').textContent=t.home;
-  $('#aboutFooterAbout').textContent=t.about;
-  $('#aboutFooterServices').textContent=t.footerServices;
-  $('#aboutFooterContact').textContent=t.contact;
-  $('#aboutFooterLegal').textContent=t.footerLegal;
-  $('#aboutFooterBrand').innerHTML=t.footerBrand;
-  $('#aboutCopyright').textContent=t.copyright;
-  $('#aboutFooterCalculator').textContent=t.openCalc;
-  const legalLinks=$$('.standard-footer-links a[href="/impressum/"],.standard-footer-links a[href="/datenschutz/"]');
-  legalLinks.forEach(a=>a.textContent=a.getAttribute('href').includes('impressum')?t.legal:t.privacy);
-  const fh=$('.standard-footer-bottom a[href^="https://accommodation"]');if(fh)fh.textContent=t.frankiholz;
-  if(aboutData)renderStory();
-  document.title=lang==='en'?'Our Story | FrankiFlow Frankfurt':'Unsere Geschichte | FrankiFlow Frankfurt';
-  const desc=$('meta[name="description"]');if(desc)desc.content=lang==='en'?'The story behind FrankiFlow: personal service, quality management and technology from Frankfurt am Main.':'Die Geschichte hinter FrankiFlow: persönlicher Service, Qualitätsmanagement und Technologie aus Frankfurt am Main.';
-}
-
-function renderStory(){
-  const lang=getLanguage()==='en'?'en':'de';
-  const sections=Array.isArray(aboutData.about_sections)?aboutData.about_sections:[];
-  const host=$('#aboutPageSections');
-  host.innerHTML=sections.map((item,index)=>{
-    const heading=lang==='en'?(item.heading_en||item.heading_de):(item.heading_de||item.heading_en);
-    const body=lang==='en'?(item.body_en||item.body_de):(item.body_de||item.body_en);
-    return `<article class="about-page-story-card"><div class="about-page-story-head"><span>${String(index+1).padStart(2,'0')}</span><h2>${esc(heading||'')}</h2></div><div class="about-page-story-copy">${splitParagraphs(body).map(p=>`<p>${esc(p)}</p>`).join('')}</div></article>`;
-  }).join('')||`<div class="about-page-loading">${esc(ui[lang].loading)}</div>`;
-}
-
-function bindMenu(){
-  const btn=$('.menu-btn'),nav=$('.nav-links');if(!btn||!nav)return;
-  btn.addEventListener('click',()=>{const open=nav.classList.toggle('open');btn.setAttribute('aria-expanded',String(open))});
-}
-
-async function loadAbout(){
-  const {data,error}=await supabase.from('frankiflow_site_settings').select('about_sections').eq('id',1).maybeSingle();
-  if(!error&&data){aboutData=data;renderStory()}
-}
-
-initI18n();
-mountLanguageSwitch($('#aboutNavActions'),{prepend:true});
-bindMenu();
-renderUi();
-await Promise.allSettled([loadAbout(),loadHeaderLogoWidth()]);
-window.addEventListener('frankiflow:language',()=>renderUi());
+function mountLanguageSwitch(){const host=$('#aboutNavActions');if(!host||host.querySelector('.about-lang-switch'))return;const box=document.createElement('div');box.className='about-lang-switch';box.innerHTML='<button type="button" data-about-lang="de">DE</button><button type="button" data-about-lang="en">EN</button>';host.prepend(box);box.addEventListener('click',e=>{const b=e.target.closest('[data-about-lang]');if(!b)return;currentLang=b.dataset.aboutLang;localStorage.setItem(LANG_KEY,currentLang);localStorage.setItem('ff-price-lang',currentLang);const u=new URL(location.href);if(currentLang==='en')u.searchParams.set('lang','en');else u.searchParams.delete('lang');history.replaceState({},'',u);renderUi()})}
+function renderUi(){const t=ui[currentLang];document.documentElement.lang=currentLang;localStorage.setItem(LANG_KEY,currentLang);$$('[data-about-lang]').forEach(b=>b.classList.toggle('active',b.dataset.aboutLang===currentLang));for(const key of ['home','services','about','contact','faq','accommodations']){const el=$(`[data-about-nav="${key}"]`);if(el)el.textContent=t[key]}const calc=$('[data-about-nav="calculator"]');if(calc)calc.innerHTML=`${t.calculator} <span aria-hidden="true">↗</span>`;$$('[data-about-ui]').forEach(el=>{const v=t[el.dataset.aboutUi];if(v!=null){if(v.includes('<span'))el.innerHTML=v;else el.textContent=v}});$('#aboutFooterCompany').textContent=t.company;$('#aboutFooterHome').textContent=t.home;$('#aboutFooterAbout').textContent=t.about;$('#aboutFooterServices').textContent=t.footerServices;$('#aboutFooterContact').textContent=t.contact;$('#aboutFooterLegal').textContent=t.footerLegal;$('#aboutFooterBrand').innerHTML=t.footerBrand;$('#aboutCopyright').textContent=t.copyright;$('#aboutFooterCalculator').textContent=t.openCalc;const legal=$('.standard-footer-links a[href="/impressum/"]'),privacy=$('.standard-footer-links a[href="/datenschutz/"]');if(legal)legal.textContent=t.legal;if(privacy)privacy.textContent=t.privacy;document.title=currentLang==='en'?'Our Story | FrankiFlow Frankfurt':'Unsere Geschichte | FrankiFlow Frankfurt';const desc=$('meta[name="description"]');if(desc)desc.content=currentLang==='en'?'The story behind FrankiFlow: personal service, quality management and technology from Frankfurt am Main.':'Die Geschichte hinter FrankiFlow: persönlicher Service, Qualitätsmanagement und Technologie aus Frankfurt am Main.';renderStory()}
+function renderStory(){if(!aboutData)return;const sections=Array.isArray(aboutData.about_sections)?aboutData.about_sections:[],host=$('#aboutPageSections');host.innerHTML=sections.map((item,index)=>{const heading=currentLang==='en'?(item.heading_en||item.heading_de):(item.heading_de||item.heading_en),body=currentLang==='en'?(item.body_en||item.body_de):(item.body_de||item.body_en);return `<article class="about-page-story-card"><div class="about-page-story-head"><span>${String(index+1).padStart(2,'0')}</span><h2>${esc(heading||'')}</h2></div><div class="about-page-story-copy">${splitParagraphs(body).map(p=>`<p>${esc(p)}</p>`).join('')}</div></article>`}).join('')||`<div class="about-page-loading">${esc(ui[currentLang].loading)}</div>`}
+function bindMenu(){const btn=$('.menu-btn'),nav=$('.nav-links');if(!btn||!nav)return;btn.addEventListener('click',()=>{const open=nav.classList.toggle('open');btn.setAttribute('aria-expanded',String(open))})}
+async function loadAbout(){const {data,error}=await supabase.from('frankiflow_site_settings').select('about_sections').eq('id',1).maybeSingle();if(!error&&data){aboutData=data;renderStory()}}
+mountLanguageSwitch();bindMenu();renderUi();await loadAbout();

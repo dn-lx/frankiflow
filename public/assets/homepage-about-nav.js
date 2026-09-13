@@ -3,6 +3,14 @@ import { getLanguage } from './site-i18n.js';
 const $=(s,p=document)=>p.querySelector(s);
 const $$=(s,p=document)=>[...p.querySelectorAll(s)];
 
+
+function keepAccommodationsLast(){
+  const nav=$('.nav-links');if(!nav)return;
+  let link=nav.querySelector('.nav-accommodations,a[href^="https://accommodation.frankiflow.de"]');
+  if(!link){link=document.createElement('a');link.href='https://accommodation.frankiflow.de/';link.className='nav-accommodations';}
+  link.textContent='Accommodations';link.classList.add('nav-accommodations');nav.append(link);
+}
+
 function keepDedicatedAboutOnly(){
   $('#about')?.remove();
   const lang=getLanguage()==='en'?'en':'de';
@@ -41,4 +49,5 @@ function keepDedicatedAboutOnly(){
 }
 
 keepDedicatedAboutOnly();
-window.addEventListener('frankiflow:language',()=>setTimeout(keepDedicatedAboutOnly,0));
+keepAccommodationsLast();
+window.addEventListener('frankiflow:language',()=>setTimeout(()=>{keepDedicatedAboutOnly();keepAccommodationsLast()},0));

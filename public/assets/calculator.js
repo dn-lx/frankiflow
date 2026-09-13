@@ -6,6 +6,7 @@ const supabase=createClient(FRANKIFLOW_CONFIG.supabaseUrl,FRANKIFLOW_CONFIG.supa
 const $=(s,p=document)=>p.querySelector(s), $$=(s,p=document)=>[...p.querySelectorAll(s)];
 const money=(v,lang=currentLang)=>new Intl.NumberFormat(lang==='de'?'de-DE':'en-IE',{style:'currency',currency:'EUR'}).format(Number(v)||0);
 let currentLang=localStorage.getItem('frankiflow-lang')||localStorage.getItem('ff-price-lang')||'de';
+if(!['de','en'].includes(currentLang))currentLang='de';
 let cfg=null,calc=null,isAdmin=false;
 
 const fallback={
@@ -74,7 +75,7 @@ function updateChecklistUi(){
   renderChecklistPreview();
 }
 function printCompanyFooterHtml(taxNote=''){
-  return `<footer class="print-company-footer"><div class="print-footer-title">FrankiFlow Gebäudereinigung &amp; Objektbetreuung · Gründer: Inura Devasurendra</div><div class="print-company-grid"><div><span>${currentLang==='de'?'Telefon':'Phone'}</span><strong>+49 176 62493041</strong></div><div><span>${currentLang==='de'?'E-Mail':'Email'}</span><strong>info@frankiflow.de</strong></div><div><span>Website</span><strong>www.frankiflow.de</strong></div><div><span>${currentLang==='de'?'Steuernummer':'Tax no.'}</span><strong>014/811/68462</strong></div><div><span>W-IdNr.</span><strong>DE464605581</strong></div></div>${taxNote?`<div class="print-tax-note">${taxNote}</div>`:''}</footer>`;
+  return `<footer class="print-company-footer"><div class="print-footer-title">FrankiFlow Unternehmensdaten</div><div class="print-company-grid"><div><span>${currentLang==='de'?'Telefon':'Phone'}</span><strong>+49 176 62493041</strong></div><div><span>${currentLang==='de'?'E-Mail':'Email'}</span><strong>info@frankiflow.de</strong></div><div><span>Website</span><strong>www.frankiflow.de</strong></div><div><span>${currentLang==='de'?'Steuernummer':'Tax no.'}</span><strong>014/811/68462</strong></div><div><span>W-IdNr.</span><strong>DE464605581</strong></div></div>${taxNote?`<div class="print-tax-note">${taxNote}</div>`:''}</footer>`;
 }
 function buildChecklistPrintPages(customerPrimary,customerSecondary){
   const groups=getChecklistGroups();
@@ -99,10 +100,11 @@ function applyLanguage(){
   document.title=currentLang==='de'?'FrankiFlow Preisrechner | Reinigung in Frankfurt':'FrankiFlow Price Calculator | Cleaning in Frankfurt';
   const meta=document.querySelector('meta[name="description"]');if(meta)meta.content=currentLang==='de'?'Berechnen Sie Ihren unverbindlichen Richtpreis für Büro-, Wohnungs-, Airbnb-, Treppenhaus- oder Fensterreinigung bei FrankiFlow.':'Calculate a non-binding estimate for office, home, Airbnb, stairwell or window cleaning with FrankiFlow.';
   const ph=currentLang==='de'?{customerName:'Max Mustermann',customerCompany:'optional',customerEmail:'name@beispiel.de',customerPhone:'+49 …',customerAddress:'Straße, PLZ, Ort',serviceDate:'z. B. September 2026'}:{customerName:'John Smith',customerCompany:'optional',customerEmail:'name@example.com',customerPhone:'+49 …',customerAddress:'Street, postcode, city',serviceDate:'e.g. September 2026'};for(const [id,v] of Object.entries(ph)){const el=$('#'+id);if(el)el.placeholder=v}
-  \nfunction quoteSnapshot(){return{service_label:calc?.serviceLabel||'',frequency_label:calc?.freq?.label||$('#frequency option:checked')?.textContent||'',visit_price:calc?money(calc.visitTotal):'',monthly_price:calc?money(calc.monthly):'',first_month_price:calc?money(calc.firstMonth):'',breakdown:$('#breakdownRows')?.innerText||'',address:$('#customerAddress')?.value?.trim()||''};}\nfunction openServiceRequest(){if(!calc)return;const name=$('#customerName').value.trim(),email=$('#customerEmail').value.trim();if(!name||!email){alert(currentLang==='de'?'Bitte zuerst Name und E-Mail unter Kundendaten eintragen.':'Please enter your name and email in Customer details first.');return}const modal=$('#quoteRequestModal');$('#requestQuoteSummary').innerHTML=`<strong>${escapeHtml(calc.serviceLabel)}</strong><span>${money(calc.visitTotal)} / ${currentLang==='de'?'Termin':'visit'}</span><span>${money(calc.monthly)} / ${currentLang==='de'?'Monat':'month'}</span><b>${currentLang==='de'?'1. Monat':'1st month'}: ${money(calc.firstMonth)}</b>`;$('#requestPrivacy').checked=false;$('#requestNotice').className='notice hidden';modal.classList.remove('hidden');modal.setAttribute('aria-hidden','false');}\nfunction closeServiceRequest(){const m=$('#quoteRequestModal');m?.classList.add('hidden');m?.setAttribute('aria-hidden','true');}\nasync function submitServiceRequest(){if(!calc)return;const notice=$('#requestNotice');if(!$('#requestPrivacy').checked){notice.textContent=currentLang==='de'?'Bitte stimmen Sie der Datenschutzerklärung zu.':'Please accept the privacy policy.';notice.className='notice error';return}const btn=$('#submitServiceRequest'),old=btn.textContent;btn.disabled=true;btn.textContent=currentLang==='de'?'Wird gesendet …':'Sending …';const payload={service_key:calc.serviceKey,frequency_key:calc.freq?.key||$('#frequency').value,area_sqm:calc.area||null,contract_months:calc.months||null,window_sqm:calc.windowArea||0,equipment_by_frankiflow:!!calc.equipment,deep_cleaning:!!calc.deep,estimated_monthly:Number(calc.monthly.toFixed(2)),customer_name:$('#customerName').value.trim(),customer_email:$('#customerEmail').value.trim().toLowerCase(),customer_phone:$('#customerPhone').value.trim(),postcode:'',company_name:$('#customerCompany').value.trim(),message:$('#requestMessage').value.trim(),privacy_accepted:true,status:'new'};const {data,error}=await supabase.from('frankiflow_quote_requests').insert(payload).select('id').single();if(error){notice.textContent=error.message;notice.className='notice error';btn.disabled=false;btn.textContent=old;return}const common={quote_request_id:data.id,customer_email:payload.customer_email,language:currentLang};const results=await Promise.allSettled([supabase.functions.invoke('frankiflow-email',{body:{event_type:'admin_enquiry',...common,attach_quote:true,quote_snapshot:quoteSnapshot()}}),supabase.functions.invoke('frankiflow-email',{body:{event_type:'enquiry_received',...common}})]);const admin=results[0];if(admin.status==='rejected'||admin.value?.error){notice.textContent=currentLang==='de'?'Die Anfrage wurde gespeichert, aber die E-Mail konnte nicht versendet werden. Bitte kontaktieren Sie uns direkt.':'Your request was saved, but the email could not be sent. Please contact us directly.';notice.className='notice error'}else{notice.textContent=currentLang==='de'?'Vielen Dank. Ihre Anfrage und das berechnete Angebot wurden an FrankiFlow gesendet.':'Thank you. Your request and calculated quotation were sent to FrankiFlow.';notice.className='notice';setTimeout(closeServiceRequest,1400)}btn.disabled=false;btn.textContent=old;}\n
-$$('[data-lang]').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLang));
+  $$('[data-lang]').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLang));
   $$('[data-i18n]').forEach(el=>{const v=t(el.dataset.i18n); if(v.includes('<em>'))el.innerHTML=v;else el.textContent=v});
+  const newCustomerValue=$('#newCustomer').value||'yes';
   $('#newCustomer').innerHTML=currentLang==='de'?'<option value="yes">Ja</option><option value="no">Nein</option>':'<option value="yes">Yes</option><option value="no">No</option>';
+  if([...$('#newCustomer').options].some(o=>o.value===newCustomerValue))$('#newCustomer').value=newCustomerValue;
   renderServices(); renderFrequency(); renderContracts(); updateDynamicLabels(); calculate(); updateChecklistUi();
 }
 function renderServices(){
@@ -159,31 +161,58 @@ function inputState(){
   return {serviceKey,windowOnly,area:windowOnly?0:Math.max(0,Number($('#areaSqm').value)||0),freq,months:Number($('#contractMonths').value)||1,newCustomer:$('#newCustomer').value==='yes',deep:windowOnly?false:$('#deepCleaning').checked,equipment:windowOnly?false:$('#equipment').checked,vat:$('#includeVat').checked,windows:windowOnly||$('#windowCleaning').checked,windowArea:Math.max(0,Number($('#windowSqm').value)||0)};
 }
 function calculate(){
-  if(!cfg)return; const s=inputState();
-  const service=s.windowOnly?{label:'Fensterreinigung',base_1m:0,enabled:true}:cfg.service_settings.services[s.serviceKey]; if(!service)return;
-  const reductionPct=s.windowOnly?0:Number(cfg.contract_settings.base_reduction_pct?.[String(s.months)]||0); const reduction=reductionPct/100;
-  const min=Number(cfg.service_settings.minimum_cleaning_charge||0); const gradient=Number(cfg.service_settings.gradient_per_sqm||0);
-  const base=Number(service.base_1m||0); const adjustedBase=base*(1-reduction);
-  let floorVisit=s.windowOnly?0:(s.area>0?Math.max(min,adjustedBase+s.area*gradient):0);
-  if(!s.windowOnly&&s.area===0&&!s.windows) floorVisit=min;
-  if(s.deep&&cfg.deep_cleaning_settings?.enabled)floorVisit*=1+Number(cfg.deep_cleaning_settings.surcharge_pct||0)/100;
-  let equipmentVisit=0;if(!s.windowOnly&&s.equipment&&cfg.equipment_settings?.enabled)equipmentVisit=Number(cfg.equipment_settings.base||0)+s.area*Number(cfg.equipment_settings.gradient_per_sqm||0);
-  let windowCharge=0;if(s.windows&&cfg.window_settings?.enabled&&s.windowArea>0)windowCharge=Math.max(Number(cfg.window_settings.minimum||0),Number(cfg.window_settings.base||0)+s.windowArea*Number(cfg.window_settings.gradient_per_sqm||0));
-  const visitTotal=s.windowOnly?windowCharge:(floorVisit+equipmentVisit);
-  const visits=Number(s.freq.visits_per_month||1);
-  const subtotal=s.windowOnly?(windowCharge*visits):(visitTotal*visits+windowCharge);
-  const vatRate=(s.vat&&cfg.vat_settings?.enabled)?Number(cfg.vat_settings.rate_pct||0)/100:0;
-  const monthly=subtotal*(1+vatRate);
-  const promoPct=(s.newCustomer&&cfg.promotion_settings?.enabled)?Number(cfg.promotion_settings.first_month_discount_pct||0):0; const promo=promoPct/100;
-  let firstSubtotal=subtotal;
-  if(promo>0){
-    const discountedFloor=floorVisit>0?Math.max(min,floorVisit*(1-promo)):0;
-    const discountedEquip=equipmentVisit*(1-promo);
-    const discountedWindow=windowCharge>0?Math.max(Number(cfg.window_settings?.minimum||0),windowCharge*(1-promo)):0;
-    firstSubtotal=s.windowOnly?(discountedWindow*visits):((discountedFloor+discountedEquip)*visits+discountedWindow);
+  if(!cfg)return;
+  const s=inputState();
+  const service=s.windowOnly?{label:'Fensterreinigung',base_1m:0,enabled:true}:cfg.service_settings.services[s.serviceKey];
+  if(!service)return;
+
+  const reductionPct=s.windowOnly?0:Number(cfg.contract_settings.base_reduction_pct?.[String(s.months)]||0);
+  const reduction=reductionPct/100;
+  const min=Number(cfg.service_settings.minimum_cleaning_charge||0);
+  const gradient=Number(cfg.service_settings.gradient_per_sqm||0);
+  const base=Number(service.base_1m||0);
+  const adjustedBase=base*(1-reduction);
+
+  let floorVisitNet=s.windowOnly?0:(s.area>0?Math.max(min,adjustedBase+s.area*gradient):0);
+  if(!s.windowOnly&&s.area===0&&!s.windows)floorVisitNet=min;
+  if(s.deep&&cfg.deep_cleaning_settings?.enabled)floorVisitNet*=1+Number(cfg.deep_cleaning_settings.surcharge_pct||0)/100;
+
+  let equipmentVisitNet=0;
+  if(!s.windowOnly&&s.equipment&&cfg.equipment_settings?.enabled){
+    equipmentVisitNet=Number(cfg.equipment_settings.base||0)+s.area*Number(cfg.equipment_settings.gradient_per_sqm||0);
   }
-  const firstMonth=firstSubtotal*(1+vatRate);
-  calc={...s,service,serviceLabel:currentLang==='en'?(serviceEnglish[s.serviceKey]||service.label):service.label,reductionPct,floorVisit,equipmentVisit,visitTotal,windowCharge,subtotal,vatRate,monthly,promoPct,firstMonth};
+
+  let windowChargeNet=0;
+  if(s.windows&&cfg.window_settings?.enabled&&s.windowArea>0){
+    windowChargeNet=Math.max(Number(cfg.window_settings.minimum||0),Number(cfg.window_settings.base||0)+s.windowArea*Number(cfg.window_settings.gradient_per_sqm||0));
+  }
+
+  const visits=Number(s.freq.visits_per_month||1);
+  const regularVisitNet=s.windowOnly?windowChargeNet:(floorVisitNet+equipmentVisitNet);
+  // For a mixed cleaning service, window cleaning is a once-per-month add-on. Window-only service follows the selected frequency.
+  const monthlyWindowNet=!s.windowOnly&&s.windows?windowChargeNet:0;
+  const subtotalNet=s.windowOnly?(regularVisitNet*visits):(regularVisitNet*visits+monthlyWindowNet);
+  const vatRate=(s.vat&&cfg.vat_settings?.enabled)?Number(cfg.vat_settings.rate_pct||0)/100:0;
+  const roundMoney=v=>Math.round((Number(v||0)+Number.EPSILON)*100)/100;
+  const gross=v=>roundMoney(Number(v||0)*(1+vatRate));
+
+  const promoPct=(s.newCustomer&&cfg.promotion_settings?.enabled)?Number(cfg.promotion_settings.first_month_discount_pct||0):0;
+  const promo=promoPct/100;
+  let firstSubtotalNet=subtotalNet;
+  if(promo>0){
+    const discountedFloorNet=floorVisitNet>0?Math.max(min,floorVisitNet*(1-promo)):0;
+    const discountedEquipNet=equipmentVisitNet*(1-promo);
+    const discountedWindowNet=windowChargeNet>0?Math.max(Number(cfg.window_settings?.minimum||0),windowChargeNet*(1-promo)):0;
+    firstSubtotalNet=s.windowOnly?(discountedWindowNet*visits):((discountedFloorNet+discountedEquipNet)*visits+discountedWindowNet);
+  }
+
+  const visitTotal=gross(regularVisitNet);
+  const monthly=gross(subtotalNet);
+  const firstMonth=gross(firstSubtotalNet);
+  calc={...s,service,serviceLabel:currentLang==='en'?(serviceEnglish[s.serviceKey]||service.label):service.label,reductionPct,
+    floorVisit:gross(floorVisitNet),equipmentVisit:gross(equipmentVisitNet),windowCharge:gross(windowChargeNet),
+    floorVisitNet:roundMoney(floorVisitNet),equipmentVisitNet:roundMoney(equipmentVisitNet),windowChargeNet:roundMoney(windowChargeNet),
+    visitTotal,subtotal:gross(subtotalNet),subtotalNet:roundMoney(subtotalNet),vatRate,monthly,promoPct,firstMonth};
   renderResult();
 }
 function renderResult(){
@@ -199,12 +228,11 @@ function renderResult(){
     rows.push([calc.deep?t('deep'):t('floorCleaning'),`${calc.freq.visits_per_month} ${t('visitsMonth')}`]);
     if(calc.reductionPct)rows.push([t('contractDiscount'),`−${calc.reductionPct}%`]);
     if(calc.equipment)rows.push([t('materials'),money(calc.equipmentVisit)+` / ${currentLang==='de'?'Termin':'visit'}`]);
-    if(calc.windows)rows.push([t('windowCleaning'),`${calc.windowArea} m² · ${money(calc.windowCharge)}`]);
+    if(calc.windows)rows.push([`${t('windowCleaning')} (${currentLang==='de'?'1×/Monat':'1×/month'})`,`${calc.windowArea} m² · ${money(calc.windowCharge)}`]);
   }
   rows.push([currentLang==='de'?'Vertragslaufzeit':'Contract duration',`${calc.months} ${calc.months===1?t('month'):t('months')}`]);
   $('#breakdownRows').innerHTML=rows.map(([a,b])=>`<div class="breakdown-row"><span>${a}</span><b>${b}</b></div>`).join('');
   updateServiceMode();
-  const iv=$('#islandVisit'),im=$('#islandMonth'),ifm=$('#islandFirst');if(iv)iv.textContent=money(calc.visitTotal);if(im)im.textContent=money(calc.monthly);if(ifm)ifm.textContent=money(calc.firstMonth);
   renderChecklistPreview();
 }
 function printDoc(type,billing=null,invoiceNumber=null){
@@ -334,7 +362,7 @@ async function createInvoice(){
 }
 
 $$('[data-lang]').forEach(b=>b.addEventListener('click',()=>{currentLang=b.dataset.lang;applyLanguage()}));
-$('#requestService')?.addEventListener('click',openServiceRequest);$('#closeRequestDialog')?.addEventListener('click',closeServiceRequest);$('#cancelRequestDialog')?.addEventListener('click',closeServiceRequest);$('#submitServiceRequest')?.addEventListener('click',submitServiceRequest);$('#calculatorForm').addEventListener('input',calculate);$('#calculatorForm').addEventListener('change',calculate);$('#windowCleaning').addEventListener('change',()=>{updateServiceMode();calculate()});$('#printQuote').addEventListener('click',()=>printDoc('quote'));$('#printInvoice').addEventListener('click',createInvoice);
+$('#calculatorForm').addEventListener('input',calculate);$('#calculatorForm').addEventListener('change',calculate);$('#windowCleaning').addEventListener('change',()=>{updateServiceMode();calculate()});$('#printQuote').addEventListener('click',()=>printDoc('quote'));$('#printInvoice').addEventListener('click',createInvoice);
 $('#viewChecklist')?.addEventListener('click',()=>{const preview=$('#checklistPreview');preview?.classList.toggle('hidden');updateChecklistUi();});
 $('#includeChecklist')?.addEventListener('change',()=>renderChecklistPreview());
 await loadConfig(); renderServices(); renderFrequency(); renderContracts(); updateDynamicLabels(); applyLanguage(); await detectAdmin(); calculate(); updateChecklistUi();
