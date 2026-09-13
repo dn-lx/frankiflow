@@ -17,7 +17,9 @@ jobs:
           ref: develop
           fetch-depth: 1
       - name: Apply requested changes
-        run: python scripts/apply-requested-develop-fixes.py
+        run: |
+          python scripts/apply-requested-develop-fixes.py
+          git checkout -- .github/workflows/deploy-develop.yml
       - name: Run syntax checks and calculator tests
         run: |
           npm run check
