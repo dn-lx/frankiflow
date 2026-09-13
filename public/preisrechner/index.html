@@ -91,7 +91,7 @@
 <div class="result-actions">
 <button class="btn-calc primary" data-i18n="printQuote" id="printQuote" type="button">Angebot drucken / PDF</button>
 <button class="btn-calc secondary hidden" data-i18n="printInvoice" id="printInvoice" type="button">Rechnung erstellen</button>
-<a class="btn-calc ghost" data-i18n="request" href="/#kontakt">Persönliches Angebot anfragen</a>
+<button class="btn-calc ghost" data-i18n="request" id="requestService" type="button">Mit Angebot kontaktieren</button>
 </div>
 <p class="result-note" data-i18n="disclaimer">Unverbindlicher Richtpreis. Der endgültige Preis kann nach Besichtigung bzw. genauer Leistungsabstimmung abweichen.</p>
 </div>
@@ -100,6 +100,19 @@
 </section>
 </main>
 <section aria-hidden="true" class="print-sheet" id="printSheet"></section>
+<div aria-hidden="true" class="quote-request-modal hidden" id="quoteRequestModal">
+<div class="quote-request-backdrop" data-close-request></div>
+<section aria-labelledby="requestDialogTitle" aria-modal="true" class="quote-request-dialog" role="dialog">
+<button aria-label="Schließen" class="quote-request-close" id="closeRequestDialog" type="button">×</button>
+<div class="quote-request-heading"><span>FRANKIFLOW</span><h2 id="requestDialogTitle">Mit Angebot kontaktieren</h2><p id="requestDialogIntro">Senden Sie Ihr aktuell berechnetes Angebot zusammen mit Ihren Kontaktdaten direkt an FrankiFlow.</p></div>
+<div class="request-quote-summary" id="requestQuoteSummary"></div>
+<div class="request-form-grid"><label class="field"><span id="requestNameLabel">Name</span><input id="requestName" autocomplete="name"></label><label class="field"><span id="requestEmailLabel">E-Mail</span><input id="requestEmail" type="email" autocomplete="email"></label><label class="field full"><span id="requestPhoneLabel">Telefon</span><input id="requestPhone" type="tel" autocomplete="tel"></label><label class="field full"><span id="requestMessageLabel">Nachricht / Hinweise</span><textarea id="requestMessage" rows="4"></textarea></label></div>
+<label class="request-consent"><input id="requestPrivacy" type="checkbox"><span id="requestPrivacyText">Ich stimme der Verarbeitung meiner Angaben zur Bearbeitung dieser Angebotsanfrage zu.</span> <a href="/datenschutz/" target="_blank">Datenschutz</a></label>
+<div class="request-notice hidden" id="requestNotice"></div>
+<div class="quote-request-actions"><button class="btn-calc ghost" id="cancelRequestDialog" type="button">Abbrechen</button><button class="btn-calc primary" id="submitServiceRequest" type="button">Angebotsanfrage senden</button></div>
+</section>
+</div>
+
 <footer class="calc-footer"><div class="calc-container"><div class="calc-footer-main"><div><img alt="FrankiFlow" src="/assets/frankiflow-logo.png"/><p>Gebäudereinigung &amp; Objektbetreuung · Frankfurt am Main &amp; Umgebung</p></div><div class="calc-footer-links"><a href="tel:+4917662493041">+49 176 62493041</a><a href="mailto:info@frankiflow.de">info@frankiflow.de</a><a class="footer-whatsapp-link" href="https://wa.link/9knp7y" rel="noopener" target="_blank">WhatsApp</a><a href="https://accommodation.frankiflow.de/">FrankiHolz Unterkunft / Accommodation ↗</a><a href="/impressum/">Impressum</a><a href="/datenschutz/">Datenschutz</a></div></div><div class="calc-footer-copy">© 2026 FrankiFlow. Mehr als Reinigung.</div></div></footer>
 <script src="/assets/calculator.js?v=20260914-fullfix1" type="module"></script>
 <script src="/assets/calculator-mobile-island.js?v=20260914-fullfix1" defer></script>

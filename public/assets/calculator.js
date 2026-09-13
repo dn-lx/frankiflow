@@ -1,6 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
 import { FRANKIFLOW_CONFIG } from './config.js';
 import { applyChecklistRows, localizeChecklistSections } from './checklists.js';
+import { calculatePricing } from './calculator-engine.js';
 
 const supabase=createClient(FRANKIFLOW_CONFIG.supabaseUrl,FRANKIFLOW_CONFIG.supabasePublishableKey);
 const $=(s,p=document)=>p.querySelector(s), $$=(s,p=document)=>[...p.querySelectorAll(s)];
@@ -17,11 +18,11 @@ const fallback={
   promotion_settings:{label:'25% Neukundenrabatt im ersten Monat',enabled:true,first_month_discount_pct:25},
   service_settings:{services:{buero:{label:'Büroreinigung',base_1m:24,enabled:true},airbnb:{label:'Ferienwohnung / Airbnb',base_1m:26,enabled:true},wohnung:{label:'Wohnungsreinigung',base_1m:30,enabled:true},treppenhaus:{label:'Treppenhausreinigung',base_1m:24,enabled:true}},gradient_per_sqm:.2304,minimum_cleaning_charge:30},
   vat_settings:{label:'MwSt. zum Rechnungsbetrag hinzufügen',enabled:true,rate_pct:19,customer_pays_default:false},
-  window_settings:{base:5,enabled:true,minimum:35,gradient_per_sqm:3}
+  window_settings:{base:5,enabled:true,minimum:35,gradient_per_sqm:3,contract_reduction_pct:{1:0,3:2,6:4,9:6,12:8,24:10}}
 };
 const i18n={
- de:{website:'Zur Website',eyebrow:'FRANKIFLOW PREISRECHNER',title:'Ihr Reinigungspreis. <em>Transparent berechnet.</em>',intro:'Wählen Sie Leistung, Fläche und Häufigkeit. Sie erhalten sofort einen unverbindlichen Richtpreis – ohne Registrierung.',instant:'Sofortiger Richtpreis',noReg:'Keine Registrierung',frankfurt:'Frankfurt & Umgebung',serviceTitle:'Welche Reinigung benötigen Sie?',serviceHint:'Wählen Sie die Leistung, die am besten passt.',scopeTitle:'Objekt & Umfang',scopeHint:'Fläche und Reinigungsrhythmus bestimmen den Richtpreis.',area:'Reinigungsfläche',areaHelp:'Bei reiner Fensterreinigung kann die Fläche 0 sein.',frequency:'Häufigkeit',contract:'Vertragslaufzeit',newCustomer:'Neukunde?',extrasTitle:'Optionale Leistungen',extrasHint:'Nur auswählen, wenn Sie diese Leistungen benötigen.',equipment:'Reinigungsmittel & Equipment',equipmentHint:'FrankiFlow stellt benötigte Materialien.',vat:'MwSt. hinzufügen',windows:'Fensterreinigung',windowsHint:'Optional nach Glasfläche.',glassArea:'Glasfläche',quoteTitle:'Angebot vorbereiten',quoteHint:'Optional: Tragen Sie Ihre Daten ein, wenn Sie das Ergebnis als Angebot drucken möchten.',name:'Name',company:'Firma / Objekt',phone:'Telefon',address:'Adresse / Leistungsort',serviceDate:'Leistungsdatum / Zeitraum',yourPrice:'IHR RICHTPREIS',perVisit:'Preis pro Termin',perMonth:'Preis pro Monat',firstMonth:'1. Monat als Neukunde',overview:'Übersicht',printQuote:'Angebot drucken / PDF',printInvoice:'Rechnung erstellen',request:'Persönliches Angebot anfragen',disclaimer:'Unverbindlicher Richtpreis. Der endgültige Preis kann nach Besichtigung bzw. genauer Leistungsabstimmung abweichen.',vatIncluded:'MwSt. enthalten',vatNotIncluded:'MwSt. nicht enthalten',discount:'Rabatt berücksichtigt',months:'Monate',month:'Monat',visitsMonth:'Termine/Monat',floorCleaning:'Allgemeine Reinigung',windowCleaning:'Fensterreinigung',deep:'Grundreinigung',materials:'Equipment & Reinigungsmittel',contractDiscount:'Laufzeitvorteil auf Basisanteil',quote:'ANGEBOT',invoice:'RECHNUNG',nonBinding:'Unverbindlicher Richtpreis / Preisvorschlag',customer:'Angebot an',invoiceTo:'Rechnung an',date:'Datum',service:'Leistung',totalMonth:'Monatlicher Richtpreis',firstMonthTotal:'1. Monat mit Neukundenrabatt',termsQuote:'Dieses Angebot ist unverbindlich. Der endgültige Preis richtet sich nach dem tatsächlich vereinbarten Leistungsumfang, Objektzustand und ggf. einer Besichtigung.',termsInvoice:'Bitte begleichen Sie den Rechnungsbetrag innerhalb des angegebenen Zahlungsziels.',adminNeeded:'Für Rechnungen bitte im FrankiFlow Website-Admin anmelden und den Rechner dort öffnen.'},
- en:{website:'Back to website',eyebrow:'FRANKIFLOW PRICE CALCULATOR',title:'Your cleaning price. <em>Calculated transparently.</em>',intro:'Choose the service, area and frequency. You receive an instant non-binding estimate – no registration required.',instant:'Instant estimate',noReg:'No registration',frankfurt:'Frankfurt & surroundings',serviceTitle:'Which cleaning service do you need?',serviceHint:'Choose the service that best matches your property.',scopeTitle:'Property & scope',scopeHint:'Area and cleaning frequency determine the estimate.',area:'Floor area',areaHelp:'For window-only cleaning, floor area may be 0.',frequency:'Frequency',contract:'Contract duration',newCustomer:'New customer?',extrasTitle:'Optional services',extrasHint:'Select only the extras you need.',equipment:'Cleaning supplies & equipment',equipmentHint:'FrankiFlow provides the required materials.',vat:'Add VAT',windows:'Window cleaning',windowsHint:'Optional, calculated by glass area.',glassArea:'Glass area',quoteTitle:'Prepare a quotation',quoteHint:'Optional: enter your details to print the result as a quotation.',name:'Name',company:'Company / property',phone:'Phone',address:'Address / service location',serviceDate:'Service date / period',yourPrice:'YOUR ESTIMATE',perVisit:'Price per visit',perMonth:'Price per month',firstMonth:'1st month as new customer',overview:'Overview',printQuote:'Print quotation / PDF',printInvoice:'Create invoice',request:'Request a personal quote',disclaimer:'Non-binding estimate. The final price may vary after inspection or detailed agreement of the service scope.',vatIncluded:'VAT included',vatNotIncluded:'VAT not included',discount:'discount applied',months:'months',month:'month',visitsMonth:'visits/month',floorCleaning:'General cleaning',windowCleaning:'Window cleaning',deep:'Deep cleaning',materials:'Equipment & cleaning supplies',contractDiscount:'Contract saving on base component',quote:'QUOTATION',invoice:'INVOICE',nonBinding:'Non-binding price estimate',customer:'Quotation for',invoiceTo:'Bill to',date:'Date',service:'Service',totalMonth:'Estimated monthly total',firstMonthTotal:'1st month incl. new-customer discount',termsQuote:'This quotation is non-binding. The final price depends on the agreed service scope, property condition and any required inspection.',termsInvoice:'Please pay the invoice within the stated payment terms.',adminNeeded:'Please sign in through the FrankiFlow website admin and open the calculator from there before creating invoices.'}
+ de:{website:'Zur Website',eyebrow:'FRANKIFLOW PREISRECHNER',title:'Ihr Reinigungspreis. <em>Transparent berechnet.</em>',intro:'Wählen Sie Leistung, Fläche und Häufigkeit. Sie erhalten sofort einen unverbindlichen Richtpreis – ohne Registrierung.',instant:'Sofortiger Richtpreis',noReg:'Keine Registrierung',frankfurt:'Frankfurt & Umgebung',serviceTitle:'Welche Reinigung benötigen Sie?',serviceHint:'Wählen Sie die Leistung, die am besten passt.',scopeTitle:'Objekt & Umfang',scopeHint:'Fläche und Reinigungsrhythmus bestimmen den Richtpreis.',area:'Reinigungsfläche',areaHelp:'Bei reiner Fensterreinigung kann die Fläche 0 sein.',frequency:'Häufigkeit',contract:'Vertragslaufzeit',newCustomer:'Neukunde?',extrasTitle:'Optionale Leistungen',extrasHint:'Nur auswählen, wenn Sie diese Leistungen benötigen.',equipment:'Reinigungsmittel & Equipment',equipmentHint:'FrankiFlow stellt benötigte Materialien.',vat:'MwSt. hinzufügen',windows:'Fensterreinigung',windowsHint:'Optional nach Glasfläche.',glassArea:'Glasfläche',quoteTitle:'Angebot vorbereiten',quoteHint:'Optional: Tragen Sie Ihre Daten ein, wenn Sie das Ergebnis als Angebot drucken möchten.',name:'Name',company:'Firma / Objekt',phone:'Telefon',address:'Adresse / Leistungsort',serviceDate:'Leistungsdatum / Zeitraum',yourPrice:'IHR RICHTPREIS',perVisit:'Preis pro Termin',perMonth:'Preis pro Monat',firstMonth:'1. Monat als Neukunde',overview:'Übersicht',printQuote:'Angebot drucken / PDF',printInvoice:'Rechnung erstellen',request:'Mit Angebot kontaktieren',disclaimer:'Unverbindlicher Richtpreis. Der endgültige Preis kann nach Besichtigung bzw. genauer Leistungsabstimmung abweichen.',vatIncluded:'MwSt. enthalten',vatNotIncluded:'MwSt. nicht enthalten',discount:'Rabatt berücksichtigt',months:'Monate',month:'Monat',visitsMonth:'Termine/Monat',floorCleaning:'Allgemeine Reinigung',windowCleaning:'Fensterreinigung',deep:'Grundreinigung',materials:'Equipment & Reinigungsmittel',contractDiscount:'Laufzeitvorteil auf Basisanteil',quote:'ANGEBOT',invoice:'RECHNUNG',nonBinding:'Unverbindlicher Richtpreis / Preisvorschlag',customer:'Angebot an',invoiceTo:'Rechnung an',date:'Datum',service:'Leistung',totalMonth:'Monatlicher Richtpreis',firstMonthTotal:'1. Monat mit Neukundenrabatt',termsQuote:'Dieses Angebot ist unverbindlich. Der endgültige Preis richtet sich nach dem tatsächlich vereinbarten Leistungsumfang, Objektzustand und ggf. einer Besichtigung.',termsInvoice:'Bitte begleichen Sie den Rechnungsbetrag innerhalb des angegebenen Zahlungsziels.',adminNeeded:'Für Rechnungen bitte im FrankiFlow Website-Admin anmelden und den Rechner dort öffnen.'},
+ en:{website:'Back to website',eyebrow:'FRANKIFLOW PRICE CALCULATOR',title:'Your cleaning price. <em>Calculated transparently.</em>',intro:'Choose the service, area and frequency. You receive an instant non-binding estimate – no registration required.',instant:'Instant estimate',noReg:'No registration',frankfurt:'Frankfurt & surroundings',serviceTitle:'Which cleaning service do you need?',serviceHint:'Choose the service that best matches your property.',scopeTitle:'Property & scope',scopeHint:'Area and cleaning frequency determine the estimate.',area:'Floor area',areaHelp:'For window-only cleaning, floor area may be 0.',frequency:'Frequency',contract:'Contract duration',newCustomer:'New customer?',extrasTitle:'Optional services',extrasHint:'Select only the extras you need.',equipment:'Cleaning supplies & equipment',equipmentHint:'FrankiFlow provides the required materials.',vat:'Add VAT',windows:'Window cleaning',windowsHint:'Optional, calculated by glass area.',glassArea:'Glass area',quoteTitle:'Prepare a quotation',quoteHint:'Optional: enter your details to print the result as a quotation.',name:'Name',company:'Company / property',phone:'Phone',address:'Address / service location',serviceDate:'Service date / period',yourPrice:'YOUR ESTIMATE',perVisit:'Price per visit',perMonth:'Price per month',firstMonth:'1st month as new customer',overview:'Overview',printQuote:'Print quotation / PDF',printInvoice:'Create invoice',request:'Contact with the Quotation',disclaimer:'Non-binding estimate. The final price may vary after inspection or detailed agreement of the service scope.',vatIncluded:'VAT included',vatNotIncluded:'VAT not included',discount:'discount applied',months:'months',month:'month',visitsMonth:'visits/month',floorCleaning:'General cleaning',windowCleaning:'Window cleaning',deep:'Deep cleaning',materials:'Equipment & cleaning supplies',contractDiscount:'Contract saving on base component',quote:'QUOTATION',invoice:'INVOICE',nonBinding:'Non-binding price estimate',customer:'Quotation for',invoiceTo:'Bill to',date:'Date',service:'Service',totalMonth:'Estimated monthly total',firstMonthTotal:'1st month incl. new-customer discount',termsQuote:'This quotation is non-binding. The final price depends on the agreed service scope, property condition and any required inspection.',termsInvoice:'Please pay the invoice within the stated payment terms.',adminNeeded:'Please sign in through the FrankiFlow website admin and open the calculator from there before creating invoices.'}
 };
 const serviceEnglish={buero:'Office cleaning',wohnung:'Home cleaning',airbnb:'Holiday rental / Airbnb',treppenhaus:'Stairwell cleaning',fenster:'Window cleaning'};
 const serviceHints={de:{buero:'Büro, Praxis & Gewerbe',wohnung:'Wohnung & Privathaushalt',airbnb:'Turnover & Ferienunterkunft',treppenhaus:'Mehrfamilienhaus & Gemeinschaftsfläche',fenster:'Nur Fenster & Glasflächen'},en:{buero:'Office, practice & commercial',wohnung:'Apartment & private home',airbnb:'Turnover & holiday rental',treppenhaus:'Apartment building & common areas',fenster:'Windows & glass only'}};
@@ -75,7 +76,7 @@ function updateChecklistUi(){
   renderChecklistPreview();
 }
 function printCompanyFooterHtml(taxNote=''){
-  return `<footer class="print-company-footer"><div class="print-footer-title">FrankiFlow Unternehmensdaten</div><div class="print-company-grid"><div><span>${currentLang==='de'?'Telefon':'Phone'}</span><strong>+49 176 62493041</strong></div><div><span>${currentLang==='de'?'E-Mail':'Email'}</span><strong>info@frankiflow.de</strong></div><div><span>Website</span><strong>www.frankiflow.de</strong></div><div><span>${currentLang==='de'?'Steuernummer':'Tax no.'}</span><strong>014/811/68462</strong></div><div><span>W-IdNr.</span><strong>DE464605581</strong></div></div>${taxNote?`<div class="print-tax-note">${taxNote}</div>`:''}</footer>`;
+  return `<footer class="print-company-footer"><div class="print-footer-title">FrankiFlow Gebäudereinigung &amp; Objektbetreuung</div><div class="print-footer-founder">Inura Devasurendra · ${currentLang==='de'?'Gründer':'Founder'}</div><div class="print-company-grid"><div><span>${currentLang==='de'?'Telefon':'Phone'}</span><strong>+49 176 62493041</strong></div><div><span>${currentLang==='de'?'E-Mail':'Email'}</span><strong>info@frankiflow.de</strong></div><div><span>Website</span><strong>www.frankiflow.de</strong></div><div><span>${currentLang==='de'?'Steuernummer':'Tax no.'}</span><strong>014/811/68462</strong></div><div><span>W-IdNr.</span><strong>DE464605581</strong></div></div>${taxNote?`<div class="print-tax-note">${taxNote}</div>`:''}</footer>`;
 }
 function buildChecklistPrintPages(customerPrimary,customerSecondary){
   const groups=getChecklistGroups();
@@ -100,7 +101,47 @@ function applyLanguage(){
   document.title=currentLang==='de'?'FrankiFlow Preisrechner | Reinigung in Frankfurt':'FrankiFlow Price Calculator | Cleaning in Frankfurt';
   const meta=document.querySelector('meta[name="description"]');if(meta)meta.content=currentLang==='de'?'Berechnen Sie Ihren unverbindlichen Richtpreis für Büro-, Wohnungs-, Airbnb-, Treppenhaus- oder Fensterreinigung bei FrankiFlow.':'Calculate a non-binding estimate for office, home, Airbnb, stairwell or window cleaning with FrankiFlow.';
   const ph=currentLang==='de'?{customerName:'Max Mustermann',customerCompany:'optional',customerEmail:'name@beispiel.de',customerPhone:'+49 …',customerAddress:'Straße, PLZ, Ort',serviceDate:'z. B. September 2026'}:{customerName:'John Smith',customerCompany:'optional',customerEmail:'name@example.com',customerPhone:'+49 …',customerAddress:'Street, postcode, city',serviceDate:'e.g. September 2026'};for(const [id,v] of Object.entries(ph)){const el=$('#'+id);if(el)el.placeholder=v}
-  $$('[data-lang]').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLang));
+  
+function quoteSnapshot(){return{service_label:calc?.serviceLabel||'',frequency_label:calc?.freq?.label||$('#frequency option:checked')?.textContent||'',visit_price:calc?money(calc.visitTotal):'',monthly_price:calc?money(calc.monthly):'',first_month_price:calc?money(calc.firstMonth):'',breakdown:$('#breakdownRows')?.innerText||'',address:$('#customerAddress')?.value?.trim()||''};}
+function syncRequestDialogLanguage(){
+  const en=currentLang==='en';
+  if($('#requestDialogTitle'))$('#requestDialogTitle').textContent=en?'Contact with the Quotation':'Mit Angebot kontaktieren';
+  if($('#requestDialogIntro'))$('#requestDialogIntro').textContent=en?'Send your current calculated quotation and contact details directly to FrankiFlow.':'Senden Sie Ihr aktuell berechnetes Angebot zusammen mit Ihren Kontaktdaten direkt an FrankiFlow.';
+  if($('#requestNameLabel'))$('#requestNameLabel').textContent=en?'Name':'Name';
+  if($('#requestEmailLabel'))$('#requestEmailLabel').textContent=en?'Email':'E-Mail';
+  if($('#requestPhoneLabel'))$('#requestPhoneLabel').textContent=en?'Phone':'Telefon';
+  if($('#requestMessageLabel'))$('#requestMessageLabel').textContent=en?'Message / notes':'Nachricht / Hinweise';
+  if($('#requestPrivacyText'))$('#requestPrivacyText').textContent=en?'I agree that my details may be processed to handle this quotation enquiry.':'Ich stimme der Verarbeitung meiner Angaben zur Bearbeitung dieser Angebotsanfrage zu.';
+  if($('#submitServiceRequest'))$('#submitServiceRequest').textContent=en?'Send quotation request':'Angebotsanfrage senden';
+  if($('#cancelRequestDialog'))$('#cancelRequestDialog').textContent=en?'Cancel':'Abbrechen';
+}
+function openServiceRequest(){
+  if(!calc)return;
+  syncRequestDialogLanguage();
+  $('#requestName').value=$('#customerName').value.trim();$('#requestEmail').value=$('#customerEmail').value.trim();$('#requestPhone').value=$('#customerPhone').value.trim();
+  $('#requestQuoteSummary').innerHTML=`<strong>${escapeHtml(calc.serviceLabel)}</strong><span>${money(calc.visitTotal)} / ${currentLang==='de'?'Termin':'visit'}</span><span>${money(calc.monthly)} / ${currentLang==='de'?'Monat':'month'}</span>${calc.promoPct?`<b>${currentLang==='de'?'1. Monat':'1st month'}: ${money(calc.firstMonth)}</b>`:''}`;
+  $('#requestPrivacy').checked=false;$('#requestNotice').textContent='';$('#requestNotice').className='request-notice hidden';
+  const modal=$('#quoteRequestModal');modal.classList.remove('hidden');modal.setAttribute('aria-hidden','false');$('#requestName').focus();
+}
+function closeServiceRequest(){const modal=$('#quoteRequestModal');modal?.classList.add('hidden');modal?.setAttribute('aria-hidden','true')}
+async function submitServiceRequest(){
+  if(!calc)return;
+  const name=$('#requestName').value.trim(),email=$('#requestEmail').value.trim().toLowerCase(),phone=$('#requestPhone').value.trim(),notice=$('#requestNotice');
+  if(!name||!email||!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){notice.textContent=currentLang==='de'?'Bitte geben Sie Name und eine gültige E-Mail-Adresse ein.':'Please enter your name and a valid email address.';notice.className='request-notice error';return}
+  if(!$('#requestPrivacy').checked){notice.textContent=currentLang==='de'?'Bitte stimmen Sie der Datenverarbeitung zu.':'Please accept the data-processing consent.';notice.className='request-notice error';return}
+  $('#customerName').value=name;$('#customerEmail').value=email;$('#customerPhone').value=phone;
+  const btn=$('#submitServiceRequest'),old=btn.textContent;btn.disabled=true;btn.textContent=currentLang==='de'?'Wird gesendet …':'Sending …';
+  const payload={service_key:calc.serviceKey,frequency_key:calc.freq?.key||$('#frequency').value,area_sqm:calc.area||null,contract_months:calc.months||null,window_sqm:calc.windowArea||0,equipment_by_frankiflow:!!calc.equipment,deep_cleaning:!!calc.deep,estimated_monthly:Number(calc.monthly.toFixed(2)),customer_name:name,customer_email:email,customer_phone:phone,postcode:'',company_name:$('#customerCompany').value.trim(),message:$('#requestMessage').value.trim(),privacy_accepted:true,status:'new'};
+  const {data,error}=await supabase.from('frankiflow_quote_requests').insert(payload).select('id').single();
+  if(error){notice.textContent=(currentLang==='de'?'Senden fehlgeschlagen: ':'Could not send: ')+error.message;notice.className='request-notice error';btn.disabled=false;btn.textContent=old;return}
+  const common={quote_request_id:data.id,customer_email:email,language:currentLang};
+  const results=await Promise.allSettled([supabase.functions.invoke('frankiflow-email',{body:{event_type:'admin_enquiry',...common,attach_quote:true,quote_snapshot:quoteSnapshot()}}),supabase.functions.invoke('frankiflow-email',{body:{event_type:'enquiry_received',...common}})]);
+  const admin=results[0];const adminFailed=admin.status==='rejected'||admin.value?.error;
+  if(adminFailed){notice.textContent=currentLang==='de'?'Die Anfrage wurde gespeichert, aber die Admin-E-Mail konnte nicht versendet werden.':'The enquiry was saved, but the admin email could not be sent.';notice.className='request-notice error'}else{notice.textContent=currentLang==='de'?'Gesendet. FrankiFlow hat Ihr Angebot und Ihre Kontaktdaten erhalten.':'Sent. FrankiFlow received your quotation and contact details.';notice.className='request-notice success';setTimeout(closeServiceRequest,1500)}
+  btn.disabled=false;btn.textContent=old;
+}
+
+$$('[data-lang]').forEach(b=>b.classList.toggle('active',b.dataset.lang===currentLang));
   $$('[data-i18n]').forEach(el=>{const v=t(el.dataset.i18n); if(v.includes('<em>'))el.innerHTML=v;else el.textContent=v});
   const newCustomerValue=$('#newCustomer').value||'yes';
   $('#newCustomer').innerHTML=currentLang==='de'?'<option value="yes">Ja</option><option value="no">Nein</option>':'<option value="yes">Yes</option><option value="no">No</option>';
@@ -163,64 +204,12 @@ function inputState(){
 function calculate(){
   if(!cfg)return;
   const s=inputState();
-  const service=s.windowOnly?{label:'Fensterreinigung',base_1m:0,enabled:true}:cfg.service_settings.services[s.serviceKey];
-  if(!service)return;
-
-  const reductionPct=s.windowOnly?0:Number(cfg.contract_settings.base_reduction_pct?.[String(s.months)]||0);
-  const reduction=reductionPct/100;
-  const min=Number(cfg.service_settings.minimum_cleaning_charge||0);
-  const gradient=Number(cfg.service_settings.gradient_per_sqm||0);
-  const base=Number(service.base_1m||0);
-  const adjustedBase=base*(1-reduction);
-
-  let floorVisitNet=s.windowOnly?0:(s.area>0?Math.max(min,adjustedBase+s.area*gradient):0);
-  if(!s.windowOnly&&s.area===0&&!s.windows)floorVisitNet=min;
-  if(s.deep&&cfg.deep_cleaning_settings?.enabled)floorVisitNet*=1+Number(cfg.deep_cleaning_settings.surcharge_pct||0)/100;
-
-  let equipmentVisitNet=0;
-  if(!s.windowOnly&&s.equipment&&cfg.equipment_settings?.enabled){
-    equipmentVisitNet=Number(cfg.equipment_settings.base||0)+s.area*Number(cfg.equipment_settings.gradient_per_sqm||0);
-  }
-
-  let windowChargeNet=0;
-  if(s.windows&&cfg.window_settings?.enabled&&s.windowArea>0){
-    windowChargeNet=Math.max(Number(cfg.window_settings.minimum||0),Number(cfg.window_settings.base||0)+s.windowArea*Number(cfg.window_settings.gradient_per_sqm||0));
-  }
-
-  const visits=Number(s.freq.visits_per_month||1);
-  const regularVisitNet=s.windowOnly?windowChargeNet:(floorVisitNet+equipmentVisitNet);
-  // For a mixed cleaning service, window cleaning is a once-per-month add-on. Window-only service follows the selected frequency.
-  const monthlyWindowNet=!s.windowOnly&&s.windows?windowChargeNet:0;
-  const subtotalNet=s.windowOnly?(regularVisitNet*visits):(regularVisitNet*visits+monthlyWindowNet);
-  const vatRate=(s.vat&&cfg.vat_settings?.enabled)?Number(cfg.vat_settings.rate_pct||0)/100:0;
-  const roundMoney=v=>Math.round((Number(v||0)+Number.EPSILON)*100)/100;
-  const gross=v=>roundMoney(Number(v||0)*(1+vatRate));
-
-  const promoPct=(s.newCustomer&&cfg.promotion_settings?.enabled)?Number(cfg.promotion_settings.first_month_discount_pct||0):0;
-  const promo=promoPct/100;
-  let firstFloorNet=floorVisitNet,firstEquipmentNet=equipmentVisitNet,firstWindowNet=windowChargeNet;
-  if(promo>0){
-    firstFloorNet=floorVisitNet>0?Math.max(min,floorVisitNet*(1-promo)):0;
-    firstEquipmentNet=equipmentVisitNet*(1-promo);
-    firstWindowNet=windowChargeNet>0?Math.max(Number(cfg.window_settings?.minimum||0),windowChargeNet*(1-promo)):0;
-  }
-
-  // Round customer-visible line items first so every displayed total adds up exactly to the cent.
-  const floorVisitGross=gross(floorVisitNet);
-  const equipmentVisitGross=gross(equipmentVisitNet);
-  const windowChargeGross=gross(windowChargeNet);
-  const visitTotal=s.windowOnly?windowChargeGross:roundMoney(floorVisitGross+equipmentVisitGross);
-  const monthly=s.windowOnly?roundMoney(windowChargeGross*visits):roundMoney(visitTotal*visits+(s.windows?windowChargeGross:0));
-  const firstFloorGross=gross(firstFloorNet);
-  const firstEquipmentGross=gross(firstEquipmentNet);
-  const firstWindowGross=gross(firstWindowNet);
-  const firstVisitGross=s.windowOnly?firstWindowGross:roundMoney(firstFloorGross+firstEquipmentGross);
-  const firstMonth=s.windowOnly?roundMoney(firstVisitGross*visits):roundMoney(firstVisitGross*visits+(s.windows?firstWindowGross:0));
-  calc={...s,service,serviceLabel:currentLang==='en'?(serviceEnglish[s.serviceKey]||service.label):service.label,reductionPct,
-    floorVisit:floorVisitGross,equipmentVisit:equipmentVisitGross,windowCharge:windowChargeGross,
-    floorVisitNet:roundMoney(floorVisitNet),equipmentVisitNet:roundMoney(equipmentVisitNet),windowChargeNet:roundMoney(windowChargeNet),
-    visitTotal,subtotal:monthly,subtotalNet:roundMoney(subtotalNet),vatRate,monthly,promoPct,firstMonth};
-  renderResult();
+  try{
+    const result=calculatePricing(cfg,s);
+    const service=result.service;
+    calc={...result,serviceLabel:currentLang==='en'?(serviceEnglish[s.serviceKey]||service.label):service.label};
+    renderResult();
+  }catch(error){console.error('FrankiFlow calculator error',error)}
 }
 function renderResult(){
   if(!calc)return; $('#visitPrice').textContent=money(calc.visitTotal); $('#monthlyPrice').textContent=money(calc.monthly); $('#firstMonthPrice').textContent=money(calc.firstMonth);
@@ -230,19 +219,27 @@ function renderResult(){
   if(calc.windowOnly){
     rows.push([t('windowCleaning'),`${calc.windowArea} m² ${currentLang==='de'?'Glas':'glass'} · ${money(calc.windowCharge)} / ${currentLang==='de'?'Termin':'visit'}`]);
     rows.push([currentLang==='de'?'Häufigkeit':'Frequency',`${calc.freq.visits_per_month} ${t('visitsMonth')}`]);
+    if(calc.windowReductionPct)rows.push([currentLang==='de'?'Fenster-Vertragsrabatt':'Window contract discount',`−${calc.windowReductionPct}%`]);
   }else{
     rows.push([calc.serviceLabel,`${calc.area} m²`]);
     rows.push([calc.deep?t('deep'):t('floorCleaning'),`${calc.freq.visits_per_month} ${t('visitsMonth')}`]);
     if(calc.reductionPct)rows.push([t('contractDiscount'),`−${calc.reductionPct}%`]);
     if(calc.equipment)rows.push([t('materials'),money(calc.equipmentVisit)+` / ${currentLang==='de'?'Termin':'visit'}`]);
-    if(calc.windows)rows.push([`${t('windowCleaning')} (${currentLang==='de'?'1×/Monat':'1×/month'})`,`${calc.windowArea} m² · ${money(calc.windowCharge)}`]);
+    if(calc.windows)rows.push([`${t('windowCleaning')} (${currentLang==='de'?'1×/Monat':'1×/month'}${calc.windowReductionPct?` · −${calc.windowReductionPct}%`:''})`,`${calc.windowArea} m² · ${money(calc.windowCharge)}`]);
   }
   rows.push([currentLang==='de'?'Vertragslaufzeit':'Contract duration',`${calc.months} ${calc.months===1?t('month'):t('months')}`]);
   $('#breakdownRows').innerHTML=rows.map(([a,b])=>`<div class="breakdown-row"><span>${a}</span><b>${b}</b></div>`).join('');
   updateServiceMode();
   renderChecklistPreview();
 }
-function printDoc(type,billing=null,invoiceNumber=null){
+async function waitForPrintAssets(){
+  const images=[...$('#printSheet').querySelectorAll('img')];
+  await Promise.all(images.map(img=>{
+    if(img.complete&&img.naturalWidth>0)return img.decode?img.decode().catch(()=>{}):Promise.resolve();
+    return new Promise(resolve=>{img.addEventListener('load',resolve,{once:true});img.addEventListener('error',resolve,{once:true})});
+  }));
+}
+async function printDoc(type,billing=null,invoiceNumber=null){
   if(!calc)return;
   const isInvoice=type==='invoice';
   const includeChecklist=!isInvoice && ($('#includeChecklist')?.checked ?? true);
@@ -299,8 +296,8 @@ function printDoc(type,billing=null,invoiceNumber=null){
   const terms=isInvoice
     ?t('termsInvoice')
     :(currentLang==='de'
-      ?`${calc.promoPct}% Neukundenrabatt gilt ausschließlich im ersten Vertragsmonat. Mindestpreise bleiben bestehen. Diese Berechnung ist unverbindlich.`
-      :`${calc.promoPct}% new-customer discount applies only to the first contract month. Minimum prices remain in force. This calculation is non-binding.`);
+      ?`${calc.promoPct}% Neukundenrabatt gilt ausschließlich im ersten Vertragsmonat. Vertragsvorteile sind in den ausgewiesenen Beträgen bereits berücksichtigt. Diese Berechnung ist unverbindlich.`
+      :`${calc.promoPct}% new-customer discount applies only to the first contract month. Contract savings are already included in the displayed amounts. This calculation is non-binding.`);
   const legalTaxNote=calc.vatRate
     ?(currentLang==='de'?'MwSt. enthalten. Die steuerliche Behandlung richtet sich nach der tatsächlich ausgestellten Rechnung.':'VAT included. Tax treatment is determined by the invoice actually issued.')
     :(currentLang==='de'?'MwSt. nicht enthalten. Die steuerliche Behandlung richtet sich nach der tatsächlich ausgestellten Rechnung.':'VAT not included. Tax treatment is determined by the invoice actually issued.');
@@ -351,6 +348,7 @@ function printDoc(type,billing=null,invoiceNumber=null){
   ${includeChecklist?buildChecklistPrintPages(customerPrimary,customerSecondary):''}`;
   $('#printSheet').setAttribute('aria-hidden','false');
   void $('#printSheet').offsetHeight;
+  await waitForPrintAssets();
   window.print();
 }
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -368,7 +366,8 @@ async function createInvoice(){
   try{const b=await callAdmin('get_private_billing');const n=await callAdmin('reserve_invoice_number');printDoc('invoice',b.billing,n.invoice_number)}catch(e){alert(e.message)}finally{btn.disabled=false;btn.textContent=old}
 }
 
-$$('[data-lang]').forEach(b=>b.addEventListener('click',()=>{currentLang=b.dataset.lang;applyLanguage()}));
+$$('[data-lang]').forEach(b=>b.addEventListener('click',()=>{currentLang=b.dataset.lang;applyLanguage();syncRequestDialogLanguage()}));
+$('#requestService')?.addEventListener('click',openServiceRequest);$('#closeRequestDialog')?.addEventListener('click',closeServiceRequest);$('#cancelRequestDialog')?.addEventListener('click',closeServiceRequest);$('#submitServiceRequest')?.addEventListener('click',submitServiceRequest);$$('[data-close-request]').forEach(el=>el.addEventListener('click',closeServiceRequest));
 $('#calculatorForm').addEventListener('input',calculate);$('#calculatorForm').addEventListener('change',calculate);$('#windowCleaning').addEventListener('change',()=>{updateServiceMode();calculate()});$('#printQuote').addEventListener('click',()=>printDoc('quote'));$('#printInvoice').addEventListener('click',createInvoice);
 $('#viewChecklist')?.addEventListener('click',()=>{const preview=$('#checklistPreview');preview?.classList.toggle('hidden');updateChecklistUi();});
 $('#includeChecklist')?.addEventListener('change',()=>renderChecklistPreview());

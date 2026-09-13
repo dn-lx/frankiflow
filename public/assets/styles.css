@@ -10,3 +10,19 @@
 
 /* September 2026: About accordion + policy */
 .about-accordion{display:grid;gap:12px}.about-accordion-item{border:1px solid var(--line,#dce8e5);border-radius:16px;background:#fff;overflow:hidden}.about-accordion-item summary{cursor:pointer;list-style:none;padding:18px 20px;font-weight:800;color:#0b3447;display:flex;justify-content:space-between;align-items:center}.about-accordion-item summary::-webkit-details-marker{display:none}.about-accordion-item summary:after{content:'+';font-size:22px;color:#218b91}.about-accordion-item[open] summary:after{content:'−'}.about-accordion-copy{padding:0 20px 18px}.about-accordion-copy p{text-align:justify;line-height:1.72;margin:0 0 13px}.policy-page{padding-top:130px}.policy-wrap{max-width:880px}.policy-wrap section{padding:18px 0;border-bottom:1px solid #dce8e5}.policy-wrap h1{font-size:clamp(36px,6vw,64px);color:#0b3447}.policy-wrap h2{font-size:20px}.policy-wrap p{line-height:1.72;text-align:justify}
+
+
+/* Homepage About accordion — section only */
+.about-home-section{background:linear-gradient(180deg,#f7fbfc 0%,#fff 100%)}
+.about-home-section .section-head{margin-bottom:28px}
+.about-accordion{display:grid;gap:12px;max-width:980px;margin:0 auto}
+.about-accordion-item{border:1px solid var(--line,#dce8e5);border-radius:18px;background:#fff;overflow:hidden;box-shadow:0 10px 34px rgba(11,33,52,.045)}
+.about-accordion-item summary{cursor:pointer;list-style:none;padding:20px 22px;font-weight:850;color:#0b3447;display:flex;justify-content:space-between;align-items:center;gap:18px;font-size:18px}
+.about-accordion-item summary::-webkit-details-marker{display:none}.about-accordion-item summary::marker{display:none;content:''}
+.about-accordion-toggle{width:30px;height:30px;border-radius:10px;background:#e8f7f5;position:relative;flex:none}
+.about-accordion-toggle:before,.about-accordion-toggle:after{content:'';position:absolute;left:50%;top:50%;width:12px;height:2px;background:#147d7b;transform:translate(-50%,-50%);border-radius:2px}
+.about-accordion-toggle:after{transform:translate(-50%,-50%) rotate(90deg);transition:.18s transform}
+.about-accordion-item[open] .about-accordion-toggle:after{transform:translate(-50%,-50%) rotate(0deg)}
+.about-accordion-copy{padding:0 22px 22px;border-top:1px solid #eef3f4}.about-accordion-copy p{margin:18px 0 0;color:#526a7b;line-height:1.75;text-align:left}
+.about-accordion-loading{padding:24px;border:1px dashed #cbdadd;border-radius:16px;text-align:center;color:#607486;background:#fff}
+@media(max-width:680px){.about-accordion-item summary{font-size:16px;padding:17px 18px}.about-accordion-copy{padding:0 18px 18px}.about-accordion-copy p{font-size:15px}}

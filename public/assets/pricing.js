@@ -11,7 +11,7 @@ export const FALLBACK_PRICING = {
   promotion_settings:{label:'25% Neukundenrabatt im ersten Monat',enabled:true,first_month_discount_pct:25},
   service_settings:{services:{buero:{label:'Büroreinigung',base_1m:24,enabled:true},airbnb:{label:'Ferienwohnung / Airbnb',base_1m:26,enabled:true},wohnung:{label:'Wohnungsreinigung',base_1m:30,enabled:true},treppenhaus:{label:'Treppenhausreinigung',base_1m:24,enabled:true}},gradient_per_sqm:.2304,minimum_cleaning_charge:30},
   vat_settings:{label:'MwSt. zum Rechnungsbetrag hinzufügen',enabled:true,rate_pct:19,customer_pays_default:false},
-  window_settings:{base:5,enabled:true,minimum:35,gradient_per_sqm:2.5}
+  window_settings:{base:5,enabled:true,minimum:35,gradient_per_sqm:2.5,contract_reduction_pct:{1:0,3:2,6:4,9:6,12:8,24:10}}
 };
 
 export async function loadPricing(){
