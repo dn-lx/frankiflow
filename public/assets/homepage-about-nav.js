@@ -26,6 +26,10 @@ function keepAboutSectionLink(){
   $$('.footer-links a[href="/about/"],.footer-links a[href="#about"],[data-section-link="about"]').forEach(link=>{link.href='#about';link.textContent=lang==='en'?'About Us':'Über uns';link.dataset.sectionLink='about'});
 }
 
+function cleanAboutSectionChrome(){
+  $('#about .section-head > p')?.remove();
+}
+
 function renderAboutAccordion(){
   const host=$('#aboutAccordion');if(!host)return;
   const lang=getLanguage()==='en'?'en':'de';
@@ -34,7 +38,7 @@ function renderAboutAccordion(){
   host.innerHTML=items.map(item=>{
     const heading=lang==='en'?(item.heading_en||item.heading_de):(item.heading_de||item.heading_en);
     const body=lang==='en'?(item.body_en||item.body_de):(item.body_de||item.body_en);
-    return `<details class="about-accordion-item"><summary><span>${esc(heading||'')}</span><span class="about-accordion-toggle" aria-hidden="true"></span></summary><div class="about-accordion-copy">${splitParagraphs(body).map(p=>`<p>${esc(p)}</p>`).join('')}</div></details>`;
+    return `<details class="about-accordion-item"><summary><span>${esc(heading||'')}</span></summary><div class="about-accordion-copy">${splitParagraphs(body).map(p=>`<p>${esc(p)}</p>`).join('')}</div></details>`;
   }).join('');
   $$('.about-accordion-item',host).forEach(item=>item.addEventListener('toggle',()=>{if(!item.open)return;$$('.about-accordion-item',host).forEach(other=>{if(other!==item)other.open=false})}));
 }
@@ -45,7 +49,8 @@ async function loadAboutAccordion(){
   renderAboutAccordion();
 }
 
+cleanAboutSectionChrome();
 keepAboutSectionLink();
 keepAccommodationsLast();
 loadAboutAccordion();
-window.addEventListener('frankiflow:language',()=>setTimeout(()=>{keepAboutSectionLink();keepAccommodationsLast();renderAboutAccordion()},0));
+window.addEventListener('frankiflow:language',()=>setTimeout(()=>{cleanAboutSectionChrome();keepAboutSectionLink();keepAccommodationsLast();renderAboutAccordion()},0));
