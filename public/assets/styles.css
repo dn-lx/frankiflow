@@ -6,3 +6,7 @@
 @import url('/assets/admin-unified-ui.css');
 @import url('/assets/admin-logo-size.css');
 @import url('/assets/header-logo-2x.css');
+
+
+/* September 2026: About accordion + policy */
+.about-accordion{display:grid;gap:12px}.about-accordion-item{border:1px solid var(--line,#dce8e5);border-radius:16px;background:#fff;overflow:hidden}.about-accordion-item summary{cursor:pointer;list-style:none;padding:18px 20px;font-weight:800;color:#0b3447;display:flex;justify-content:space-between;align-items:center}.about-accordion-item summary::-webkit-details-marker{display:none}.about-accordion-item summary:after{content:'+';font-size:22px;color:#218b91}.about-accordion-item[open] summary:after{content:'−'}.about-accordion-copy{padding:0 20px 18px}.about-accordion-copy p{text-align:justify;line-height:1.72;margin:0 0 13px}.policy-page{padding-top:130px}.policy-wrap{max-width:880px}.policy-wrap section{padding:18px 0;border-bottom:1px solid #dce8e5}.policy-wrap h1{font-size:clamp(36px,6vw,64px);color:#0b3447}.policy-wrap h2{font-size:20px}.policy-wrap p{line-height:1.72;text-align:justify}
