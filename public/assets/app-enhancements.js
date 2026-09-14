@@ -177,9 +177,18 @@ async function sendEnquiry(e){
   if(error){notice.innerHTML=tr(`Die Online-Anfrage konnte nicht gesendet werden. Schreiben Sie uns bitte direkt an <a href="mailto:${FRANKIFLOW_CONFIG.defaultEmail}">${FRANKIFLOW_CONFIG.defaultEmail}</a>.`,`The Online Enquiry could not be sent. Please email us directly at <a href="mailto:${FRANKIFLOW_CONFIG.defaultEmail}">${FRANKIFLOW_CONFIG.defaultEmail}</a>.`);notice.className='notice error';return}
   form.reset();notice.textContent=tr('Vielen Dank! Ihre Anfrage ist eingegangen. Eine Bestätigung wurde per E-Mail gesendet. Wir melden uns so schnell wie möglich persönlich bei Ihnen.','Thank You! We received your Enquiry. A Confirmation was sent by Email and we will contact you personally as soon as possible.');notice.className='notice';
   try{
-    const r=await fetch(`${FRANKIFLOW_CONFIG.supabaseUrl}/functions/v1/frankiflow-email`,{method:'POST',headers:{'Content-Type':'application/json','apikey':FRANKIFLOW_CONFIG.supabasePublishableKey},body:JSON.stringify({event_type:'enquiry_received',quote_request_id:quoteId,customer_email:payload.customer_email,language:getLanguage()})});
-    if(!r.ok)console.warn('FrankiFlow acknowledgement email failed',await r.text());
-  }catch(err){console.warn('FrankiFlow acknowledgement email failed',err)}
+    const endpoint=`${FRANKIFLOW_CONFIG.supabaseUrl}/functions/v1/frankiflow-email`;
+    const headers={'Content-Type':'application/json','apikey':FRANKIFLOW_CONFIG.supabasePublishableKey};
+    const common={quote_request_id:quoteId,customer_email:payload.customer_email,language:getLanguage()};
+    const results=await Promise.allSettled([
+      fetch(endpoint,{method:'POST',headers,body:JSON.stringify({event_type:'admin_enquiry',source:'website',...common})}),
+      fetch(endpoint,{method:'POST',headers,body:JSON.stringify({event_type:'enquiry_received',source:'website',...common})})
+    ]);
+    for(const result of results){
+      if(result.status==='rejected')console.warn('FrankiFlow enquiry email failed',result.reason);
+      else if(!result.value.ok)console.warn('FrankiFlow enquiry email failed',await result.value.text());
+    }
+  }catch(err){console.warn('FrankiFlow enquiry email failed',err)}
 }
 
 async function renderHomepageGallery(){
