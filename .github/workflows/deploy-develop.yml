@@ -19,7 +19,6 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: staging
-      url: https://frankiflow.shipstatic.com
 
     steps:
       - name: Checkout develop
@@ -31,14 +30,13 @@ jobs:
       - name: Run calculator tests
         run: npm test
 
-      - name: Deploy public folder to ShipStatic
+      - name: Deploy public folder to ShipStatic staging
         id: shipstatic
         uses: shipstatic/action@v2
         with:
           token: ${{ secrets.SHIP_TOKEN }}
           path: ./public
-          domain: frankiflow.shipstatic.com
-          labels: development,frankiflow,develop
+          labels: staging,frankiflow,develop
 
       - name: Show development URL
         run: |
@@ -46,7 +44,7 @@ jobs:
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "- Branch: \`develop\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- Commit: \`${GITHUB_SHA}\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- URL: https://frankiflow.shipstatic.com" >> "$GITHUB_STEP_SUMMARY"
+          echo "- URL: ${{ steps.shipstatic.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
           if [ -n "${{ steps.shipstatic.outputs.expires }}" ]; then
             echo "- Expiry: ${{ steps.shipstatic.outputs.expires }}" >> "$GITHUB_STEP_SUMMARY"
           else
