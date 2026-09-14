@@ -1,5 +1,6 @@
 [build]
   publish = "public"
+  ignore = "test \"$BRANCH\" = \"main\""
 
 [dev]
   publish = "public"
