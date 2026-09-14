@@ -1,0 +1,98 @@
+name: Apply FrankiFlow homepage restoration
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - .github/workflows/apply-homepage-restoration.yml
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout develop
+        uses: actions/checkout@v6
+        with:
+          ref: develop
+          fetch-depth: 0
+
+      - name: Restore homepage structure
+        run: |
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+
+          pages=[Path('public/index.html'),Path('public/en/index.html')]
+          for page in pages:
+              html=page.read_text(encoding='utf-8')
+
+              # Remove the two homepage sections completely.
+              for section_id in ('warum','ablauf'):
+                  pattern=rf'\n?<section\b(?=[^>]*\bid=["\']{section_id}["\'])[^>]*>.*?</section>\n?'
+                  html,n=re.subn(pattern,'\n',html,flags=re.I|re.S)
+                  if n>1:
+                      raise SystemExit(f'{page}: removed {n} #{section_id} sections; expected at most one')
+
+              # Remove all header/footer navigation links to those removed sections.
+              html=re.sub(r'\n?\s*<a\b[^>]*href=["\']#(?:warum|ablauf)["\'][^>]*>.*?</a>\s*', '\n', html, flags=re.I|re.S)
+
+              # Preisrechner must always stay in the same browser tab.
+              def same_tab(match):
+                  tag=match.group(0)
+                  tag=re.sub(r'\s+target=["\']_blank["\']','',tag,flags=re.I)
+                  tag=re.sub(r'\s+rel=["\'][^"\']*["\']','',tag,flags=re.I)
+                  return tag
+              html=re.sub(r'<a\b(?=[^>]*href=["\']\/preisrechner\/?["\'])[^>]*>', same_tab, html, flags=re.I)
+
+              # Keep whitespace readable after the surgical removals.
+              html=re.sub(r'\n{3,}','\n\n',html)
+              page.write_text(html,encoding='utf-8')
+          PY
+
+      - name: Validate requested homepage behavior
+        run: |
+          set -euo pipefail
+          for page in public/index.html public/en/index.html; do
+            grep -q 'id="about"' "$page"
+            grep -q 'href="#about"' "$page"
+            ! grep -q 'id="warum"' "$page"
+            ! grep -q 'id="ablauf"' "$page"
+            ! grep -q 'href="#warum"' "$page"
+            ! grep -q 'href="#ablauf"' "$page"
+            ! grep -q 'href="/about/"' "$page"
+          done
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+          for page in [Path('public/index.html'),Path('public/en/index.html')]:
+              html=page.read_text(encoding='utf-8')
+              links=re.findall(r'<a\b(?=[^>]*href=["\']\/preisrechner\/?["\'])[^>]*>',html,re.I)
+              if not links:
+                  raise SystemExit(f'{page}: no Preisrechner links found')
+              bad=[tag for tag in links if re.search(r'\btarget=["\']_blank["\']',tag,re.I)]
+              if bad:
+                  raise SystemExit(f'{page}: Preisrechner still opens in a new tab: {bad[:2]}')
+          PY
+
+      - name: Validate JavaScript
+        run: npm run check
+
+      - name: Run calculator tests
+        run: npm test
+
+      - name: Commit restored homepage
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- public/index.html public/en/index.html; then
+            echo "Homepage already matches the requested structure."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/index.html public/en/index.html
+          git commit -m "Restore homepage sections and same-tab calculator navigation"
+          git push origin HEAD:develop
