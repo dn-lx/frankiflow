@@ -30,6 +30,14 @@ function cleanAboutSectionChrome(){
   $('#about .section-head > p')?.remove();
 }
 
+function syncAboutHeading(){
+  const section=$('#about');if(!section)return;
+  const lang=getLanguage()==='en'?'en':'de';
+  const eyebrow=$('.eyebrow',section),title=$('h2',section);
+  if(eyebrow)eyebrow.textContent=lang==='en'?'About Us':'Über uns';
+  if(title)title.innerHTML=lang==='en'?'The story behind <span class="teal-text">FrankiFlow.</span>':'Die Geschichte hinter <span class="teal-text">FrankiFlow.</span>';
+}
+
 function renderAboutAccordion(){
   const host=$('#aboutAccordion');if(!host)return;
   const lang=getLanguage()==='en'?'en':'de';
@@ -49,8 +57,40 @@ async function loadAboutAccordion(){
   renderAboutAccordion();
 }
 
+function routeHomepageLanguageSwitch(){
+  const homepagePaths=new Set(['/','/index.html','/en','/en/','/en/index.html']);
+  document.addEventListener('click',event=>{
+    const button=event.target.closest?.('.ff-language-switch button[data-lang]');
+    if(!button||!homepagePaths.has(location.pathname))return;
+    const lang=button.dataset.lang==='en'?'en':'de';
+    const target=lang==='en'?'/en/':'/';
+    event.preventDefault();event.stopImmediatePropagation();
+    localStorage.setItem('frankiflow-lang',lang);
+    localStorage.setItem('ff-price-lang',lang);
+    location.assign(target+(location.hash||''));
+  },true);
+}
+
+function forceCalculatorSameTab(){
+  const normalize=()=>$$('a[href]').forEach(link=>{
+    try{const url=new URL(link.href,location.href);if(url.origin===location.origin&&/^\/preisrechner\/?$/.test(url.pathname)){link.removeAttribute('target');link.removeAttribute('rel')}}catch{}
+  });
+  normalize();
+  document.addEventListener('click',event=>{
+    const link=event.target.closest?.('a[href]');if(!link)return;
+    let url;try{url=new URL(link.href,location.href)}catch{return}
+    if(url.origin!==location.origin||!/^\/preisrechner\/?$/.test(url.pathname))return;
+    if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+    event.preventDefault();
+    location.assign(url.href);
+  },true);
+}
+
+routeHomepageLanguageSwitch();
+forceCalculatorSameTab();
 cleanAboutSectionChrome();
+syncAboutHeading();
 keepAboutSectionLink();
 keepAccommodationsLast();
 loadAboutAccordion();
-window.addEventListener('frankiflow:language',()=>setTimeout(()=>{cleanAboutSectionChrome();keepAboutSectionLink();keepAccommodationsLast();renderAboutAccordion()},0));
+window.addEventListener('frankiflow:language',()=>setTimeout(()=>{cleanAboutSectionChrome();syncAboutHeading();keepAboutSectionLink();keepAccommodationsLast();renderAboutAccordion();forceCalculatorSameTab()},0));
