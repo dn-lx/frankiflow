@@ -45,8 +45,8 @@
 <div class="step-head"><span>02</span><div><h2 data-i18n="scopeTitle">Objekt &amp; Umfang</h2><p data-i18n="scopeHint">Fläche und Reinigungsrhythmus bestimmen den Richtpreis.</p></div></div>
 <div class="form-grid two">
 <label class="field" id="areaFieldWrap"><span data-i18n="area">Reinigungsfläche</span><div class="input-suffix"><input id="areaSqm" inputmode="decimal" max="5000" min="0" step="1" type="number" value="80"/><em>m²</em></div><small data-i18n="areaHelp">Bei reiner Fensterreinigung kann die Fläche 0 sein.</small></label>
-<label class="field"><span data-i18n="frequency">Häufigkeit</span><select id="frequency"></select></label>
-<label class="field"><span data-i18n="contract">Vertragslaufzeit</span><select id="contractMonths"></select><small id="contractSaving"></small></label>
+<label class="field"><span data-i18n="frequency">Häufigkeit</span><select id="frequency"><option value="weekly1">1× pro Woche</option></select></label>
+<label class="field"><span data-i18n="contract">Vertragslaufzeit</span><select id="contractMonths"><option value="1">1 Monat</option></select><small id="contractSaving"></small></label>
 <label class="field"><span data-i18n="newCustomer">Neukunde?</span><select id="newCustomer"><option value="yes">Ja</option><option value="no">Nein</option></select><small id="promoHint"></small></label>
 <div class="window-primary-slot hidden" id="windowPrimarySlot"></div>
 </div>
@@ -114,7 +114,8 @@
 </div>
 
 <footer class="calc-footer"><div class="calc-container"><div class="calc-footer-main"><div><img alt="FrankiFlow" src="/assets/frankiflow-logo.png"/><p>Gebäudereinigung &amp; Objektbetreuung · Frankfurt am Main &amp; Umgebung</p></div><div class="calc-footer-links"><a href="tel:+4917662493041">+49 176 62493041</a><a href="mailto:info@frankiflow.de">info@frankiflow.de</a><a class="footer-whatsapp-link" href="https://wa.link/9knp7y" rel="noopener" target="_blank">WhatsApp</a><a href="https://accommodation.frankiflow.de/">FrankiHolz Unterkunft / Accommodation ↗</a><a href="/impressum/">Impressum</a><a href="/datenschutz/">Datenschutz</a></div></div><div class="calc-footer-copy">© 2026 FrankiFlow. Mehr als Reinigung.</div></div></footer>
-<script src="/assets/calculator.js?v=20260914-fullfix1" type="module"></script>
-<script src="/assets/calculator-mobile-island.js?v=20260914-fullfix1" defer></script>
+<script src="/assets/calculator.js?v=20260914-calcfix2" type="module"></script>
+<script src="/assets/calculator-runtime-fix.js?v=20260914-calcfix2" type="module"></script>
+<script src="/assets/calculator-mobile-island.js?v=20260914-calcfix2" defer></script>
 </body>
 </html>
