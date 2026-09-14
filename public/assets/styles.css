@@ -26,3 +26,8 @@
 .about-accordion-copy{padding:0 22px 22px;border-top:1px solid #eef3f4}.about-accordion-copy p{margin:18px 0 0;color:#526a7b;line-height:1.75;text-align:justify;text-justify:inter-word;hyphens:auto}
 .about-accordion-loading{padding:24px;border:1px dashed #cbdadd;border-radius:16px;text-align:center;color:#607486;background:#fff}
 @media(max-width:680px){.about-accordion-item summary{font-size:16px;padding:17px 18px}.about-accordion-copy{padding:0 18px 18px}.about-accordion-copy p{font-size:15px;text-align:justify;text-justify:inter-word;hyphens:auto}}
+
+/* Header WhatsApp action: keep the original site WhatsApp asset, icon only. */
+.site-header .nav-whatsapp{font-size:0;width:34px;height:34px;min-width:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;line-height:1}
+.site-header .nav-whatsapp::before{margin-right:0!important;--wa-size:19px}
+.site-header .nav-whatsapp:hover{background:rgba(37,211,102,.08)}
