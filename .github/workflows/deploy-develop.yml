@@ -28,6 +28,9 @@ jobs:
       - name: Validate JavaScript
         run: npm run check
 
+      - name: Run calculator tests
+        run: npm test
+
       - name: Deploy public folder to ShipStatic
         id: shipstatic
         uses: shipstatic/action@v2
