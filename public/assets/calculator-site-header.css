@@ -1,0 +1,49 @@
+@import url('/assets/header-logo-2x.css');
+
+/* Preisrechner uses the same public header system as the homepage. */
+.calc-site-header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:blur(18px);border-bottom:1px solid rgba(221,231,237,.8);overflow:visible}
+.calc-site-header .calc-container{width:min(1200px,calc(100% - 40px));margin:auto}
+.calc-site-header .nav{display:flex;align-items:center;justify-content:space-between;gap:26px;position:relative}
+.calc-site-header .brand{display:flex;align-items:center;overflow:visible;text-decoration:none}
+.calc-site-header .nav-links{display:flex;align-items:center;gap:28px;font-size:14px;font-weight:720}
+.calc-site-header .nav-links a{text-decoration:none;color:#365064;transition:.2s color}
+.calc-site-header .nav-links a:hover{color:#0a817b}
+.calc-site-header .nav-actions{display:flex;align-items:center;gap:14px}
+.calc-site-header .text-link{font-size:14px;font-weight:750;text-decoration:none;color:#10283b}
+.calc-site-header .text-link:hover{color:#0a817b}
+.calc-site-header .btn{appearance:none;border:0;border-radius:14px;padding:13px 19px;font:inherit;font-weight:800;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.2s transform,.2s box-shadow,.2s background,.2s color}
+.calc-site-header .btn:hover{transform:translateY(-2px)}
+.calc-site-header .btn-primary{background:#0b2134;color:#fff;box-shadow:0 10px 25px rgba(11,33,52,.14)}
+.calc-site-header .btn-primary:hover{background:#061a2a;box-shadow:0 14px 32px rgba(11,33,52,.2)}
+.calc-site-header .menu-btn{display:none;background:#fff;border:1px solid #dde7ed;border-radius:12px;padding:9px 11px;color:#0b2134;font-size:20px;cursor:pointer}
+.calc-site-header .language-switch{display:flex;background:#eef4f6;padding:3px;border-radius:11px}
+.calc-site-header .language-switch button{border:0;background:transparent;padding:7px 10px;border-radius:8px;color:#617381;font-weight:800;font-size:12px;cursor:pointer}
+.calc-site-header .language-switch button.active{background:#fff;color:#0b2134;box-shadow:0 2px 8px rgba(5,32,55,.08)}
+
+@media(min-width:1181px){
+  .calc-site-header .calc-container{width:min(1480px,calc(100% - 24px))}
+  .calc-site-header .nav{gap:14px}
+  .calc-site-header .nav-links{gap:18px;font-size:13px}
+  .calc-site-header .nav-actions{gap:8px}
+}
+@media(min-width:681px) and (max-width:1180px){
+  .calc-site-header .nav{gap:14px}
+  .calc-site-header .nav-links{gap:16px;font-size:13px}
+  .calc-site-header .nav-actions{gap:8px}
+}
+@media(max-width:1020px){
+  .calc-site-header .nav-links{display:none}
+  .calc-site-header .menu-btn{display:block}
+  .calc-site-header .nav-links.open{display:flex;position:absolute;top:100%;left:-20px;right:-20px;background:#fff;padding:22px;flex-direction:column;align-items:flex-start;border-bottom:1px solid #dde7ed;box-shadow:0 12px 40px rgba(12,38,58,.08)}
+  .calc-site-header .nav-whatsapp{display:none}
+}
+@media(max-width:680px){
+  .calc-site-header .calc-container{width:min(100% - 24px,1200px)}
+  .calc-site-header .nav-actions .btn-primary{padding:10px 12px;font-size:12px}
+  .calc-site-header .menu-btn{font-size:17px;padding:7px 9px}
+  .calc-site-header .language-switch button{padding:6px 8px}
+}
+@media(max-width:520px){
+  .calc-site-header .nav-actions{gap:6px}
+  .calc-site-header .nav-actions .btn-primary{display:none}
+}
