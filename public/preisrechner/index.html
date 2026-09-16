@@ -9,16 +9,26 @@
 <meta content="#071f38" name="theme-color"/>
 <link href="/assets/frankiflow-logo.png" rel="icon" type="image/png"/>
 <link href="/assets/calculator.css?v=20260914-v3" rel="stylesheet"/>
+<link href="/assets/calculator-site-header.css?v=20260916-v1" rel="stylesheet"/>
 <link href="https://frankiflow.de/preisrechner/" rel="canonical"/><meta content="index,follow,max-image-preview:large" name="robots"/></head>
 <body class="calculator-body">
-<header class="calc-header">
-<div class="calc-container calc-nav">
-<a aria-label="FrankiFlow Startseite" class="calc-brand" href="/"><img alt="FrankiFlow" src="/assets/frankiflow-logo.png"/></a>
-<div class="calc-nav-actions">
-<a class="calc-back" href="/">← <span data-i18n="website">Zur Website</span></a>
+<header class="site-header calc-site-header">
+<div class="calc-container nav">
+<a aria-label="FrankiFlow Startseite" class="brand" href="/"><img alt="FrankiFlow" src="/assets/frankiflow-logo.png"/></a>
+<nav aria-label="Hauptnavigation" class="nav-links">
+<a data-calc-nav="services" href="/#leistungen">Leistungen</a>
+<a data-calc-nav="about" href="/#about">Über uns</a>
+<a data-calc-nav="contact" href="/#kontakt">Kontakt</a>
+<a data-calc-nav="faq" href="/#faq">FAQ</a>
+<a class="nav-accommodations" data-calc-nav="stay" href="https://stay.frankiflow.de/">Unterkunft</a>
+</nav>
+<div class="nav-actions">
 <div aria-label="Sprache" class="language-switch">
 <button class="active" data-lang="de" type="button">DE</button><button data-lang="en" type="button">EN</button>
 </div>
+<a class="text-link nav-whatsapp" data-whatsapp="" href="https://wa.link/9knp7y" rel="noopener" target="_blank">WhatsApp</a>
+<a class="btn btn-primary calc-nav-price" href="/preisrechner/">Preis berechnen <span aria-hidden="true">↗</span></a>
+<button aria-expanded="false" aria-label="Menü öffnen" class="menu-btn" type="button">☰</button>
 </div>
 </div>
 </header>
@@ -114,6 +124,7 @@
 </div>
 
 <footer class="calc-footer"><div class="calc-container"><div class="calc-footer-main"><div><img alt="FrankiFlow" src="/assets/frankiflow-logo.png"/><p>Gebäudereinigung &amp; Objektbetreuung · Frankfurt am Main &amp; Umgebung</p></div><div class="calc-footer-links"><a href="tel:+4917662493041">+49 176 62493041</a><a href="mailto:info@frankiflow.de">info@frankiflow.de</a><a class="footer-whatsapp-link" href="https://wa.link/9knp7y" rel="noopener" target="_blank">WhatsApp</a><a href="https://stay.frankiflow.de/">FrankiHolz Unterkunft / Accommodation ↗</a><a href="/impressum/">Impressum</a><a href="/datenschutz/">Datenschutz</a></div></div><div class="calc-footer-copy">© 2026 FrankiFlow. Mehr als Reinigung.</div></div></footer>
+<script src="/assets/calculator-site-header.js?v=20260916-v1" type="module"></script>
 <script src="/assets/calculator-app-v3.js?v=20260914-v3" type="module"></script>
 <script src="/assets/calculator-mobile-island.js?v=20260914-v3" defer></script>
 </body>
