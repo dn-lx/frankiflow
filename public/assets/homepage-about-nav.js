@@ -11,10 +11,13 @@ let aboutSections=[];
 function splitParagraphs(text=''){return String(text).split(/\n\s*\n/g).map(x=>x.trim()).filter(Boolean)}
 
 function keepAccommodationsLast(){
+  const lang=getLanguage()==='en'?'en':'de';
   const nav=$('.nav-links');if(!nav)return;
-  let link=nav.querySelector('.nav-accommodations,a[href^="https://accommodation.frankiflow.de"]');
-  if(!link){link=document.createElement('a');link.href='https://accommodation.frankiflow.de/';link.className='nav-accommodations';}
-  link.textContent='Accommodations';link.classList.add('nav-accommodations');nav.append(link);
+  let link=nav.querySelector('.nav-accommodations,a[href^="https://stay.frankiflow.de"]');
+  if(!link){link=document.createElement('a');link.className='nav-accommodations';}
+  link.href='https://stay.frankiflow.de/';
+  link.textContent=lang==='en'?'Accommodations':'Unterkunft';
+  link.classList.add('nav-accommodations');nav.append(link);
 }
 
 function keepAboutSectionLink(){
