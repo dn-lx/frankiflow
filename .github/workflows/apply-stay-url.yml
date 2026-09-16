@@ -1,0 +1,81 @@
+name: Update FrankiHolz navigation URL
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - .github/workflows/apply-stay-url.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: develop
+          fetch-depth: 0
+
+      - name: Update accommodation links and navigation label
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          public = Path('public')
+          old = 'https://accommodation.frankiflow.de/'
+          new = 'https://stay.frankiflow.de/'
+
+          # Replace the retired FrankiHolz URL everywhere in the public site.
+          for path in public.rglob('*'):
+              if not path.is_file() or path.suffix.lower() not in {'.html', '.js', '.css', '.xml', '.txt'}:
+                  continue
+              text = path.read_text(encoding='utf-8')
+              updated = text.replace(old, new).replace('https://accommodation.frankiflow.de', 'https://stay.frankiflow.de')
+              if updated != text:
+                  path.write_text(updated, encoding='utf-8')
+
+          nav = Path('public/assets/homepage-about-nav.js')
+          text = nav.read_text(encoding='utf-8')
+          pattern = re.compile(r"function keepAccommodationsLast\(\)\{.*?\n\}\n\nfunction keepAboutSectionLink", re.S)
+          replacement = '''function keepAccommodationsLast(){
+  const lang=getLanguage()==='en'?'en':'de';
+  const nav=$('.nav-links');if(!nav)return;
+  let link=nav.querySelector('.nav-accommodations,a[href^="https://stay.frankiflow.de"],a[href^="https://accommodation.frankiflow.de"]');
+  if(!link){link=document.createElement('a');link.className='nav-accommodations';}
+  link.href='https://stay.frankiflow.de/';
+  link.textContent=lang==='en'?'Accommodations':'Unterkunft';
+  link.classList.add('nav-accommodations');nav.append(link);
+}
+
+function keepAboutSectionLink'''
+          text, count = pattern.subn(replacement, text, count=1)
+          if count != 1:
+              raise SystemExit('Could not update keepAccommodationsLast()')
+          nav.write_text(text, encoding='utf-8')
+
+          # Ensure the German homepage has the correct label even before JS initializes.
+          de = Path('public/index.html')
+          text = de.read_text(encoding='utf-8')
+          text = re.sub(r'(<a[^>]*class="nav-accommodations"[^>]*href="https://stay\.frankiflow\.de/"[^>]*>)Accommodations(</a>)', r'\1Unterkunft\2', text, count=1)
+          de.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Validate
+        run: |
+          node --check public/assets/homepage-about-nav.js
+          ! grep -R "accommodation.frankiflow.de" public
+          grep -q "https://stay.frankiflow.de/" public/assets/homepage-about-nav.js
+          grep -q "Unterkunft" public/assets/homepage-about-nav.js
+          grep -q "Accommodations" public/assets/homepage-about-nav.js
+
+      - name: Commit develop-only change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public
+          git commit -m "Update FrankiHolz navigation and stay URL"
+          git push origin develop
