@@ -44,7 +44,7 @@ jobs:
               "function keepAccommodationsLast(){",
               "  const lang=getLanguage()==='en'?'en':'de';",
               "  const nav=$('.nav-links');if(!nav)return;",
-              "  let link=nav.querySelector('.nav-accommodations,a[href^=\"https://stay.frankiflow.de\"],a[href^=\"https://accommodation.frankiflow.de\"]');",
+              "  let link=nav.querySelector('.nav-accommodations,a[href^=\"https://stay.frankiflow.de\"]');",
               "  if(!link){link=document.createElement('a');link.className='nav-accommodations';}",
               "  link.href='https://stay.frankiflow.de/';",
               "  link.textContent=lang==='en'?'Accommodations':'Unterkunft';",
