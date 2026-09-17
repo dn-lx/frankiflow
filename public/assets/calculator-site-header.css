@@ -20,6 +20,11 @@
 .calc-site-header .language-switch button{border:0;background:transparent;padding:7px 10px;border-radius:8px;color:#617381;font-weight:800;font-size:12px;cursor:pointer}
 .calc-site-header .language-switch button.active{background:#fff;color:#0b2134;box-shadow:0 2px 8px rgba(5,32,55,.08)}
 
+/* Match the homepage WhatsApp action: icon only, using the shared brand asset. */
+.calc-site-header .nav-whatsapp{font-size:0;width:34px;height:34px;min-width:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;line-height:1}
+.calc-site-header .nav-whatsapp::before{content:"";display:inline-block;width:19px;height:19px;flex:0 0 19px;background:url('/assets/whatsapp.svg') center/contain no-repeat;margin-right:0;vertical-align:-3px}
+.calc-site-header .nav-whatsapp:hover{background:rgba(37,211,102,.08)}
+
 @media(min-width:1181px){
   .calc-site-header .calc-container{width:min(1480px,calc(100% - 24px))}
   .calc-site-header .nav{gap:14px}
