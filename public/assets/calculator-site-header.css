@@ -47,3 +47,17 @@
   .calc-site-header .nav-actions{gap:6px}
   .calc-site-header .nav-actions .btn-primary{display:none}
 }
+
+/* Print only the generated quotation/checklist. The public site header was previously
+   left in the print flow, overlapping page 1 and pushing the quotation footer onto
+   a nearly empty extra page. */
+@media print{
+  .site-header,
+  .calc-site-header,
+  body>main,
+  body>.calc-footer,
+  body>.quote-request-modal,
+  body>.price-island{display:none!important}
+  html,body{margin:0!important;padding:0!important}
+  .print-sheet{display:block!important;margin:0!important;padding:0!important}
+}
