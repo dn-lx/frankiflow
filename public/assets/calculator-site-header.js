@@ -8,6 +8,21 @@ function currentLanguage(){
   return localStorage.getItem('frankiflow-lang')==='en'||localStorage.getItem('ff-price-lang')==='en'?'en':'de';
 }
 
+function applyFooterLanguage(lang=currentLanguage()){
+  const en=lang==='en';
+  const footer=$('.calc-footer');if(!footer)return;
+  const description=footer.querySelector('.calc-footer-main p');
+  if(description)description.textContent=en?'Building Cleaning & Property Services · Frankfurt am Main & Surroundings':'Gebäudereinigung & Objektbetreuung · Frankfurt am Main & Umgebung';
+  const stay=footer.querySelector('a[href="https://stay.frankiflow.de/"]');
+  if(stay)stay.textContent=en?'FrankiHolz Accommodation ↗':'FrankiHolz Unterkunft ↗';
+  const legal=footer.querySelector('a[href="/impressum/"]');
+  if(legal)legal.textContent=en?'Legal notice':'Impressum';
+  const privacy=footer.querySelector('a[href="/datenschutz/"]');
+  if(privacy)privacy.textContent=en?'Privacy':'Datenschutz';
+  const copy=footer.querySelector('.calc-footer-copy');
+  if(copy)copy.textContent=en?'© 2026 FrankiFlow. More than cleaning.':'© 2026 FrankiFlow. Mehr als Reinigung.';
+}
+
 function applyHeaderLanguage(lang=currentLanguage()){
   const en=lang==='en';
   const home=en?'/en/':'/';
@@ -25,6 +40,7 @@ function applyHeaderLanguage(lang=currentLanguage()){
   const brand=$('.calc-site-header .brand');if(brand)brand.href=home;
   const price=$('.calc-site-header .calc-nav-price');if(price){price.firstChild.textContent=en?'Calculate price ':'Preis berechnen ';price.href='/preisrechner/';}
   const menu=$('.calc-site-header .menu-btn');if(menu)menu.setAttribute('aria-label',en?'Open menu':'Menü öffnen');
+  applyFooterLanguage(lang);
 }
 
 function bindHeader(){
