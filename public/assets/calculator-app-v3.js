@@ -45,7 +45,7 @@ let isAdmin=false;
 
 const t=k=>TEXT[lang]?.[k]||k;
 const money=v=>new Intl.NumberFormat(lang==='de'?'de-DE':'en-IE',{style:'currency',currency:'EUR'}).format(Number(v)||0);
-const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
+const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 function checklistText(){return lang==='de'
   ?{title:'Leistungscheckliste',hint:'Sehen Sie, welche Standardleistungen für die gewählte Reinigung enthalten sind.',view:'Checkliste ansehen',hide:'Checkliste schließen',include:'Checkliste dem Angebot beifügen',includeHint:'Die Leistungscheckliste wird als zusätzliche PDF-Seite(n) gedruckt.',deep:'Erweiterte Grundreinigung',windows:'Fensterreinigung',selected:'Ausgewählte Reinigung',optional:'Nur nach ausdrücklicher Vereinbarung',scope:'Leistungsumfang',page:'LEISTUNGSCHECKLISTE',note:'Die Checkliste beschreibt den Standard-Leistungsumfang. Maßgeblich sind die konkret vereinbarten Leistungen und die Gegebenheiten vor Ort.'}
