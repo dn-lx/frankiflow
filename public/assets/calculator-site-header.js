@@ -38,7 +38,7 @@ function applyHeaderLanguage(lang=currentLanguage()){
     link.textContent=label;link.href=href;
   });
   const brand=$('.calc-site-header .brand');if(brand)brand.href=home;
-  const price=$('.calc-site-header .calc-nav-price');if(price){price.firstChild.textContent=en?'Calculate price ':'Preis berechnen ';price.href='/preisrechner/';}
+  const price=$('.calc-site-header .calc-nav-price');if(price){price.firstChild.textContent=en?'Calculate Price ':'Preis berechnen ';price.href='/preisrechner/';}
   const menu=$('.calc-site-header .menu-btn');if(menu)menu.setAttribute('aria-label',en?'Open menu':'Menü öffnen');
   applyFooterLanguage(lang);
 }
