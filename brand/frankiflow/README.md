@@ -4,7 +4,9 @@ This folder contains the approved FrankiFlow family brand assets migrated from t
 
 ## Canonical files
 
-- `frankiflow-full-navy-512.png` — preferred full logo for documents, quotations and general light-background use.
+- `frankiflow-full-transparent-1024.png` — **preferred full logo for white/light backgrounds, quotations and printable documents.**
+
+- `frankiflow-full-navy-512.png` — navy-background/alternate brand asset; do not use it on white quotation pages.
 - `frankiflow-symbol-navy-256.png` — symbol-only mark.
 - `frankiflow-icon-navy-192.png` — square/app-style icon.
 - `frankiflow-favicon.ico` — browser/favicon asset.
