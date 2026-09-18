@@ -15,3 +15,15 @@ Read [.agents/skills/frankiflow/SKILL.md](.agents/skills/frankiflow/SKILL.md) wh
 - Verify the affected behavior and report checks and limitations. Do not weaken tests to hide a failure.
 
 Keep the static frontend, Supabase boundary, and current hosting layout. Run `npm run check` and `npm test` before committing relevant JavaScript changes. See the project skill for active entry points and manual checks.
+
+## FrankiFlow Projects shared agent stack
+
+This repository belongs to the **FrankiFlow Projects** family. See [PROJECT-FAMILY.md](PROJECT-FAMILY.md) for the shared architecture and [docs/AGENT-ORCHESTRATION.md](docs/AGENT-ORCHESTRATION.md) for Planner → Executor → Reviewer routing.
+
+Use these repository-local skills when relevant:
+
+- [Context7 policy](.agents/skills/context7/SKILL.md) for current third-party API/SDK documentation.
+- [Frontend Design](.agents/skills/frontend-design/SKILL.md) for substantial UI/design work.
+- [Headroom pilot](.agents/skills/headroom-pilot/SKILL.md) only when large repetitive context is a measurable bottleneck; do not use compressed context as the sole evidence for high-risk logic.
+
+The agentic stack status is tracked in [docs/AGENTIC-STACK-STATUS.md](docs/AGENTIC-STACK-STATUS.md). Current source, tests and accepted ADRs override agent memory, compressed context or stale graph output.
