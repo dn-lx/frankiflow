@@ -4,3 +4,8 @@
 !.env.example
 node_modules/
 .DS_Store
+
+# Local Graphify tooling and derived code maps
+.venv-graphify/
+.graphify/
+graphify-out/
