@@ -58,3 +58,20 @@ test('both quotation paths show area prominently and use canonical FrankiFlow lo
   assert.match(js,/areaValue=Number\(calc\.windowOnly\?calc\.windowArea:calc\.area\)/);
   assert.match(js,/print-service-intro[\s\S]*m²/);
 });
+
+test('direct PDF checklist uses branded two-column card layout',()=>{
+  const js=read('public/assets/calculator-app-v3.js');
+  assert.match(js,/function pdfChecklistCardHeight/);
+  assert.match(js,/function pdfDrawChecklistCard/);
+  assert.match(js,/const cardW=86,gap=6/);
+  assert.match(js,/pdfChecklistHeader/);
+  assert.match(js,/pdfAddLogo\(doc,logo/);
+  assert.match(js,/roundedRect\(x,y,width,height/);
+});
+
+test('direct quotation PDF has structured client and price cards',()=>{
+  const js=read('public/assets/calculator-app-v3.js');
+  assert.match(js,/roundedRect\(143,8,51,22/);
+  assert.match(js,/roundedRect\(16,37,178,20/);
+  assert.match(js,/frankiflow-full-transparent-1024\.png/);
+});
