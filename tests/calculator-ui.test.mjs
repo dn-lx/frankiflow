@@ -49,3 +49,12 @@ test('print CSS avoids fixed A4-height boxes that create Safari blank pages',()=
   assert.match(css,/\.print-sheet>\*:last-child\{break-after:auto!important;page-break-after:auto!important\}/);
   assert.match(css,/\.print-company-footer\{position:static/);
 });
+
+test('both quotation paths show area prominently and use canonical FrankiFlow logo',()=>{
+  const js=read('public/assets/calculator-app-v3.js');
+  assert.match(js,/frankiflow-full-navy-512\.png/);
+  assert.match(js,/Reinigungsfläche':'Floor area'/);
+  assert.match(js,/Glasfläche':'Glass area'/);
+  assert.match(js,/areaValue=Number\(calc\.windowOnly\?calc\.windowArea:calc\.area\)/);
+  assert.match(js,/print-service-intro[\s\S]*m²/);
+});
