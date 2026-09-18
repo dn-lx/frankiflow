@@ -18,3 +18,34 @@ test('window cleaning is a per-visit add-on in engine and UI',()=>{const app=rea
 test('checklist uses database data with built-in fallback and responsive CSS',()=>{const app=read('public/assets/calculator-app-v3.js'),checklists=read('public/assets/checklists.js'),css=read('public/assets/calculator.css');assert.match(app,/frankiflow_checklists/);assert.match(app,/applyChecklistRows/);assert.match(app,/localizeChecklistSections/);assert.match(app,/renderChecklistPreview/);for(const key of ['buero','wohnung','airbnb','treppenhaus','deep','windows'])assert.match(checklists,new RegExp(`\\b${key}:`));assert.match(css,/\.checklist-screen-items/);assert.match(css,/grid-template-columns:repeat\(2/);assert.match(css,/@media\(max-width:700px\)/)});
 test('calculator page retains mobile live-price island',()=>{const html=read('public/preisrechner/index.html'),island=read('public/assets/calculator-mobile-island.js');assert.match(html,/calculator-mobile-island\.js\?v=/);assert.match(island,/mobile-price-island/);assert.match(island,/MutationObserver/)});
 test('config does not auto-start stale calculator side-effect modules',()=>{const cfg=read('public/assets/config.js');assert.doesNotMatch(cfg,/calculator-overrides|calculator-mobile-island|calculator-header-revert/)});
+
+test('top navigation CTAs have no diagonal arrow and calculator sells the business product',()=>{
+  const home=read('public/index.html'),homeEn=read('public/en/index.html'),calc=read('public/preisrechner/index.html'),header=read('public/assets/calculator-site-header.js');
+  const deNav=home.match(/<div class="nav-actions">([\s\S]*?)<\/div>/)?.[1]||'';
+  const enNav=homeEn.match(/<div class="nav-actions">([\s\S]*?)<\/div>/)?.[1]||'';
+  assert.doesNotMatch(deNav,/↗/);assert.doesNotMatch(enNav,/↗/);
+  assert.match(calc,/Preisrechner für Ihr Unternehmen kaufen/);
+  assert.doesNotMatch(calc.match(/<a class="btn btn-primary calc-nav-price"[\s\S]*?<\/a>/)?.[0]||'',/↗/);
+  assert.match(header,/Buy calculator for your business/);
+  assert.match(header,/Preisrechner für Ihr Unternehmen kaufen/);
+});
+
+test('quotation includes property area and supports direct PDF download',()=>{
+  const js=read('public/assets/calculator-app-v3.js'),html=read('public/preisrechner/index.html');
+  assert.match(html,/id="downloadQuote"/);
+  assert.match(js,/downloadQuote:'Angebot direkt herunterladen'/);
+  assert.match(js,/downloadQuote:'Download quotation PDF'/);
+  assert.match(js,/Reinigungsfläche':'Floor area'/);
+  assert.match(js,/Glasfläche':'Glass area'/);
+  assert.match(js,/jspdf@4\.2\.1/);
+  assert.match(js,/doc\.save\(/);
+  assert.match(js,/addEventListener\('click',downloadQuotePdf\)/);
+});
+
+test('print CSS avoids fixed A4-height boxes that create Safari blank pages',()=>{
+  const css=read('public/assets/calculator.css');
+  assert.doesNotMatch(css,/\.print-document\{[^}]*height:297mm/);
+  assert.doesNotMatch(css,/\.print-checklist-document\{[^}]*height:297mm/);
+  assert.match(css,/\.print-sheet>\*:last-child\{break-after:auto!important;page-break-after:auto!important\}/);
+  assert.match(css,/\.print-company-footer\{position:static/);
+});
