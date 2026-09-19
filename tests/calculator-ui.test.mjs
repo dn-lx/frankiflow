@@ -75,3 +75,5 @@ test('direct quotation PDF has structured client and price cards',()=>{
   assert.match(js,/roundedRect\(16,37,178,20/);
   assert.match(js,/frankiflow-full-transparent-1024\.png/);
 });
+
+test('print pagination is iOS-safe and only breaks when a following print page exists',()=>{const css=read('public/assets/calculator.css'),js=read('public/assets/calculator-app-v3.js');assert.match(css,/\.print-sheet\{[^}]*min-height:0!important[^}]*height:auto!important/s);assert.match(css,/\.print-document\{[^}]*height:auto;min-height:0[^}]*break-inside:avoid-page[^}]*overflow:visible/s);assert.match(css,/\.print-checklist-document\{[^}]*height:auto;min-height:0[^}]*break-before:auto;page-break-before:auto[^}]*overflow:visible/s);assert.match(css,/\.has-following-print-page\{break-after:page!important;page-break-after:always!important\}/);assert.match(js,/print-document\$\{includeChecklist\?' has-following-print-page':''\}/);assert.match(js,/print-checklist-document\$\{i<groups\.length-1\?' has-following-print-page':''\}/);});
