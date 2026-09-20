@@ -37,7 +37,13 @@ function applyHeaderLanguage(lang=currentLanguage()){
   Object.entries(items).forEach(([key,[label,href,tooltip]])=>{
     const link=$(`[data-calc-nav="${key}"]`);if(!link)return;
     link.textContent=label;link.href=href;
-    if(tooltip)link.dataset.navTooltip=tooltip;else delete link.dataset.navTooltip;
+    if(tooltip){
+      link.dataset.navTooltip=tooltip;
+      link.setAttribute('aria-label',`${label} — ${tooltip}`);
+    }else{
+      delete link.dataset.navTooltip;
+      link.removeAttribute('aria-label');
+    }
   });
   const brand=$('.calc-site-header .brand');if(brand)brand.href=home;
   const menu=$('.calc-site-header .menu-btn');if(menu)menu.setAttribute('aria-label',en?'Open menu':'Menü öffnen');
