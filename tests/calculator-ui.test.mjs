@@ -19,15 +19,18 @@ test('checklist uses database data with built-in fallback and responsive CSS',()
 test('calculator page retains mobile live-price island',()=>{const html=read('public/preisrechner/index.html'),island=read('public/assets/calculator-mobile-island.js');assert.match(html,/calculator-mobile-island\.js\?v=/);assert.match(island,/mobile-price-island/);assert.match(island,/MutationObserver/)});
 test('config does not auto-start stale calculator side-effect modules',()=>{const cfg=read('public/assets/config.js');assert.doesNotMatch(cfg,/calculator-overrides|calculator-mobile-island|calculator-header-revert/)});
 
-test('top navigation CTAs have no diagonal arrow and calculator sells the business product',()=>{
+test('header sales CTAs are removed and CalcPura sales CTA lives below the calculator',()=>{
   const home=read('public/index.html'),homeEn=read('public/en/index.html'),calc=read('public/preisrechner/index.html'),header=read('public/assets/calculator-site-header.js');
-  const deNav=home.match(/<div class="nav-actions">([\s\S]*?)<\/div>/)?.[1]||'';
-  const enNav=homeEn.match(/<div class="nav-actions">([\s\S]*?)<\/div>/)?.[1]||'';
-  assert.doesNotMatch(deNav,/↗/);assert.doesNotMatch(enNav,/↗/);
-  assert.match(calc,/Preisrechner für Ihr Unternehmen kaufen/);
-  assert.doesNotMatch(calc.match(/<a class="btn btn-primary calc-nav-price"[\s\S]*?<\/a>/)?.[0]||'',/↗/);
-  assert.match(header,/Buy calculator for your business/);
-  assert.match(header,/Preisrechner für Ihr Unternehmen kaufen/);
+  const deActions=home.match(/<div class="nav-actions">([\s\S]*?)<\/div>/)?.[1]||'';
+  const enActions=homeEn.match(/<div class="nav-actions">([\s\S]*?)<\/div>/)?.[1]||'';
+  const calcHeader=calc.match(/<header class="site-header calc-site-header">([\s\S]*?)<\/header>/)?.[1]||'';
+  assert.doesNotMatch(deActions,/Preis berechnen|btn-primary/);
+  assert.doesNotMatch(enActions,/Calculate Price|Preis berechnen|btn-primary/);
+  assert.doesNotMatch(calcHeader,/calc-nav-price|Buy calculator for your business|Preisrechner für Ihr Unternehmen kaufen/);
+  assert.doesNotMatch(header,/calc-nav-price|Buy calculator for your business|Preisrechner für Ihr Unternehmen kaufen/);
+  assert.match(calc,/class="calc-business-cta"/);
+  assert.match(calc,/CalcPura für Ihr Unternehmen entdecken/);
+  assert.match(calc,/https:\/\/calcpura\.frankiflow\.de\//);
 });
 
 test('quotation includes property area and supports direct PDF download',()=>{
