@@ -2,17 +2,14 @@
 .calculator-cta-section,.local-seo-section{display:none!important}
 .ff-admin-hidden-section{display:none!important}
 
-/* Header logo: 2x the original 205px desktop width on large screens. */
+/* Public header follows the same content rails as the page below it.
+   Logo size and header height are controlled centrally by header-logo-2x.css/settings. */
 @media(min-width:1181px){
-  .site-header .container{width:min(1480px,calc(100% - 24px))}
-  .site-header .nav{height:96px;gap:14px}
-  .site-header .brand{width:410px}
+  .site-header .container{width:min(var(--max),calc(100% - 40px))}
   .site-header .nav-links{gap:18px;font-size:13px}
   .site-header .nav-actions{gap:8px}
 }
 @media(min-width:681px) and (max-width:1180px){
-  .site-header .brand{width:300px}
-  .site-header .nav{height:88px;gap:14px}
   .site-header .nav-links{gap:16px;font-size:13px}
   .site-header .nav-actions{gap:8px}
 }
