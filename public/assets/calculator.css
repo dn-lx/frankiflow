@@ -152,3 +152,26 @@
 .print-footer-founder{font-size:7pt;font-weight:700;color:#536975;margin:1mm 0 2.4mm}
 @media(max-width:620px){.quote-request-modal{padding:10px}.quote-request-dialog{padding:22px 18px;border-radius:20px}.request-form-grid{grid-template-columns:1fr}.request-form-grid .full{grid-column:auto}.quote-request-actions{display:grid;grid-template-columns:1fr}.quote-request-actions .btn-calc{width:100%}}
 @media print{.quote-request-modal{display:none!important}.print-brand img{display:block!important;width:42mm!important;max-height:18mm!important;object-fit:contain!important;object-position:left center!important}}
+
+/* CalcPura business CTA lives below the calculator instead of inside navigation. */
+.calc-business-cta{padding:0 0 74px;background:var(--ice)}
+.calc-business-card{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:28px;
+  padding:30px 32px;border:1px solid rgba(7,31,56,.08);border-radius:24px;background:linear-gradient(135deg,#fff 0%,#f0fbf9 100%);
+  box-shadow:var(--shadow-sm)
+}
+.calc-business-kicker{display:block;margin-bottom:8px;color:#078c8f;font-size:11px;font-weight:900;letter-spacing:.12em}
+.calc-business-copy h2{margin:0;color:var(--navy);font-size:clamp(25px,3vw,36px);line-height:1.12;letter-spacing:-.035em}
+.calc-business-copy p{max-width:720px;margin:10px 0 0;color:var(--muted);font-size:14px;line-height:1.65}
+.calc-business-button{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:13px 18px;
+  border-radius:14px;background:var(--navy);color:#fff;font-size:13px;font-weight:850;white-space:nowrap;
+  box-shadow:0 12px 28px rgba(7,31,56,.14);transition:transform .18s ease,box-shadow .18s ease,background .18s ease
+}
+.calc-business-button:hover{transform:translateY(-2px);background:#04192d;box-shadow:0 16px 34px rgba(7,31,56,.19)}
+@media(max-width:760px){
+  .calc-business-cta{padding:0 0 52px}
+  .calc-business-card{grid-template-columns:1fr;padding:24px 20px}
+  .calc-business-button{width:100%;white-space:normal}
+}
+
