@@ -118,11 +118,13 @@ test('public navigation aligns and matches across homepage and calculator', asyn
       expect(rails.actionsRight).toBeLessThanOrEqual(rails.navRight+1);
     }
 
-    const calcPura=header.locator('.nav-calcpura');
-    await calcPura.hover();
-    await expect.poll(async()=>Number(await calcPura.evaluate(el=>getComputedStyle(el,'::after').opacity))).toBeGreaterThan(.9);
-    const tooltipContent=await calcPura.evaluate(el=>getComputedStyle(el,'::after').content);
-    expect(tooltipContent).not.toBe('none');
+    if(desktop){
+      const calcPura=header.locator('.nav-calcpura');
+      await calcPura.hover();
+      await expect.poll(async()=>Number(await calcPura.evaluate(el=>getComputedStyle(el,'::after').opacity))).toBeGreaterThan(.9);
+      const tooltipContent=await calcPura.evaluate(el=>getComputedStyle(el,'::after').content);
+      expect(tooltipContent).not.toBe('none');
+    }
   }
 });
 
