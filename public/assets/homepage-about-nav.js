@@ -20,6 +20,7 @@ function keepProductLinksLast(){
   calcPura.textContent='CalcPura';
   calcPura.className='nav-product nav-calcpura';
   calcPura.dataset.navTooltip=lang==='en'?'Pricing software for service businesses':'Preissoftware für Dienstleistungsunternehmen';
+  calcPura.setAttribute('aria-label',`CalcPura — ${calcPura.dataset.navTooltip}`);
 
   let frankiHolz=nav.querySelector('.nav-frankiholz,.nav-accommodations,a[href^="https://stay.frankiflow.de"]');
   if(!frankiHolz){frankiHolz=document.createElement('a');}
@@ -27,6 +28,7 @@ function keepProductLinksLast(){
   frankiHolz.textContent='FrankiHolz';
   frankiHolz.className='nav-product nav-frankiholz';
   frankiHolz.dataset.navTooltip=lang==='en'?'FrankiFlow accommodation & room booking':'FrankiFlow Unterkunft & Zimmerbuchung';
+  frankiHolz.setAttribute('aria-label',`FrankiHolz — ${frankiHolz.dataset.navTooltip}`);
 
   nav.append(calcPura,frankiHolz);
 }
