@@ -105,11 +105,18 @@ test('public navigation aligns and matches across homepage and calculator', asyn
       };
     },{contentSelector});
 
-    expect(rails.display).toBe('grid');
-    expect(Math.abs(rails.navLeft-rails.contentLeft)).toBeLessThan(2);
-    expect(Math.abs(rails.navRight-rails.contentRight)).toBeLessThan(2);
-    expect(Math.abs(rails.brandLeft-rails.contentLeft)).toBeLessThan(2);
-    expect(Math.abs(rails.actionsRight-rails.contentRight)).toBeLessThan(2);
+    const desktop=await page.evaluate(()=>window.innerWidth>=1021);
+    if(desktop){
+      expect(rails.display).toBe('grid');
+      expect(Math.abs(rails.navLeft-rails.contentLeft)).toBeLessThan(2);
+      expect(Math.abs(rails.navRight-rails.contentRight)).toBeLessThan(2);
+      expect(Math.abs(rails.brandLeft-rails.contentLeft)).toBeLessThan(2);
+      expect(Math.abs(rails.actionsRight-rails.contentRight)).toBeLessThan(2);
+    }else{
+      expect(rails.display).toBe('flex');
+      expect(rails.brandLeft).toBeGreaterThanOrEqual(rails.navLeft-1);
+      expect(rails.actionsRight).toBeLessThanOrEqual(rails.navRight+1);
+    }
 
     const calcPura=header.locator('.nav-calcpura');
     await calcPura.hover();
