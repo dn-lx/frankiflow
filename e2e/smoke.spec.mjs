@@ -53,19 +53,6 @@ test('quotation and checklist print footers stay at the bottom of every short A4
       </div>`;
   });
 
-  const readLayout = doc => {
-    const footer = doc.querySelector('.print-company-footer');
-    const dr = doc.getBoundingClientRect();
-    const fr = footer.getBoundingClientRect();
-    const style = getComputedStyle(doc);
-    return {
-      display: style.display,
-      direction: style.flexDirection,
-      minHeight: parseFloat(style.minHeight),
-      docHeight: dr.height,
-      footerBottomGap: dr.bottom - fr.bottom
-    };
-  };
   const layouts = await page.locator('.print-document,.print-checklist-document').evaluateAll(nodes => nodes.map(doc => {
     const footer = doc.querySelector('.print-company-footer');
     const dr = doc.getBoundingClientRect();
