@@ -27,18 +27,19 @@ function applyHeaderLanguage(lang=currentLanguage()){
   const en=lang==='en';
   const home=en?'/en/':'/';
   const items={
-    services:[en?'Services':'Leistungen',`${home}#leistungen`],
-    about:[en?'About Us':'Über uns',`${home}#about`],
-    contact:[en?'Contact':'Kontakt',`${home}#kontakt`],
-    faq:['FAQ',`${home}#faq`],
-    stay:[en?'Accommodations':'Unterkunft','https://stay.frankiflow.de/']
+    services:[en?'Services':'Leistungen',`${home}#leistungen`,''],
+    about:[en?'About Us':'Über uns',`${home}#about`,''],
+    contact:[en?'Contact':'Kontakt',`${home}#kontakt`,''],
+    faq:['FAQ',`${home}#faq`,''],
+    calcpura:['CalcPura','https://calcpura.frankiflow.de/',en?'Pricing software for service businesses':'Preissoftware für Dienstleistungsunternehmen'],
+    stay:['FrankiHolz','https://stay.frankiflow.de/',en?'FrankiFlow accommodation & room booking':'FrankiFlow Unterkunft & Zimmerbuchung']
   };
-  Object.entries(items).forEach(([key,[label,href]])=>{
+  Object.entries(items).forEach(([key,[label,href,tooltip]])=>{
     const link=$(`[data-calc-nav="${key}"]`);if(!link)return;
     link.textContent=label;link.href=href;
+    if(tooltip)link.dataset.navTooltip=tooltip;else delete link.dataset.navTooltip;
   });
   const brand=$('.calc-site-header .brand');if(brand)brand.href=home;
-  const price=$('.calc-site-header .calc-nav-price');if(price){price.textContent=en?'Buy calculator for your business':'Preisrechner für Ihr Unternehmen kaufen';price.href='/preisrechner/';}
   const menu=$('.calc-site-header .menu-btn');if(menu)menu.setAttribute('aria-label',en?'Open menu':'Menü öffnen');
   applyFooterLanguage(lang);
 }
