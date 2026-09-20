@@ -4,7 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 const read=p=>readFileSync(p,'utf8');
 
 test('About Us is a homepage accordion only',()=>{assert.equal(existsSync('public/about/index.html'),false);const home=read('public/index.html');const js=read('public/assets/homepage-about-nav.js');assert.match(home,/id="about"/);assert.match(home,/id="aboutAccordion"/);assert.match(home,/href="#about"/);assert.doesNotMatch(home,/href="\/about\/"/);assert.match(js,/slice\(0,3\)/);assert.match(js,/<details class=/);assert.doesNotMatch(js,/padStart|about-page-story-head/)});
-test('Accommodation remains the final navigation link after FAQ',()=>{for(const [p,label] of [['public/index.html','Unterkunft'],['public/en/index.html','Accommodations']]){const s=read(p);const nav=s.match(/<nav[^>]*class="nav-links"[^>]*>([\s\S]*?)<\/nav>/)?.[1]||'';assert.ok(nav.lastIndexOf(label)>nav.lastIndexOf('FAQ'))}});
+test('CalcPura and FrankiHolz finish the public navigation in the same order',()=>{for(const p of ['public/index.html','public/en/index.html','public/preisrechner/index.html']){const s=read(p);const nav=s.match(/<nav[^>]*class="nav-links"[^>]*>([\s\S]*?)<\/nav>/)?.[1]||'';assert.ok(nav.lastIndexOf('CalcPura')>nav.lastIndexOf('FAQ'));assert.ok(nav.lastIndexOf('FrankiHolz')>nav.lastIndexOf('CalcPura'));assert.match(nav,/calcpura\.frankiflow\.de/);assert.match(nav,/stay\.frankiflow\.de/)}});
 
 test('calculator page loads exactly one primary controller',()=>{const html=read('public/preisrechner/index.html');assert.match(html,/calculator-app-v3\.js\?v=/);assert.doesNotMatch(html,/calculator\.js\?v=/);assert.doesNotMatch(html,/calculator-runtime-fix\.js\?v=/);assert.equal((html.match(/createClient/g)||[]).length,0)});
 test('calculator controller wires print, contact and checklist buttons',()=>{const js=read('public/assets/calculator-app-v3.js'),html=read('public/preisrechner/index.html');for(const id of ['printQuote','requestService','viewChecklist','quoteRequestModal','checklistPreview'])assert.match(html,new RegExp(`id="${id}"`));assert.match(js,/addEventListener\('click',\(\)=>printDoc\('quote'\)\)/);assert.match(js,/addEventListener\('click',openServiceRequest\)/);assert.match(js,/addEventListener\('click',toggleChecklist\)/)});
@@ -19,15 +19,18 @@ test('checklist uses database data with built-in fallback and responsive CSS',()
 test('calculator page retains mobile live-price island',()=>{const html=read('public/preisrechner/index.html'),island=read('public/assets/calculator-mobile-island.js');assert.match(html,/calculator-mobile-island\.js\?v=/);assert.match(island,/mobile-price-island/);assert.match(island,/MutationObserver/)});
 test('config does not auto-start stale calculator side-effect modules',()=>{const cfg=read('public/assets/config.js');assert.doesNotMatch(cfg,/calculator-overrides|calculator-mobile-island|calculator-header-revert/)});
 
-test('top navigation CTAs have no diagonal arrow and calculator sells the business product',()=>{
+test('header sales CTAs are removed and CalcPura sales CTA lives below the calculator',()=>{
   const home=read('public/index.html'),homeEn=read('public/en/index.html'),calc=read('public/preisrechner/index.html'),header=read('public/assets/calculator-site-header.js');
-  const deNav=home.match(/<div class="nav-actions">([\s\S]*?)<\/div>/)?.[1]||'';
-  const enNav=homeEn.match(/<div class="nav-actions">([\s\S]*?)<\/div>/)?.[1]||'';
-  assert.doesNotMatch(deNav,/↗/);assert.doesNotMatch(enNav,/↗/);
-  assert.match(calc,/Preisrechner für Ihr Unternehmen kaufen/);
-  assert.doesNotMatch(calc.match(/<a class="btn btn-primary calc-nav-price"[\s\S]*?<\/a>/)?.[0]||'',/↗/);
-  assert.match(header,/Buy calculator for your business/);
-  assert.match(header,/Preisrechner für Ihr Unternehmen kaufen/);
+  const deActions=home.match(/<div class="nav-actions">([\s\S]*?)<\/div>/)?.[1]||'';
+  const enActions=homeEn.match(/<div class="nav-actions">([\s\S]*?)<\/div>/)?.[1]||'';
+  const calcHeader=calc.match(/<header class="site-header calc-site-header">([\s\S]*?)<\/header>/)?.[1]||'';
+  assert.doesNotMatch(deActions,/Preis berechnen|btn-primary/);
+  assert.doesNotMatch(enActions,/Calculate Price|Preis berechnen|btn-primary/);
+  assert.doesNotMatch(calcHeader,/calc-nav-price|Buy calculator for your business|Preisrechner für Ihr Unternehmen kaufen/);
+  assert.doesNotMatch(header,/calc-nav-price|Buy calculator for your business|Preisrechner für Ihr Unternehmen kaufen/);
+  assert.match(calc,/class="calc-business-cta"/);
+  assert.match(calc,/CalcPura für Ihr Unternehmen entdecken/);
+  assert.match(calc,/https:\/\/calcpura\.frankiflow\.de\//);
 });
 
 test('quotation includes property area and supports direct PDF download',()=>{
@@ -80,3 +83,18 @@ test('print pagination is iOS-safe and only breaks when a following print page e
 
 
 test('every browser-print page anchors the company footer to the bottom without fixed page height',()=>{const css=read('public/assets/calculator.css'),js=read('public/assets/calculator-app-v3.js');assert.match(css,/\.print-document\{[^}]*height:auto;min-height:296mm[^}]*display:flex[^}]*flex-direction:column/s);assert.match(css,/\.print-checklist-document\{[^}]*height:auto;min-height:296mm[^}]*display:flex[^}]*flex-direction:column/s);assert.match(css,/\.print-company-footer\{[^}]*position:static[^}]*margin-top:auto[^}]*border-top:/s);assert.doesNotMatch(css,/\.print-document\{[^}]*;height:29[67]mm(?:;|})/s);assert.doesNotMatch(css,/\.print-checklist-document\{[^}]*;height:29[67]mm(?:;|})/s);assert.match(js,/print-checklist-note[\s\S]*\$\{companyFooter\(''\)\}/);assert.match(js,/pdfFooter\(doc\);doc\.addPage/);assert.match(js,/pdfFooter\(doc\);\n\}/);});
+
+
+test('public headers remove sales CTAs and use balanced product navigation',()=>{const de=read('public/index.html'),en=read('public/en/index.html'),calc=read('public/preisrechner/index.html'),siteCss=read('public/assets/styles.css'),calcCss=read('public/assets/calculator-site-header.css');for(const html of [de,en]){const header=html.match(/<header class="site-header">[\s\S]*?<\/header>/)?.[0]||'';assert.doesNotMatch(header,/Preis berechnen/);assert.match(header,/data-nav-tooltip=/);}const calcHeader=calc.match(/<header class="site-header calc-site-header">[\s\S]*?<\/header>/)?.[0]||'';assert.doesNotMatch(calcHeader,/calc-nav-price|Buy calculator for your business|Preisrechner für Ihr Unternehmen kaufen/);assert.match(calcHeader,/data-calc-nav="calcpura"/);assert.match(calc,/class="calc-business-cta"/);assert.match(calc,/calcpura\.frankiflow\.de/);assert.match(siteCss,/grid-template-columns:minmax\(180px,1fr\) auto minmax\(180px,1fr\)/);assert.match(calcCss,/grid-template-columns:minmax\(180px,1fr\) auto minmax\(180px,1fr\)/);assert.match(siteCss,/content:attr\(data-nav-tooltip\)/);assert.match(calcCss,/content:attr\(data-nav-tooltip\)/);});
+
+
+test('homepage header uses the same 1200px content rail as the hero',()=>{const cms=read('public/assets/homepage-cms.css'),base=read('public/assets/styles-base.css'),calc=read('public/assets/calculator.css');assert.doesNotMatch(cms,/1480px/);assert.doesNotMatch(cms,/\.site-header \.brand\{width:(?:410|300)px/);assert.match(cms,/\.site-header \.container\{width:min\(var\(--max\),calc\(100% - 40px\)\)\}/);assert.match(base,/--max:1200px/);assert.match(calc,/\.calc-container\{width:min\(1200px,calc\(100% - 40px\)\);margin:auto\}/);});
+
+
+test('CalcPura and FrankiHolz tooltips are exposed as localized accessible names',()=>{const de=read('public/index.html'),en=read('public/en/index.html'),calc=read('public/preisrechner/index.html'),homeNav=read('public/assets/homepage-about-nav.js'),calcNav=read('public/assets/calculator-site-header.js');assert.match(de,/aria-label="CalcPura — Preissoftware für Dienstleistungsunternehmen"/);assert.match(de,/aria-label="FrankiHolz — FrankiFlow Unterkunft &amp; Zimmerbuchung"/);assert.match(en,/aria-label="CalcPura — Pricing software for service businesses"/);assert.match(en,/aria-label="FrankiHolz — FrankiFlow accommodation &amp; room booking"/);assert.match(calc,/aria-label="CalcPura — Preissoftware für Dienstleistungsunternehmen"/);assert.match(homeNav,/setAttribute\('aria-label',`CalcPura — \$\{calcPura\.dataset\.navTooltip\}`\)/);assert.match(homeNav,/setAttribute\('aria-label',`FrankiHolz — \$\{frankiHolz\.dataset\.navTooltip\}`\)/);assert.match(calcNav,/setAttribute\('aria-label',`\$\{label\} — \$\{tooltip\}`\)/);});
+
+
+test('homepage binds navigation before awaiting remote content',()=>{const js=read('public/assets/app-base.js');const bind=js.lastIndexOf('initI18n();bindUI();');const wait=js.lastIndexOf('await Promise.allSettled([loadSite(),loadGallery(),loadAboutMain(),loadHeaderLogoWidth()])');assert.ok(bind>=0);assert.ok(wait>=0);assert.ok(bind<wait);});
+
+
+test('public mobile navigation is local and independent of remote app imports',()=>{const nav=read('public/assets/header-nav.js'),de=read('public/index.html'),en=read('public/en/index.html'),app=read('public/assets/app-base.js');assert.doesNotMatch(nav,/\bimport\b|https?:\/\//);assert.match(nav,/classList\.toggle\('open'\)/);for(const html of [de,en]){const navIndex=html.indexOf('/assets/header-nav.js');const appIndex=html.indexOf('/assets/app.js');assert.ok(navIndex>=0);assert.ok(appIndex>=0);assert.ok(navIndex<appIndex);}assert.doesNotMatch(app,/menu\?\.addEventListener\('click'/);});

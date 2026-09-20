@@ -63,8 +63,8 @@ async function submitQuote(e){
   ]);
   form.reset();notice.textContent=tr('Vielen Dank! Ihre Anfrage ist eingegangen. Wir melden uns persönlich bei Ihnen.','Thank you! We received your enquiry and will contact you personally.');notice.className='notice';
 }
-function bindUI(){const menu=$('.menu-btn'),nav=$('.nav-links');menu?.addEventListener('click',()=>{const open=nav?.classList.toggle('open');menu.setAttribute('aria-expanded',String(Boolean(open)))});$$('.nav-links a').forEach(a=>a.addEventListener('click',()=>{nav?.classList.remove('open');menu?.setAttribute('aria-expanded','false')}));$('#quoteForm')?.addEventListener('submit',submitQuote)}
+function bindUI(){$('#quoteForm')?.addEventListener('submit',submitQuote)}
 
-mountLanguageSwitch($('.nav-actions'),{prepend:true});initI18n();
+mountLanguageSwitch($('.nav-actions'),{prepend:true});initI18n();bindUI();
 window.addEventListener('frankiflow:language',()=>{applySiteLanguage();loadAboutMain()});
-await Promise.allSettled([loadSite(),loadGallery(),loadAboutMain(),loadHeaderLogoWidth()]);bindUI();applySiteLanguage();
+await Promise.allSettled([loadSite(),loadGallery(),loadAboutMain(),loadHeaderLogoWidth()]);applySiteLanguage();
