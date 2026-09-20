@@ -95,3 +95,6 @@ test('CalcPura and FrankiHolz tooltips are exposed as localized accessible names
 
 
 test('homepage binds navigation before awaiting remote content',()=>{const js=read('public/assets/app-base.js');const bind=js.lastIndexOf('initI18n();bindUI();');const wait=js.lastIndexOf('await Promise.allSettled([loadSite(),loadGallery(),loadAboutMain(),loadHeaderLogoWidth()])');assert.ok(bind>=0);assert.ok(wait>=0);assert.ok(bind<wait);});
+
+
+test('public mobile navigation is local and independent of remote app imports',()=>{const nav=read('public/assets/header-nav.js'),de=read('public/index.html'),en=read('public/en/index.html'),app=read('public/assets/app-base.js');assert.doesNotMatch(nav,/\bimport\b|https?:\/\//);assert.match(nav,/classList\.toggle\('open'\)/);for(const html of [de,en]){const navIndex=html.indexOf('/assets/header-nav.js');const appIndex=html.indexOf('/assets/app.js');assert.ok(navIndex>=0);assert.ok(appIndex>=0);assert.ok(navIndex<appIndex);}assert.doesNotMatch(app,/menu\?\.addEventListener\('click'/);});
