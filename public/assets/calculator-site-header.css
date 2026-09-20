@@ -73,3 +73,28 @@
   html,body{margin:0!important;padding:0!important}
   .print-sheet{display:block!important;margin:0!important;padding:0!important}
 }
+
+/* Keep Preisrechner navigation visually identical to the homepage. */
+@media(min-width:1021px){
+  .calc-site-header .nav{display:grid;grid-template-columns:minmax(180px,1fr) auto minmax(180px,1fr);column-gap:28px}
+  .calc-site-header .brand{justify-self:start}
+  .calc-site-header .nav-links{justify-self:center}
+  .calc-site-header .nav-actions{justify-self:end}
+}
+.calc-site-header .nav-product{position:relative}
+.calc-site-header .nav-product::after{
+  content:attr(data-nav-tooltip);position:absolute;left:50%;top:calc(100% + 13px);transform:translate(-50%,-4px);
+  width:max-content;max-width:240px;padding:9px 11px;border-radius:10px;background:#0b2134;color:#fff;
+  font-size:11px;font-weight:650;line-height:1.4;letter-spacing:0;white-space:normal;text-align:center;
+  box-shadow:0 12px 30px rgba(11,33,52,.18);opacity:0;visibility:hidden;pointer-events:none;z-index:100;
+  transition:opacity .16s ease,transform .16s ease,visibility .16s ease
+}
+.calc-site-header .nav-product:hover::after,.calc-site-header .nav-product:focus-visible::after{opacity:1;visibility:visible;transform:translate(-50%,0)}
+@media(max-width:1020px){
+  .calc-site-header .nav-links.open .nav-product{display:flex;flex-direction:column;align-items:flex-start}
+  .calc-site-header .nav-links.open .nav-product::after{
+    position:static;transform:none;opacity:1;visibility:visible;background:transparent;color:#7a8d9a;
+    box-shadow:none;padding:2px 0 0;max-width:280px;text-align:left;font-size:10px
+  }
+}
+

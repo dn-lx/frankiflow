@@ -78,3 +78,40 @@ test('quotation and checklist print footers stay at the bottom of every short A4
     expect(layout.footerBottomGap).toBeLessThan(60);
   }
 });
+
+
+test('public navigation aligns and matches across homepage and calculator', async ({ page }) => {
+  for (const path of ['/en/','/preisrechner/']) {
+    await page.goto(path,{waitUntil:'domcontentloaded'});
+    const header=page.locator('.site-header');
+    await expect(header).toBeVisible();
+
+    const productLabels=await header.locator('.nav-links a').allTextContents();
+    expect(productLabels.slice(-2)).toEqual(['CalcPura','FrankiHolz']);
+    await expect(header.locator('.nav-actions a[href="/preisrechner/"]')).toHaveCount(0);
+    await expect(header.locator('.calc-nav-price')).toHaveCount(0);
+
+    const alignment=await header.locator('.nav').evaluate(nav=>{
+      const brand=nav.querySelector('.brand').getBoundingClientRect();
+      const actions=nav.querySelector('.nav-actions').getBoundingClientRect();
+      const box=nav.getBoundingClientRect();
+      return {leftGap:Math.abs(brand.left-box.left),rightGap:Math.abs(box.right-actions.right),display:getComputedStyle(nav).display};
+    });
+    expect(alignment.display).toBe('grid');
+    expect(alignment.leftGap).toBeLessThan(2);
+    expect(alignment.rightGap).toBeLessThan(2);
+
+    const calcPura=header.locator('.nav-calcpura');
+    await calcPura.hover();
+    await expect.poll(async()=>Number(await calcPura.evaluate(el=>getComputedStyle(el,'::after').opacity))).toBeGreaterThan(.9);
+    const tooltipContent=await calcPura.evaluate(el=>getComputedStyle(el,'::after').content);
+    expect(tooltipContent).not.toBe('none');
+  }
+});
+
+test('calculator presents CalcPura business CTA below the calculator', async ({ page }) => {
+  await page.goto('/preisrechner/',{waitUntil:'domcontentloaded'});
+  const cta=page.locator('.calc-business-cta');
+  await expect(cta).toBeVisible();
+  await expect(cta.getByRole('link',{name:/CalcPura/i})).toHaveAttribute('href','https://calcpura.frankiflow.de/');
+});
