@@ -18,7 +18,7 @@ test('price calculator shell renders without external writes', async ({ page }) 
 });
 
 
-test('quotation print footer stays at the bottom of a short A4 page', async ({ page }) => {
+test('quotation and checklist print footers stay at the bottom of every short A4 page', async ({ page }) => {
   await page.goto('/preisrechner/', { waitUntil: 'domcontentloaded' });
   await page.emulateMedia({ media: 'print' });
 
@@ -38,27 +38,43 @@ test('quotation print footer stays at the bottom of a short A4 page', async ({ p
         <section class="print-month-totals"><div class="print-month-row"><span>Regular month</span><strong>€169.72</strong></div></section>
         <div class="print-note">Non-binding quotation.</div>
         <footer class="print-company-footer"><div class="print-footer-title">FrankiFlow Building Cleaning &amp; Property Services</div></footer>
+      </div>
+      <div class="print-checklist-document">
+        <div class="print-topline"></div>
+        <header class="print-checklist-head">
+          <div class="print-brand"><p>FrankiFlow</p></div>
+          <div class="print-checklist-titlebox"><span>SERVICE CHECKLIST</span><strong>Office cleaning</strong><small>1 / 1</small></div>
+        </header>
+        <div class="print-divider"></div>
+        <section class="print-checklist-client"><div><span>Client / property</span><strong>Test customer</strong></div></section>
+        <div class="print-checklist-grid"><section class="print-checklist-section"><h4>Office</h4><div class="print-checklist-items"><div class="print-checklist-item"><span class="check-symbol included"></span><em>Clean work surfaces</em></div></div></section></div>
+        <div class="print-checklist-note">Standard service scope.</div>
+        <footer class="print-company-footer"><div class="print-footer-title">FrankiFlow Building Cleaning &amp; Property Services</div></footer>
       </div>`;
   });
 
-  const layout = await page.locator('.print-document').evaluate(doc => {
+  const layouts = await page.locator('.print-document,.print-checklist-document').evaluateAll(nodes => nodes.map(doc => {
     const footer = doc.querySelector('.print-company-footer');
     const dr = doc.getBoundingClientRect();
     const fr = footer.getBoundingClientRect();
     const style = getComputedStyle(doc);
     return {
+      className: doc.className,
       display: style.display,
       direction: style.flexDirection,
       minHeight: parseFloat(style.minHeight),
       docHeight: dr.height,
       footerBottomGap: dr.bottom - fr.bottom
     };
-  });
+  }));
 
-  expect(layout.display).toBe('flex');
-  expect(layout.direction).toBe('column');
-  expect(layout.minHeight).toBeGreaterThan(1100);
-  expect(layout.docHeight).toBeLessThan(1130);
-  expect(layout.footerBottomGap).toBeGreaterThan(35);
-  expect(layout.footerBottomGap).toBeLessThan(60);
+  expect(layouts).toHaveLength(2);
+  for (const layout of layouts) {
+    expect(layout.display).toBe('flex');
+    expect(layout.direction).toBe('column');
+    expect(layout.minHeight).toBeGreaterThan(1100);
+    expect(layout.docHeight).toBeLessThan(1130);
+    expect(layout.footerBottomGap).toBeGreaterThan(35);
+    expect(layout.footerBottomGap).toBeLessThan(60);
+  }
 });
