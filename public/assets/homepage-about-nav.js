@@ -10,14 +10,25 @@ let aboutSections=[];
 
 function splitParagraphs(text=''){return String(text).split(/\n\s*\n/g).map(x=>x.trim()).filter(Boolean)}
 
-function keepAccommodationsLast(){
+function keepProductLinksLast(){
   const lang=getLanguage()==='en'?'en':'de';
   const nav=$('.nav-links');if(!nav)return;
-  let link=nav.querySelector('.nav-accommodations,a[href^="https://stay.frankiflow.de"]');
-  if(!link){link=document.createElement('a');link.className='nav-accommodations';}
-  link.href='https://stay.frankiflow.de/';
-  link.textContent=lang==='en'?'Accommodations':'Unterkunft';
-  link.classList.add('nav-accommodations');nav.append(link);
+
+  let calcPura=nav.querySelector('.nav-calcpura,a[href^="https://calcpura.frankiflow.de"]');
+  if(!calcPura){calcPura=document.createElement('a');nav.append(calcPura);}
+  calcPura.href='https://calcpura.frankiflow.de/';
+  calcPura.textContent='CalcPura';
+  calcPura.className='nav-product nav-calcpura';
+  calcPura.dataset.navTooltip=lang==='en'?'Pricing software for service businesses':'Preissoftware für Dienstleistungsunternehmen';
+
+  let frankiHolz=nav.querySelector('.nav-frankiholz,.nav-accommodations,a[href^="https://stay.frankiflow.de"]');
+  if(!frankiHolz){frankiHolz=document.createElement('a');}
+  frankiHolz.href='https://stay.frankiflow.de/';
+  frankiHolz.textContent='FrankiHolz';
+  frankiHolz.className='nav-product nav-frankiholz';
+  frankiHolz.dataset.navTooltip=lang==='en'?'FrankiFlow accommodation & room booking':'FrankiFlow Unterkunft & Zimmerbuchung';
+
+  nav.append(calcPura,frankiHolz);
 }
 
 function keepAboutSectionLink(){
@@ -94,6 +105,6 @@ forceCalculatorSameTab();
 cleanAboutSectionChrome();
 syncAboutHeading();
 keepAboutSectionLink();
-keepAccommodationsLast();
+keepProductLinksLast();
 loadAboutAccordion();
-window.addEventListener('frankiflow:language',()=>setTimeout(()=>{cleanAboutSectionChrome();syncAboutHeading();keepAboutSectionLink();keepAccommodationsLast();renderAboutAccordion();forceCalculatorSameTab()},0));
+window.addEventListener('frankiflow:language',()=>setTimeout(()=>{cleanAboutSectionChrome();syncAboutHeading();keepAboutSectionLink();keepProductLinksLast();renderAboutAccordion();forceCalculatorSameTab()},0));
