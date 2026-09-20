@@ -3,4 +3,14 @@
 .env.*
 !.env.example
 node_modules/
+.npm-cache/
+playwright-report/
+test-results/
+lighthouse-report/
 .DS_Store
+
+# Local Graphify tooling and derived code maps
+.venv-graphify/
+.graphify/
+graphify-out/
+.lighthouseci/

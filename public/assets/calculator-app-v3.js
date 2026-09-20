@@ -31,8 +31,8 @@ const FALLBACK={
 };
 
 const TEXT={
-  de:{website:'Zur Website',eyebrow:'FRANKIFLOW PREISRECHNER',title:'Ihr Reinigungspreis. <em>Transparent berechnet.</em>',intro:'Wählen Sie Leistung, Fläche und Häufigkeit. Sie erhalten sofort einen unverbindlichen Richtpreis – ohne Registrierung.',instant:'Sofortiger Richtpreis',noReg:'Keine Registrierung',frankfurt:'Frankfurt & Umgebung',serviceTitle:'Welche Reinigung benötigen Sie?',serviceHint:'Wählen Sie die Leistung, die am besten passt.',scopeTitle:'Objekt & Umfang',scopeHint:'Fläche und Reinigungsrhythmus bestimmen den Richtpreis.',area:'Reinigungsfläche',areaHelp:'Bei reiner Fensterreinigung kann die Fläche 0 sein.',frequency:'Häufigkeit',contract:'Vertragslaufzeit',newCustomer:'Neukunde?',extrasTitle:'Optionale Leistungen',extrasHint:'Nur auswählen, wenn Sie diese Leistungen benötigen.',equipment:'Reinigungsmittel & Equipment',equipmentHint:'FrankiFlow stellt benötigte Materialien.',vat:'MwSt. hinzufügen',windows:'Fensterreinigung',windowsHint:'Optional nach Glasfläche.',glassArea:'Glasfläche',quoteTitle:'Angebot vorbereiten',quoteHint:'Optional: Tragen Sie Ihre Daten ein, wenn Sie das Ergebnis als Angebot drucken möchten.',name:'Name',company:'Firma / Objekt',phone:'Telefon',address:'Adresse / Leistungsort',serviceDate:'Leistungsdatum / Zeitraum',yourPrice:'IHR RICHTPREIS',perVisit:'Preis pro Termin',perMonth:'Preis pro Monat',firstMonth:'1. Monat als Neukunde',overview:'Übersicht',printQuote:'Angebot drucken / PDF',printInvoice:'Rechnung erstellen',request:'Mit Angebot kontaktieren',disclaimer:'Unverbindlicher Richtpreis. Der endgültige Preis kann nach Besichtigung bzw. genauer Leistungsabstimmung abweichen.',vatIncluded:'MwSt. enthalten',vatNotIncluded:'MwSt. nicht enthalten',discount:'Rabatt berücksichtigt',month:'Monat',months:'Monate',visitsMonth:'Termine/Monat',floorCleaning:'Allgemeine Reinigung',windowCleaning:'Fensterreinigung',deep:'Grundreinigung',materials:'Equipment & Reinigungsmittel',quote:'ANGEBOT',invoice:'RECHNUNG'},
-  en:{website:'Back to website',eyebrow:'FRANKIFLOW PRICE CALCULATOR',title:'Your cleaning price. <em>Calculated transparently.</em>',intro:'Choose the service, area and frequency. You receive an instant non-binding estimate – no registration required.',instant:'Instant estimate',noReg:'No registration',frankfurt:'Frankfurt & surroundings',serviceTitle:'Which cleaning service do you need?',serviceHint:'Choose the service that best matches your property.',scopeTitle:'Property & scope',scopeHint:'Area and cleaning frequency determine the estimate.',area:'Floor area',areaHelp:'For window-only cleaning, floor area may be 0.',frequency:'Frequency',contract:'Contract duration',newCustomer:'New customer?',extrasTitle:'Optional services',extrasHint:'Select only the extras you need.',equipment:'Cleaning supplies & equipment',equipmentHint:'FrankiFlow provides the required materials.',vat:'Add VAT',windows:'Window cleaning',windowsHint:'Optional, calculated by glass area.',glassArea:'Glass area',quoteTitle:'Prepare a quotation',quoteHint:'Optional: enter your details to print the result as a quotation.',name:'Name',company:'Company / property',phone:'Phone',address:'Address / service location',serviceDate:'Service date / period',yourPrice:'YOUR ESTIMATE',perVisit:'Price per visit',perMonth:'Price per month',firstMonth:'1st month as new customer',overview:'Overview',printQuote:'Print quotation / PDF',printInvoice:'Create invoice',request:'Contact with the Quotation',disclaimer:'Non-binding estimate. The final price may vary after inspection or detailed agreement of the service scope.',vatIncluded:'VAT included',vatNotIncluded:'VAT not included',discount:'discount applied',month:'month',months:'months',visitsMonth:'visits/month',floorCleaning:'General cleaning',windowCleaning:'Window cleaning',deep:'Deep cleaning',materials:'Equipment & cleaning supplies',quote:'QUOTATION',invoice:'INVOICE'}
+  de:{website:'Zur Website',eyebrow:'FRANKIFLOW PREISRECHNER',title:'Ihr Reinigungspreis. <em>Transparent berechnet.</em>',intro:'Wählen Sie Leistung, Fläche und Häufigkeit. Sie erhalten sofort einen unverbindlichen Richtpreis – ohne Registrierung.',instant:'Sofortiger Richtpreis',noReg:'Keine Registrierung',frankfurt:'Frankfurt & Umgebung',serviceTitle:'Welche Reinigung benötigen Sie?',serviceHint:'Wählen Sie die Leistung, die am besten passt.',scopeTitle:'Objekt & Umfang',scopeHint:'Fläche und Reinigungsrhythmus bestimmen den Richtpreis.',area:'Reinigungsfläche',areaHelp:'Bei reiner Fensterreinigung kann die Fläche 0 sein.',frequency:'Häufigkeit',contract:'Vertragslaufzeit',newCustomer:'Neukunde?',extrasTitle:'Optionale Leistungen',extrasHint:'Nur auswählen, wenn Sie diese Leistungen benötigen.',equipment:'Reinigungsmittel & Equipment',equipmentHint:'FrankiFlow stellt benötigte Materialien.',vat:'MwSt. hinzufügen',windows:'Fensterreinigung',windowsHint:'Optional nach Glasfläche.',glassArea:'Glasfläche',quoteTitle:'Angebot vorbereiten',quoteHint:'Optional: Tragen Sie Ihre Daten ein, wenn Sie das Ergebnis drucken oder direkt als PDF herunterladen möchten.',name:'Name',company:'Firma / Objekt',phone:'Telefon',address:'Adresse / Leistungsort',serviceDate:'Leistungsdatum / Zeitraum',yourPrice:'IHR RICHTPREIS',perVisit:'Preis pro Termin',perMonth:'Preis pro Monat',firstMonth:'1. Monat als Neukunde',overview:'Übersicht',printQuote:'Angebot drucken / als PDF sichern',downloadQuote:'Angebot direkt herunterladen',printInvoice:'Rechnung erstellen',request:'Mit Angebot kontaktieren',disclaimer:'Unverbindlicher Richtpreis. Der endgültige Preis kann nach Besichtigung bzw. genauer Leistungsabstimmung abweichen.',vatIncluded:'MwSt. enthalten',vatNotIncluded:'MwSt. nicht enthalten',discount:'Rabatt berücksichtigt',month:'Monat',months:'Monate',visitsMonth:'Termine/Monat',floorCleaning:'Allgemeine Reinigung',windowCleaning:'Fensterreinigung',deep:'Grundreinigung',materials:'Equipment & Reinigungsmittel',quote:'ANGEBOT',invoice:'RECHNUNG'},
+  en:{website:'Back to website',eyebrow:'FRANKIFLOW PRICE CALCULATOR',title:'Your cleaning price. <em>Calculated transparently.</em>',intro:'Choose the service, area and frequency. You receive an instant non-binding estimate – no registration required.',instant:'Instant estimate',noReg:'No registration',frankfurt:'Frankfurt & surroundings',serviceTitle:'Which cleaning service do you need?',serviceHint:'Choose the service that best matches your property.',scopeTitle:'Property & scope',scopeHint:'Area and cleaning frequency determine the estimate.',area:'Floor area',areaHelp:'For window-only cleaning, floor area may be 0.',frequency:'Frequency',contract:'Contract duration',newCustomer:'New customer?',extrasTitle:'Optional services',extrasHint:'Select only the extras you need.',equipment:'Cleaning supplies & equipment',equipmentHint:'FrankiFlow provides the required materials.',vat:'Add VAT',windows:'Window cleaning',windowsHint:'Optional, calculated by glass area.',glassArea:'Glass area',quoteTitle:'Prepare a quotation',quoteHint:'Optional: enter your details to print the result or download it directly as a PDF quotation.',name:'Name',company:'Company / property',phone:'Phone',address:'Address / service location',serviceDate:'Service date / period',yourPrice:'YOUR ESTIMATE',perVisit:'Price per visit',perMonth:'Price per month',firstMonth:'1st month as new customer',overview:'Overview',printQuote:'Print / Save as PDF',downloadQuote:'Download quotation PDF',printInvoice:'Create invoice',request:'Contact with the Quotation',disclaimer:'Non-binding estimate. The final price may vary after inspection or detailed agreement of the service scope.',vatIncluded:'VAT included',vatNotIncluded:'VAT not included',discount:'discount applied',month:'month',months:'months',visitsMonth:'visits/month',floorCleaning:'General cleaning',windowCleaning:'Window cleaning',deep:'Deep cleaning',materials:'Equipment & cleaning supplies',quote:'QUOTATION',invoice:'INVOICE'}
 };
 const SERVICE_EN={buero:'Office cleaning',wohnung:'Home cleaning',airbnb:'Holiday rental / Airbnb',treppenhaus:'Stairwell cleaning',fenster:'Window cleaning'};
 const SERVICE_HINTS={de:{buero:'Büro, Praxis & Gewerbe',wohnung:'Wohnung & Privathaushalt',airbnb:'Turnover & Ferienunterkunft',treppenhaus:'Mehrfamilienhaus & Gemeinschaftsfläche',fenster:'Nur Fenster & Glasflächen'},en:{buero:'Office, practice & commercial',wohnung:'Apartment & private home',airbnb:'Turnover & holiday rental',treppenhaus:'Apartment building & common areas',fenster:'Windows & glass only'}};
@@ -117,6 +117,8 @@ function summaryRows(result){
   const rows=[];
   rows.push([lang==='de'?'Leistung':'Service',localizedServiceLabel(result)]);
   rows.push([lang==='de'?'Häufigkeit':'Frequency',`${result.visits} ${t('visitsMonth')}`]);
+  if(result.windowOnly)rows.push([lang==='de'?'Glasfläche':'Glass area',`${Number(result.windowArea||0)} m²`]);
+  else rows.push([lang==='de'?'Reinigungsfläche':'Floor area',`${Number(result.area||0)} m²`]);
   if(!result.windowOnly&&result.floorVisit>0)rows.push([lang==='de'?'Reinigung / Termin':'Cleaning / visit',money(result.floorVisit)]);
   if(result.equipmentVisit>0)rows.push([lang==='de'?'Equipment / Termin':'Equipment / visit',money(result.equipmentVisit)]);
   if(result.windowCharge>0)rows.push([`${t('windowCleaning')} / ${visitWord}`,`${money(result.windowCharge)} · ${result.windowArea} m²`]);
@@ -170,7 +172,7 @@ function toggleChecklist(){const preview=$('#checklistPreview');if(!preview)retu
 
 function companyFooter(tax=''){return `<footer class="print-company-footer"><div class="print-footer-title">${lang==='de'?'FrankiFlow Gebäudereinigung &amp; Objektbetreuung':'FrankiFlow Building Cleaning &amp; Property Services'}</div><div class="print-footer-founder">Inura Devasurendra · ${lang==='de'?'Gründer':'Founder'}</div><div class="print-company-grid"><div><span>${lang==='de'?'Telefon':'Phone'}</span><strong>+49 176 62493041</strong></div><div><span>E-Mail</span><strong>info@frankiflow.de</strong></div><div><span>Website</span><strong>www.frankiflow.de</strong></div><div><span>${lang==='de'?'Steuernummer':'Tax no.'}</span><strong>014/811/68462</strong></div><div><span>${lang==='de'?'Betriebsnummer':'Employer no.'}</span><strong>69471447</strong></div><div><span>W-IdNr.</span><strong>DE464605581</strong></div></div>${tax?`<div class="print-tax-note">${escapeHtml(tax)}</div>`:''}</footer>`;}
 
-function checklistPrintPages(primary,secondary){const u=checklistText(),groups=checklistGroups();return groups.map((g,i)=>`<div class="print-checklist-document${i<groups.length-1?' has-following-print-page':''}"><div class="print-topline"></div><header class="print-checklist-head"><div class="print-brand"><img src="/assets/frankiflow-logo.png" alt="FrankiFlow"><p>${lang==='de'?'Gebäudereinigung &amp; Objektbetreuung · Frankfurt am Main & Umgebung':'Building Cleaning &amp; Property Services · Frankfurt am Main & Surroundings'}</p></div><div class="print-checklist-titlebox"><span>${u.page}</span><strong>${escapeHtml(g.label)}</strong><small>${i+1} / ${groups.length}</small></div></header><div class="print-divider"></div><section class="print-checklist-client"><div><span>${lang==='de'?'Kunde / Objekt':'Client / property'}</span><strong>${escapeHtml(primary)}</strong>${secondary?`<small>${secondary}</small>`:''}</div><div><span>${u.scope}</span><strong>${escapeHtml(g.label)}</strong></div></section><div class="print-checklist-grid">${g.sections.map(s=>checklistSectionHtml(s,false)).join('')}</div><div class="print-checklist-note">${escapeHtml(u.note)}</div>${companyFooter('')}</div>`).join('');}
+function checklistPrintPages(primary,secondary){const u=checklistText(),groups=checklistGroups();return groups.map((g,i)=>`<div class="print-checklist-document${i<groups.length-1?' has-following-print-page':''}"><div class="print-topline"></div><header class="print-checklist-head"><div class="print-brand"><img src="/assets/brand/frankiflow-full-transparent-1024.png" alt="FrankiFlow"><p>${lang==='de'?'Gebäudereinigung &amp; Objektbetreuung · Frankfurt am Main & Umgebung':'Building Cleaning &amp; Property Services · Frankfurt am Main & Surroundings'}</p></div><div class="print-checklist-titlebox"><span>${u.page}</span><strong>${escapeHtml(g.label)}</strong><small>${i+1} / ${groups.length}</small></div></header><div class="print-divider"></div><section class="print-checklist-client"><div><span>${lang==='de'?'Kunde / Objekt':'Client / property'}</span><strong>${escapeHtml(primary)}</strong>${secondary?`<small>${secondary}</small>`:''}</div><div><span>${u.scope}</span><strong>${escapeHtml(g.label)}</strong></div></section><div class="print-checklist-grid">${g.sections.map(s=>checklistSectionHtml(s,false)).join('')}</div><div class="print-checklist-note">${escapeHtml(u.note)}</div>${companyFooter('')}</div>`).join('');}
 
 async function waitForImages(root){const images=[...root.querySelectorAll('img')];await Promise.all(images.map(img=>img.complete&&img.naturalWidth?img.decode?.().catch(()=>{})||Promise.resolve():new Promise(resolve=>{img.addEventListener('load',resolve,{once:true});img.addEventListener('error',resolve,{once:true});setTimeout(resolve,2500)})));}
 
@@ -178,11 +180,218 @@ async function printDoc(kind='quote',billing=null,invoiceNumber=''){
   if(!calc)return;const invoice=kind==='invoice';const locale=lang==='de'?'de-DE':'en-GB';const today=new Date().toLocaleDateString(locale);const name=$('#customerName')?.value.trim()||'—',company=$('#customerCompany')?.value.trim()||'',email=$('#customerEmail')?.value.trim()||'',phone=$('#customerPhone')?.value.trim()||'',address=$('#customerAddress')?.value.trim()||'';const primary=company||name;const secondary=[company?name:'',address,email,phone].filter(Boolean).map(escapeHtml).join('<br>');const includeChecklist=!invoice&&($('#includeChecklist')?.checked??true);const rows=summaryRows(calc);const featured=calc.promoPct?calc.firstMonth:calc.monthly;const featuredCaption=calc.promoPct?(lang==='de'?'1. Vertragsmonat':'1st contract month'):(lang==='de'?'Monatlicher Betrag':'Monthly amount');const vatNote=calc.vatRate?(lang==='de'?'MwSt. enthalten.':'VAT included.'):(lang==='de'?'MwSt. nicht enthalten.':'VAT not included.');
   const meta=invoice?`<div class="print-doc-meta"><span>${lang==='de'?'Rechnungsnummer':'Invoice no.'}</span><strong>${escapeHtml(invoiceNumber)}</strong><span>${lang==='de'?'Datum':'Date'}</span><strong>${today}</strong></div>`:`<div class="print-doc-meta"><span>${lang==='de'?'Datum':'Date'}</span><strong>${today}</strong><span>${lang==='de'?'Vertragslaufzeit':'Contract duration'}</span><strong>${calc.months} ${calc.months===1?t('month'):t('months')}</strong></div>`;
   const billingHtml=invoice&&billing?`<div class="print-bank"><div class="print-bank-title">${lang==='de'?'Zahlungsinformationen':'Payment details'}</div><div class="print-bank-grid"><span>${escapeHtml(billing.payment_terms||'')}</span><span>${escapeHtml(billing.account_holder||'')} · ${escapeHtml(billing.bank_name||'')}</span><span>IBAN: ${escapeHtml(billing.iban||'')}</span><span>BIC: ${escapeHtml(billing.bic||'')}</span></div></div>`:'';
-  const sheet=$('#printSheet');sheet.innerHTML=`<div class="print-document${includeChecklist?' has-following-print-page':''}"><div class="print-topline"></div><header class="print-head-legacy"><div class="print-brand"><img src="/assets/frankiflow-logo.png" alt="FrankiFlow"><p>${lang==='de'?'Gebäudereinigung & Objektbetreuung · Frankfurt am Main & Umgebung':'Building Cleaning & Property Services · Frankfurt am Main & Surroundings'}</p></div><div class="print-featured"><div class="print-kind">${invoice?t('invoice'):t('quote')}</div><div class="print-featured-amount">${money(featured)}</div><div class="print-featured-caption">${featuredCaption}</div></div></header><div class="print-divider"></div><section class="print-client-block"><div><div class="print-customer-name">${escapeHtml(primary)}</div>${secondary?`<div class="print-customer-details">${secondary}</div>`:''}</div>${meta}</section><section class="print-service-intro"><h2>${escapeHtml(calc.serviceLabel)}</h2><p>${money(calc.monthly)} / ${lang==='de'?'Monat':'month'} · ${vatNote}</p></section><section class="print-breakdown-legacy">${rows.map(([a,b],i)=>`<div class="print-line ${i===rows.length-1?'vat-line':''}"><span>${escapeHtml(a)}</span><strong>${escapeHtml(b)}</strong></div>`).join('')}</section><section class="print-month-totals"><div class="print-month-row"><span>${lang==='de'?'Regulärer Monat':'Regular month'}</span><strong>${money(calc.monthly)}</strong></div>${calc.promoPct?`<div class="print-month-row promo"><span>${lang==='de'?'1. Monat mit Neukundenrabatt':'1st month with new-customer discount'}</span><strong>${money(calc.firstMonth)}</strong></div>`:''}</section><div class="print-note">${lang==='de'?'Dieses Angebot ist unverbindlich. Der endgültige Preis richtet sich nach dem tatsächlich vereinbarten Leistungsumfang und dem Objektzustand.':'This quotation is non-binding. The final price depends on the agreed service scope and property condition.'}</div>${billingHtml}${companyFooter('')}</div>${includeChecklist?checklistPrintPages(primary,secondary):''}`;
+  const sheet=$('#printSheet');sheet.innerHTML=`<div class="print-document${includeChecklist?' has-following-print-page':''}"><div class="print-topline"></div><header class="print-head-legacy"><div class="print-brand"><img src="/assets/brand/frankiflow-full-transparent-1024.png" alt="FrankiFlow"><p>${lang==='de'?'Gebäudereinigung & Objektbetreuung · Frankfurt am Main & Umgebung':'Building Cleaning & Property Services · Frankfurt am Main & Surroundings'}</p></div><div class="print-featured"><div class="print-kind">${invoice?t('invoice'):t('quote')}</div><div class="print-featured-amount">${money(featured)}</div><div class="print-featured-caption">${featuredCaption}</div></div></header><div class="print-divider"></div><section class="print-client-block"><div><div class="print-customer-name">${escapeHtml(primary)}</div>${secondary?`<div class="print-customer-details">${secondary}</div>`:''}</div>${meta}</section><section class="print-service-intro"><h2>${escapeHtml(calc.serviceLabel)}</h2><p>${money(calc.monthly)} / ${lang==='de'?'Monat':'month'} · ${calc.windowOnly?(lang==='de'?'Glasfläche':'Glass area'):(lang==='de'?'Reinigungsfläche':'Floor area')}: ${Number(calc.windowOnly?calc.windowArea:calc.area)||0} m² · ${vatNote}</p></section><section class="print-breakdown-legacy">${rows.map(([a,b],i)=>`<div class="print-line ${i===rows.length-1?'vat-line':''}"><span>${escapeHtml(a)}</span><strong>${escapeHtml(b)}</strong></div>`).join('')}</section><section class="print-month-totals"><div class="print-month-row"><span>${lang==='de'?'Regulärer Monat':'Regular month'}</span><strong>${money(calc.monthly)}</strong></div>${calc.promoPct?`<div class="print-month-row promo"><span>${lang==='de'?'1. Monat mit Neukundenrabatt':'1st month with new-customer discount'}</span><strong>${money(calc.firstMonth)}</strong></div>`:''}</section><div class="print-note">${lang==='de'?'Dieses Angebot ist unverbindlich. Der endgültige Preis richtet sich nach dem tatsächlich vereinbarten Leistungsumfang und dem Objektzustand.':'This quotation is non-binding. The final price depends on the agreed service scope and property condition.'}</div>${billingHtml}${companyFooter('')}</div>${includeChecklist?checklistPrintPages(primary,secondary):''}`;
   sheet.setAttribute('aria-hidden','false');void sheet.offsetHeight;await waitForImages(sheet);window.print();
 }
 
-function quoteSnapshot(){return{service_label:calc?.serviceLabel||'',frequency_label:$('#frequency option:checked')?.textContent||'',visit_price:calc?money(calc.visitTotal):'',monthly_price:calc?money(calc.monthly):'',first_month_price:calc?money(calc.firstMonth):'',breakdown:$('#breakdownRows')?.innerText||'',address:$('#customerAddress')?.value?.trim()||''};}
+
+let jsPdfModulePromise=null;
+async function loadJsPdf(){
+  if(!jsPdfModulePromise)jsPdfModulePromise=import('https://esm.sh/jspdf@4.2.1?bundle');
+  return jsPdfModulePromise;
+}
+async function imageDataUrl(url){
+  const response=await fetch(url,{cache:'force-cache'});if(!response.ok)throw new Error('Logo load failed');
+  const blob=await response.blob();
+  return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(blob);});
+}
+function safePdfName(value){
+  return String(value||'quotation').normalize('NFKD').replace(/[^a-z0-9_-]+/gi,'-').replace(/^-+|-+$/g,'').slice(0,50)||'quotation';
+}
+function pdfFooter(doc){
+  const pageHeight=doc.internal.pageSize.getHeight();
+  doc.setDrawColor(214,224,228);doc.setLineWidth(.25);doc.line(16,pageHeight-29,194,pageHeight-29);
+  doc.setTextColor(11,45,75);doc.setFont('helvetica','bold');doc.setFontSize(8);doc.text('FrankiFlow Gebäudereinigung & Objektbetreuung',16,pageHeight-24);
+  doc.setFont('helvetica','normal');doc.setTextColor(83,105,117);doc.setFontSize(6.8);
+  doc.text('Inura Devasurendra · Founder',16,pageHeight-20);
+  doc.text('+49 176 62493041 · info@frankiflow.de · www.frankiflow.de',16,pageHeight-16);
+  doc.text('Tax no. 014/811/68462 · Employer no. 69471447 · W-IdNr. DE464605581',16,pageHeight-12);
+}
+function pdfBrandBar(doc){
+  const pageWidth=doc.internal.pageSize.getWidth();
+  doc.setFillColor(11,45,75);doc.rect(0,0,pageWidth*.58,3,'F');
+  doc.setFillColor(27,153,152);doc.rect(pageWidth*.58,0,pageWidth*.24,3,'F');
+  doc.setFillColor(111,207,131);doc.rect(pageWidth*.82,0,pageWidth*.18,3,'F');
+}
+function pdfAddLogo(doc,logo,x=16,y=8,maxW=45,maxH=22){
+  if(!logo)return;
+  try{
+    const props=doc.getImageProperties(logo);
+    const ratio=props?.width&&props?.height?props.width/props.height:2;
+    let w=maxW,h=w/ratio;
+    if(h>maxH){h=maxH;w=h*ratio;}
+    doc.addImage(logo,'PNG',x,y,w,h,undefined,'FAST');
+  }catch(error){console.warn('PDF logo unavailable',error);}
+}
+function pdfChecklistCardHeight(doc,section,width){
+  doc.setFont('helvetica','bold');doc.setFontSize(8.6);
+  const titleLines=doc.splitTextToSize(section.title,width-11);
+  let height=8+titleLines.length*4;
+  if(section.optional)height+=4;
+  doc.setFont('helvetica','normal');doc.setFontSize(7.2);
+  for(const item of section.items){
+    const lines=doc.splitTextToSize(String(item),width-16);
+    height+=Math.max(1,lines.length)*3.45+1.5;
+  }
+  return Math.max(20,height+4);
+}
+function pdfDrawChecklistCard(doc,section,x,y,width,height){
+  const optional=Boolean(section.optional);
+  doc.setDrawColor(optional?226:218,optional?211:228,optional?172:232);
+  doc.setFillColor(optional?255:248,optional?251:251,optional?241:252);
+  doc.setLineWidth(.28);doc.roundedRect(x,y,width,height,2.2,2.2,'FD');
+  doc.setFillColor(optional?174:27,optional?139:153,optional?69:152);doc.roundedRect(x,y,3.2,height,2.2,2.2,'F');
+
+  doc.setFont('helvetica','bold');doc.setFontSize(8.6);doc.setTextColor(optional?126:11,optional?100:45,optional?42:75);
+  const titleLines=doc.splitTextToSize(section.title,width-11);
+  doc.text(titleLines,x+7,y+6.5);
+  let cy=y+6.5+titleLines.length*4;
+  if(optional){
+    doc.setFontSize(5.8);doc.setTextColor(154,120,49);
+    doc.text(lang==='de'?'OPTIONAL / NACH VEREINBARUNG':'OPTIONAL / BY AGREEMENT',x+7,cy+1.5);
+    cy+=5;
+  }
+  doc.setFont('helvetica','normal');doc.setFontSize(7.2);doc.setTextColor(74,94,107);
+  for(const item of section.items){
+    const lines=doc.splitTextToSize(String(item),width-16);
+    doc.setDrawColor(optional?168:27,optional?136:153,optional?67:152);
+    doc.setLineWidth(.25);doc.roundedRect(x+7,cy-2.3,3,3,.55,.55,'S');
+    if(!optional){
+      doc.setDrawColor(27,153,152);doc.setLineWidth(.38);
+      doc.line(x+7.65,cy-.9,x+8.3,cy-.15);doc.line(x+8.3,cy-.15,x+9.45,cy-1.75);
+    }
+    doc.setTextColor(74,94,107);doc.text(lines,x+12,cy);
+    cy+=Math.max(1,lines.length)*3.45+1.5;
+  }
+}
+function pdfChecklistHeader(doc,group,index,total,primary,secondary,logo,continued=false){
+  pdfBrandBar(doc);pdfAddLogo(doc,logo,16,8,40,19);
+  doc.setFont('helvetica','bold');doc.setTextColor(11,45,75);doc.setFontSize(7);
+  doc.text(lang==='de'?'LEISTUNGSCHECKLISTE':'SERVICE CHECKLIST',194,10,{align:'right'});
+  doc.setFontSize(16);doc.text(group.label,194,18,{align:'right'});
+  doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(122,135,144);
+  doc.text(continued?(lang==='de'?'Fortsetzung':'Continued'):`${index+1} / ${total}`,194,23.5,{align:'right'});
+
+  doc.setFillColor(246,250,250);doc.setDrawColor(226,234,236);doc.setLineWidth(.25);doc.roundedRect(16,31,178,16,2.2,2.2,'FD');
+  doc.setFont('helvetica','normal');doc.setTextColor(126,140,149);doc.setFontSize(6.2);
+  doc.text(lang==='de'?'KUNDE / OBJEKT':'CLIENT / PROPERTY',21,36);
+  doc.text(lang==='de'?'LEISTUNGSBEREICH':'SERVICE SCOPE',116,36);
+  doc.setFont('helvetica','bold');doc.setTextColor(35,55,68);doc.setFontSize(8.5);
+  doc.text(primary||'—',21,41);
+  doc.text(group.label,116,41);
+  if(secondary){
+    doc.setFont('helvetica','normal');doc.setTextColor(111,128,138);doc.setFontSize(6.2);
+    const detail=doc.splitTextToSize(secondary.replace(/<br>/g,' · '),82);doc.text(detail.slice(0,1),21,45);
+  }
+  return 53;
+}
+function pdfChecklistPage(doc,group,index,total,primary,secondary,logo){
+  doc.addPage('a4','portrait');
+  let startY=pdfChecklistHeader(doc,group,index,total,primary,secondary,logo,false);
+  const cardW=86,gap=6,leftX=16,rightX=16+cardW+gap,maxY=251;
+  let cols=[startY,startY];
+
+  for(const section of group.sections){
+    let height=pdfChecklistCardHeight(doc,section,cardW);
+    let col=cols[0]<=cols[1]?0:1;
+    if(cols[col]+height>maxY){
+      const other=col===0?1:0;
+      if(cols[other]+height<=maxY)col=other;
+      else{
+        pdfFooter(doc);doc.addPage('a4','portrait');
+        startY=pdfChecklistHeader(doc,group,index,total,primary,secondary,logo,true);
+        cols=[startY,startY];col=0;
+      }
+    }
+    const x=col===0?leftX:rightX;
+    pdfDrawChecklistCard(doc,section,x,cols[col],cardW,height);
+    cols[col]+=height+4;
+  }
+
+  const note=checklistText().note;
+  let noteY=Math.max(cols[0],cols[1])+2;
+  if(noteY<253){
+    const noteLines=doc.splitTextToSize(note,166);
+    const noteH=7+noteLines.length*3.2;
+    if(noteY+noteH<267){
+      doc.setFillColor(239,248,247);doc.setDrawColor(211,235,232);doc.roundedRect(16,noteY,178,noteH,2,2,'FD');
+      doc.setFont('helvetica','normal');doc.setTextColor(90,116,122);doc.setFontSize(6.7);
+      doc.text(noteLines,21,noteY+5);
+    }
+  }
+  pdfFooter(doc);
+}
+async function downloadQuotePdf(){
+  if(!calc)return;
+  const button=$('#downloadQuote'),old=button?.textContent||'';
+  if(button){button.disabled=true;button.textContent=lang==='de'?'PDF wird erstellt …':'Creating PDF …';}
+  try{
+    const {jsPDF}=await loadJsPdf();
+    const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true,putOnlyUsedFonts:true});
+    const pageWidth=doc.internal.pageSize.getWidth(),locale=lang==='de'?'de-DE':'en-GB';
+    const today=new Date().toLocaleDateString(locale);
+    const name=$('#customerName')?.value.trim()||'—',company=$('#customerCompany')?.value.trim()||'',email=$('#customerEmail')?.value.trim()||'',phone=$('#customerPhone')?.value.trim()||'',address=$('#customerAddress')?.value.trim()||'';
+    const primary=company||name;
+    const secondary=[company?name:'',address,email,phone].filter(Boolean).join(' · ');
+    const featured=calc.promoPct?calc.firstMonth:calc.monthly;
+    const rows=summaryRows(calc);
+    const vatNote=calc.vatRate?(lang==='de'?'MwSt. enthalten.':'VAT included.'):(lang==='de'?'MwSt. nicht enthalten.':'VAT not included.');
+    let pdfLogo='';try{pdfLogo=await imageDataUrl('/assets/brand/frankiflow-full-transparent-1024.png');}catch(error){console.warn('PDF logo unavailable',error);}
+
+    pdfBrandBar(doc);pdfAddLogo(doc,pdfLogo,16,8,45,22);
+    doc.setFillColor(242,249,248);doc.setDrawColor(220,238,236);doc.setLineWidth(.25);doc.roundedRect(143,8,51,22,2.2,2.2,'FD');
+    doc.setFont('helvetica','bold');doc.setTextColor(72,101,109);doc.setFontSize(6.4);doc.text(lang==='de'?'ANGEBOT':'QUOTATION',190,13,{align:'right'});
+    doc.setTextColor(11,45,75);doc.setFontSize(21);doc.text(money(featured),190,21,{align:'right'});
+    doc.setFont('helvetica','normal');doc.setTextColor(111,137,142);doc.setFontSize(6.6);doc.text(calc.promoPct?(lang==='de'?'1. Vertragsmonat':'1st contract month'):(lang==='de'?'Monatlicher Betrag':'Monthly amount'),190,26,{align:'right'});
+
+    doc.setFillColor(249,251,252);doc.setDrawColor(226,233,237);doc.roundedRect(16,37,178,20,2.2,2.2,'FD');
+    doc.setFont('helvetica','normal');doc.setTextColor(132,145,153);doc.setFontSize(6.3);doc.text(lang==='de'?'KUNDE / OBJEKT':'CLIENT / PROPERTY',21,42);
+    doc.setFont('helvetica','bold');doc.setTextColor(23,37,53);doc.setFontSize(10.5);doc.text(primary,21,48);
+    if(secondary){doc.setFont('helvetica','normal');doc.setTextColor(111,125,135);doc.setFontSize(6.8);doc.text(doc.splitTextToSize(secondary,102).slice(0,1),21,53);}
+    doc.setFont('helvetica','normal');doc.setTextColor(137,148,155);doc.setFontSize(6.3);doc.text(lang==='de'?'DATUM':'DATE',145,42);doc.text(lang==='de'?'VERTRAGSLAUFZEIT':'CONTRACT DURATION',145,49);
+    doc.setFont('helvetica','bold');doc.setTextColor(54,71,84);doc.setFontSize(7.4);doc.text(today,190,42,{align:'right'});doc.text(`${calc.months} ${calc.months===1?t('month'):t('months')}`,190,49,{align:'right'});
+
+    doc.setFillColor(27,153,152);doc.roundedRect(16,64,2.4,13,1,1,'F');
+    doc.setFont('helvetica','bold');doc.setTextColor(11,45,75);doc.setFontSize(12.4);doc.text(calc.serviceLabel,22,69);
+    doc.setFont('helvetica','normal');doc.setTextColor(116,134,144);doc.setFontSize(7.4);const areaLabel=calc.windowOnly?(lang==='de'?'Glasfläche':'Glass area'):(lang==='de'?'Reinigungsfläche':'Floor area');const areaValue=Number(calc.windowOnly?calc.windowArea:calc.area)||0;doc.text(`${money(calc.monthly)} / ${lang==='de'?'Monat':'month'} · ${areaLabel}: ${areaValue} m² · ${vatNote}`,22,74);
+
+    let y=83;
+    doc.setDrawColor(220,228,232);doc.line(16,y-3,194,y-3);
+    for(const [label,value] of rows){
+      doc.setFont('helvetica','normal');doc.setTextColor(111,125,135);doc.setFontSize(8);doc.text(String(label),16,y);
+      doc.setFont('helvetica','bold');doc.setTextColor(23,37,53);doc.text(String(value),194,y,{align:'right'});
+      doc.setDrawColor(237,241,243);doc.line(16,y+3,194,y+3);y+=8;
+    }
+
+    y+=2;doc.setFont('helvetica','normal');doc.setTextColor(97,113,125);doc.setFontSize(9);doc.text(lang==='de'?'Regulärer Monat':'Regular month',16,y);
+    doc.setFont('helvetica','bold');doc.setTextColor(23,37,53);doc.setFontSize(10);doc.text(money(calc.monthly),194,y,{align:'right'});y+=8;
+    if(calc.promoPct){
+      doc.setFillColor(237,249,247);doc.roundedRect(16,y-5,178,10,2,2,'F');
+      doc.setTextColor(11,112,110);doc.setFontSize(8);doc.text(lang==='de'?'1. Monat mit Neukundenrabatt':'1st month with new-customer discount',20,y+1);
+      doc.setFontSize(10);doc.text(money(calc.firstMonth),190,y+1,{align:'right'});y+=13;
+    }
+    doc.setFont('helvetica','normal');doc.setTextColor(123,136,145);doc.setFontSize(7);
+    const note=lang==='de'?'Dieses Angebot ist unverbindlich. Der endgültige Preis richtet sich nach dem tatsächlich vereinbarten Leistungsumfang und dem Objektzustand.':'This quotation is non-binding. The final price depends on the agreed service scope and property condition.';
+    doc.text(doc.splitTextToSize(note,172),16,y+4);
+    pdfFooter(doc);
+
+    if($('#includeChecklist')?.checked){
+      const groups=checklistGroups();
+      groups.forEach((group,index)=>pdfChecklistPage(doc,group,index,groups.length,primary,secondary,pdfLogo));
+    }
+
+    const subject=safePdfName(company||name||calc.serviceLabel);
+    const date=new Date().toISOString().slice(0,10);
+    doc.save(`FrankiFlow-Quotation-${subject}-${date}.pdf`);
+  }catch(error){
+    console.error('Direct quotation PDF failed',error);
+    alert(lang==='de'?'Der direkte PDF-Download konnte nicht erstellt werden. Bitte nutzen Sie alternativ „Drucken / als PDF sichern“.':'The direct PDF download could not be created. Please use “Print / Save as PDF” instead.');
+  }finally{
+    if(button){button.disabled=false;button.textContent=old||t('downloadQuote');}
+  }
+}
+
+function quoteSnapshot(){return{service_label:calc?.serviceLabel||'',frequency_label:$('#frequency option:checked')?.textContent||'',area_label:calc?.windowOnly?(lang==='de'?'Glasfläche':'Glass area'):(lang==='de'?'Reinigungsfläche':'Floor area'),area_sqm:calc?.windowOnly?Number(calc?.windowArea||0):Number(calc?.area||0),visit_price:calc?money(calc.visitTotal):'',monthly_price:calc?money(calc.monthly):'',first_month_price:calc?money(calc.firstMonth):'',breakdown:$('#breakdownRows')?.innerText||'',address:$('#customerAddress')?.value?.trim()||''};}
 
 function syncRequestDialogLanguage(){const en=lang==='en';if($('#requestDialogTitle'))$('#requestDialogTitle').textContent=en?'Contact with the Quotation':'Mit Angebot kontaktieren';if($('#requestDialogIntro'))$('#requestDialogIntro').textContent=en?'Send your current calculated quotation and contact details directly to FrankiFlow.':'Senden Sie Ihr aktuell berechnetes Angebot zusammen mit Ihren Kontaktdaten direkt an FrankiFlow.';if($('#requestEmailLabel'))$('#requestEmailLabel').textContent=en?'Email':'E-Mail';if($('#requestPhoneLabel'))$('#requestPhoneLabel').textContent=en?'Phone':'Telefon';if($('#requestMessageLabel'))$('#requestMessageLabel').textContent=en?'Message / notes':'Nachricht / Hinweise';if($('#requestPrivacyText'))$('#requestPrivacyText').textContent=en?'I agree that my details may be processed to handle this quotation enquiry.':'Ich stimme der Verarbeitung meiner Angaben zur Bearbeitung dieser Angebotsanfrage zu.';if($('#submitServiceRequest'))$('#submitServiceRequest').textContent=en?'Send quotation request':'Angebotsanfrage senden';if($('#cancelRequestDialog'))$('#cancelRequestDialog').textContent=en?'Cancel':'Abbrechen';}
 
@@ -225,7 +434,7 @@ function bind(){
   $('#calculatorForm')?.addEventListener('input',event=>{if(event.target.matches('input,select,textarea'))recalculate();});
   $('#calculatorForm')?.addEventListener('change',event=>{if(event.target.matches('input[name="serviceKey"]')){if(event.target.value==='fenster'&&frequencies().some(o=>o.key==='once'))$('#frequency').value='once';}recalculate();});
   $('#viewChecklist')?.addEventListener('click',toggleChecklist);$('#includeChecklist')?.addEventListener('change',renderChecklistPreview);
-  $('#printQuote')?.addEventListener('click',()=>printDoc('quote'));$('#printInvoice')?.addEventListener('click',createInvoice);
+  $('#printQuote')?.addEventListener('click',()=>printDoc('quote'));$('#downloadQuote')?.addEventListener('click',downloadQuotePdf);$('#printInvoice')?.addEventListener('click',createInvoice);
   $('#requestService')?.addEventListener('click',openServiceRequest);$('#closeRequestDialog')?.addEventListener('click',closeServiceRequest);$('#cancelRequestDialog')?.addEventListener('click',closeServiceRequest);$('#submitServiceRequest')?.addEventListener('click',submitServiceRequest);$$('[data-close-request]').forEach(el=>el.addEventListener('click',closeServiceRequest));
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('#quoteRequestModal')?.classList.contains('hidden'))closeServiceRequest();});
 }
