@@ -103,12 +103,9 @@ test('public navigation aligns and matches across homepage and calculator', asyn
 
     const calcPura=header.locator('.nav-calcpura');
     await calcPura.hover();
-    const tooltip=await calcPura.evaluate(el=>({
-      content:getComputedStyle(el,'::after').content,
-      opacity:getComputedStyle(el,'::after').opacity
-    }));
-    expect(tooltip.content).not.toBe('none');
-    expect(Number(tooltip.opacity)).toBeGreaterThan(.9);
+    await expect.poll(async()=>Number(await calcPura.evaluate(el=>getComputedStyle(el,'::after').opacity))).toBeGreaterThan(.9);
+    const tooltipContent=await calcPura.evaluate(el=>getComputedStyle(el,'::after').content);
+    expect(tooltipContent).not.toBe('none');
   }
 });
 
