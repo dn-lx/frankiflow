@@ -22,3 +22,8 @@ There is no unfinished application feature recorded in this handoff at the time 
 3. Confirm the requested task and required external connections.
 4. Create a focused branch from current `develop` for implementation work.
 5. Update this file only when there is meaningful unfinished state, a changed decision, or an external side effect the next agent must know.
+
+
+## Agent Project Starter alignment — 2026-09-22
+
+Agent infrastructure was aligned with `dn-lx/agent-project-starter` without changing FrankiFlow product/runtime behavior. The repository gained model-routing and memory/context policy, MCP and memory-context skills, bootstrap guidance, agent-stack validation, stronger PR evidence, reusable templates and an agent-independent engineering ADR. Existing FrankiFlow-specific skills and stronger CI/security/release checks were preserved. `main` is not part of this change.
