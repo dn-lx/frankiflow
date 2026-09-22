@@ -49,3 +49,18 @@ At the start of a new coding-agent session, read [Project Memory](docs/PROJECT-M
 `AGENTS.md` remains the canonical shared instruction source. Platform adapter files such as `CLAUDE.md`, `GEMINI.md` and `.github/copilot-instructions.md` must stay thin and must not redefine product or release rules.
 
 Before ending unfinished work, or after a material decision/external side effect, update `docs/CURRENT-HANDOFF.md` so the next agent can continue without relying on private chat/session memory.
+
+
+## Agent Project Starter parity
+
+FrankiFlow keeps its project-specific rules and stronger CI, while adopting the reusable Agent Project Starter operating model.
+
+- Read [MCP / Connector Usage](.agents/skills/mcp-usage/SKILL.md) before external-system work; verify the exact account/project/environment with a harmless read before writes.
+- Read [Memory and Context Efficiency](.agents/skills/memory-context/SKILL.md) and [Memory / Context Policy](docs/MEMORY-CONTEXT-POLICY.md) before broad repository/context loading.
+- Use [Model Routing Policy](docs/MODEL-ROUTING-POLICY.md) to choose agents by capability and risk instead of hard-coding one provider/model.
+- For sensitive auth, data, secrets, external writes or release work, combine deterministic checks with an independent capable reviewer.
+- Run `node scripts/validate-agent-stack.mjs` when changing agent infrastructure and keep the Agent stack validation workflow green.
+- [Project Bootstrap](.agents/skills/project-bootstrap/SKILL.md) and [New Project Bootstrap Checklist](docs/PROJECT-BOOTSTRAP-CHECKLIST.md) are for creating future projects from this standard, not routine FrankiFlow feature work.
+- Reusable templates live under `docs/templates/`; the real FrankiFlow project skill remains authoritative for implementation details.
+
+The starter-only placeholder project skill is intentionally not copied because this repository already has a real project-specific skill.
