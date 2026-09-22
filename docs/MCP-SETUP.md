@@ -49,3 +49,22 @@ Before claiming an MCP/connector works:
 4. only then perform an authorized write.
 
 Configuration present in the repository is not evidence that an external integration is active.
+
+
+## Project capability profile
+
+| Capability | Status | Project provider / environment | Safe verification |
+| --- | --- | --- | --- |
+| Source control / PRs / CI | Required | GitHub · `dn-lx/frankiflow` | Read `develop`, open PRs and latest checks |
+| Current library/API docs | Recommended | Context7 / official docs | Resolve/query a public library or API |
+| Database/auth/storage | Required for backend/admin work | Shared Supabase FrankiFlow backend | Read schema/function metadata before writes |
+| Hosting/deployments | Required for deploy work | Netlify FrankiFlow site | Read current site/deploy metadata |
+| Browser verification | Recommended for UI changes | Playwright / preview | Run repository smoke checks |
+| Code relationships | Recommended | Graphify local | Query a known symbol/module and confirm in source |
+| Runtime observability | Optional / activation-dependent | Sentry scaffold | Read project/config metadata |
+| Product analytics/flags | Optional / task-dependent | PostHog when connected | Read project/flag metadata |
+| Payments | Not a default website capability | Stripe only for an explicitly added payment flow | Read account/context before any test write |
+| Transactional email | Task-dependent | Resend / shared backend email functions | Read delivery/webhook metadata |
+| Business/project documents | Optional | Google Drive when connected | List/read a known project document |
+
+Provider availability is agent-host specific. Repository documentation is not proof that a connector is currently active.
