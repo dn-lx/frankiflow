@@ -43,7 +43,7 @@ jobs:
           exit 1
       - name: Capture homepage and Preisrechner
         run: |
-          cat > /tmp/capture.mjs <<'EOF'
+          cat > capture.mjs <<'EOF'
           import { chromium } from '@playwright/test';
           import fs from 'node:fs';
           fs.mkdirSync('visual-preview', { recursive: true });
@@ -68,7 +68,7 @@ jobs:
           }
           await browser.close();
           EOF
-          node /tmp/capture.mjs
+          node capture.mjs
       - name: Upload screenshots
         uses: actions/upload-artifact@v5
         with:
