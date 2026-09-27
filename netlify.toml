@@ -1,56 +1,18 @@
 [build]
-  publish = "public"
+  base = "next-preview"
+  command = "npm run build"
+  publish = ".next"
 
 [dev]
-  publish = "public"
-
-[[redirects]]
-  from = "/admin"
-  to = "/admin/"
-  status = 301
-
-[[redirects]]
-  from = "/preisrechner"
-  to = "/preisrechner/"
-  status = 301
-
-[[redirects]]
-  from = "/preisrechner/admin"
-  to = "/admin/"
-  status = 301
-
-[[redirects]]
-  from = "/preisrechner/admin/*"
-  to = "/admin/"
-  status = 301
-
-[[redirects]]
-  from = "/impressum"
-  to = "/impressum/"
-  status = 301
-
-[[redirects]]
-  from = "/datenschutz"
-  to = "/datenschutz/"
-  status = 301
+  command = "npm run dev"
+  targetPort = 3000
 
 [[headers]]
   for = "/*"
   [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' https://esm.sh; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co https://esm.sh; font-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
-
-[[headers]]
-  for = "/sitemap.xml"
-  [headers.values]
-    Content-Type = "application/xml; charset=UTF-8"
-    Cache-Control = "public, max-age=86400"
-
-[[headers]]
-  for = "/robots.txt"
-  [headers.values]
-    Content-Type = "text/plain; charset=UTF-8"
-    Cache-Control = "public, max-age=86400"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://frankiflow.de; connect-src 'self'; font-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self' mailto:;"
