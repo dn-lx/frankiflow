@@ -9,7 +9,7 @@ export function calculatePricing(cfg,s){
   const reduction=reductionPct/100;
   const min=Number(cfg.service_settings?.minimum_cleaning_charge||0);
   const gradient=Number(service.gradient_per_sqm??cfg.service_settings?.gradient_per_sqm??0);
-  const base=Number(service.base_1m||0);
+  const base=Number(service.calibrated_base_1m??service.base_1m??0);
   const adjustedBase=base*(1-reduction);
 
   let floorVisitNet=s.windowOnly?0:(s.area>0?Math.max(min,adjustedBase+s.area*gradient):0);
