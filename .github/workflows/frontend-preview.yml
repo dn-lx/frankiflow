@@ -1,0 +1,77 @@
+name: Frontend visual preview
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [develop]
+    paths:
+      - "public/assets/frontend-refresh.css"
+      - "public/index.html"
+      - "public/preisrechner/index.html"
+      - ".github/workflows/frontend-preview.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+      - name: Install dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Start static site
+        run: |
+          python3 -m http.server 4173 --directory public > /tmp/frankiflow-preview.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/frankiflow-preview.log
+          exit 1
+      - name: Capture homepage and Preisrechner
+        run: |
+          cat > /tmp/capture.mjs <<'EOF'
+          import { chromium } from '@playwright/test';
+          import fs from 'node:fs';
+          fs.mkdirSync('visual-preview', { recursive: true });
+
+          const browser = await chromium.launch();
+          const targets = [
+            ['homepage-desktop.png', '/', 1440, 1000],
+            ['homepage-mobile.png', '/', 390, 844],
+            ['preisrechner-desktop.png', '/preisrechner/', 1440, 1000],
+            ['preisrechner-mobile.png', '/preisrechner/', 390, 844],
+          ];
+
+          for (const [name, path, width, height] of targets) {
+            const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 1 });
+            const errors = [];
+            page.on('pageerror', err => errors.push(String(err)));
+            await page.goto('http://127.0.0.1:4173' + path, { waitUntil: 'domcontentloaded' });
+            await page.waitForTimeout(2500);
+            await page.screenshot({ path: 'visual-preview/' + name, fullPage: true });
+            if (errors.length) console.log(name + ' page errors:', errors);
+            await page.close();
+          }
+          await browser.close();
+          EOF
+          node /tmp/capture.mjs
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v5
+        with:
+          name: frankiflow-frontend-preview-${{ github.run_id }}
+          path: visual-preview/*.png
+          retention-days: 7
