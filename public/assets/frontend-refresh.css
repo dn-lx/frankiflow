@@ -29,7 +29,8 @@ body{
   box-shadow:0 8px 28px rgba(7,29,47,.035);
   backdrop-filter:blur(22px)!important;
 }
-.site-header .nav,.calc-site-header .nav{min-height:82px!important;}
+.site-header .nav{min-height:82px!important;width:min(1220px,calc(100% - 48px))!important;margin-left:auto!important;margin-right:auto!important;}
+.calc-site-header .nav{min-height:82px!important;width:min(1200px,calc(100% - 48px))!important;margin-left:auto!important;margin-right:auto!important;}
 .site-header .nav-links,.calc-site-header .nav-links{gap:30px!important;}
 .site-header .nav-links a,.calc-site-header .nav-links a{
   color:#425d6c!important;
