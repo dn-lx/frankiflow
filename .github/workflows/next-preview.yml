@@ -52,8 +52,9 @@ jobs:
       - name: Capture desktop screenshot
         run: npx --yes playwright@1.63.0 screenshot --browser chromium --viewport-size "1440,1000" --full-page http://127.0.0.1:3000/ preview-desktop.png
       - name: Capture mobile screenshot
-        run: npx --yes playwright@1.63.0 screenshot --browser chromium --device "iPhone 13" --full-page http://127.0.0.1:3000/ preview-mobile.png
+        run: npx --yes playwright@1.63.0 screenshot --browser chromium --viewport-size "390,844" --full-page http://127.0.0.1:3000/ preview-mobile.png
       - name: Upload preview screenshots
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v5
         with:
           name: frankiflow-next-preview-${{ github.run_id }}
