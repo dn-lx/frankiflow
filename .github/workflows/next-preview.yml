@@ -19,7 +19,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: next-preview
@@ -32,3 +32,32 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Build Next.js preview
         run: npm run build
+      - name: Install Chromium
+        run: npx --yes playwright@1.63.0 install --with-deps chromium
+      - name: Start preview server
+        run: |
+          npm run start -- -H 0.0.0.0 > /tmp/frankiflow-next.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:3000/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/frankiflow-next.log
+          exit 1
+      - name: Smoke-test German and English routes
+        run: |
+          curl -fsS http://127.0.0.1:3000/ | grep -q "Saubere Räume"
+          curl -fsS http://127.0.0.1:3000/en/ | grep -q "Clean spaces"
+      - name: Capture desktop screenshot
+        run: npx --yes playwright@1.63.0 screenshot --browser chromium --viewport-size "1440,1000" --full-page http://127.0.0.1:3000/ preview-desktop.png
+      - name: Capture mobile screenshot
+        run: npx --yes playwright@1.63.0 screenshot --browser chromium --device "iPhone 13" --full-page http://127.0.0.1:3000/ preview-mobile.png
+      - name: Upload preview screenshots
+        uses: actions/upload-artifact@v5
+        with:
+          name: frankiflow-next-preview-${{ github.run_id }}
+          path: |
+            next-preview/preview-desktop.png
+            next-preview/preview-mobile.png
+          retention-days: 7
