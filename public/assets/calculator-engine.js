@@ -8,7 +8,7 @@ export function calculatePricing(cfg,s){
   const reductionPct=s.windowOnly?0:pct(cfg.contract_settings?.base_reduction_pct?.[months]);
   const reduction=reductionPct/100;
   const min=Number(cfg.service_settings?.minimum_cleaning_charge||0);
-  const gradient=Number(cfg.service_settings?.gradient_per_sqm||0);
+  const gradient=Number(service.gradient_per_sqm??cfg.service_settings?.gradient_per_sqm??0);
   const base=Number(service.base_1m||0);
   const adjustedBase=base*(1-reduction);
 
