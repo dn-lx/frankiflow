@@ -22,7 +22,7 @@ body{
   color:var(--ff-ink);
   text-rendering:optimizeLegibility;
 }
-.container,.calc-container{width:min(1220px,calc(100% - 48px));}
+.container{width:min(1220px,calc(100% - 48px));}\n.calc-container{width:min(1200px,calc(100% - 48px));}
 .site-header,.calc-site-header{
   background:rgba(251,252,251,.88)!important;
   border-bottom:1px solid rgba(7,29,47,.07)!important;
