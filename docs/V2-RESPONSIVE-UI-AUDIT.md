@@ -182,3 +182,46 @@ Before V2 is ready to promote:
 - representative screenshots at 390, 768 and 1440 have been visually inspected,
 - console/network errors have been checked in a real browser runtime,
 - accessibility scan has been run on homepage + Calculator.
+
+
+## Repair verification — responsive pass 2
+
+The V2 branch now contains the responsive fixes plus `e2e/v2-responsive.spec.mjs` regression coverage.
+
+### Resolved in this pass
+
+- **Homepage hero/dashboard collision:** phone layout now moves the dashboard into normal flow. The decorative photo stays absolute behind it, while the dashboard defines the actual container height.
+- **Trust-strip clipping:** tablet/phone trust stats use shrink-safe `minmax(0,1fr)` columns and stack the large value above the supporting copy.
+- **Homepage language navigation:** DE/EN controls are now present on both homepage language variants and use the existing `.ff-language-switch` route/persistence controller.
+- **Touch targets:** mobile/tablet hamburger controls are normalized to 44×44 px; language/disclosure/card actions have enlarged hit areas.
+- **Calculator live price:** mobile/tablet now gets a compact live-price rail synchronized with the real pricing result.
+- **Price-rail collision:** the rail was changed from a fixed bottom overlay to an **in-flow sticky rail** inside the Calculator section so it never covers Step 01 or later controls.
+- **Calculator first-view density:** mobile hero/section spacing is reduced so Step 01 appears earlier.
+- **Service-card mobile density:** phone cards use content-driven height instead of a large desktop-style minimum.
+
+### Rendered review-artifact geometry
+
+The repaired local V2 review artifact was rendered and inspected at **375, 390, 430, 768, 1024 and 1440 px**.
+
+Representative 390 px measurements:
+- document scroll width = viewport width (390 px),
+- homepage dashboard bottom ≈ 1403 px,
+- trust strip starts ≈ 1529 px,
+- therefore no hero/trust collision,
+- trust grid rail = 366 px and both 183 px columns remain inside it,
+- mobile menu = 44×44 px,
+- language control height = 44 px,
+- Calculator live-price rail = 362×68 px,
+- Calculator rail ends ≈ 773 px and Step 01 begins ≈ 791 px, leaving a clear gap rather than overlap.
+
+Representative 768 px measurements:
+- document scroll width = viewport width (768 px),
+- trust rail = 690 px with two 345 px columns fully contained,
+- menu = 44×44 px,
+- Calculator live-price rail = 680×68 px and remains in flow above Step 01.
+
+At 1024/1440 px the mobile price rail is hidden and the normal desktop result card remains the primary summary.
+
+### Remaining verification before promotion
+
+The local review artifact proves the responsive geometry and visual composition of the repair. Before V2 promotion, still run the repository Playwright suite from a real checked-out/preview runtime so console, blocked assets, Supabase-dependent states and browser-specific behavior are covered by the normal release checks.
