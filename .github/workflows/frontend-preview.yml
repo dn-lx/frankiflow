@@ -3,10 +3,13 @@ name: Frontend visual preview
 on:
   workflow_dispatch:
   push:
-    branches: [develop]
+    branches: [develop, v2]
     paths:
       - "public/assets/frontend-refresh.css"
+      - "public/assets/v2-redesign.css"
+      - "public/assets/v2-motion.js"
       - "public/index.html"
+      - "public/en/index.html"
       - "public/preisrechner/index.html"
       - ".github/workflows/frontend-preview.yml"
 
@@ -75,3 +78,10 @@ jobs:
           name: frankiflow-frontend-preview-${{ github.run_id }}
           path: visual-preview/*.png
           retention-days: 7
+
+      - name: Upload deploy bundle
+        uses: actions/upload-artifact@v5
+        with:
+          name: frankiflow-v2-site-${{ github.run_id }}
+          path: public/
+          retention-days: 1
