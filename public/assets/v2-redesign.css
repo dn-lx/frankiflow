@@ -532,6 +532,33 @@ html.v2-motion-ready .v2-reveal[data-v2-delay="3"]{transition-delay:.18s}
 .mobile-price-bar{display:none}
 
 @media(max-width:900px){
+  /* Tablet/mobile controls and trust stats must stay inside their rails. */
+  .site-header .menu-btn,.calc-site-header .menu-btn{
+    width:44px!important;
+    min-width:44px!important;
+    height:44px!important;
+    min-height:44px!important;
+    padding:0!important;
+    flex:0 0 44px!important;
+    display:grid!important;
+    place-items:center;
+  }
+  .site-header .language-switch,.calc-site-header .language-switch{min-height:44px}
+  .signal-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    min-height:0!important;
+  }
+  .signal-grid>div{
+    min-width:0;
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    align-content:center;
+    align-items:start!important;
+    gap:5px!important;
+    padding:20px 18px!important;
+  }
+  .signal-grid strong{display:block}
+  .signal-grid span{display:block;min-width:0;overflow-wrap:anywhere}
   .calculator-body{
     padding-bottom:calc(92px + env(safe-area-inset-bottom))!important;
     scroll-padding-bottom:calc(104px + env(safe-area-inset-bottom));
