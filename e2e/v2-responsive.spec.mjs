@@ -29,6 +29,22 @@ for(const width of widths){
     const geometry=await pageGeometry(page);
     expect(geometry.scrollWidth,JSON.stringify(geometry.offenders,null,2)).toBeLessThanOrEqual(geometry.clientWidth+1);
 
+    const signalBox=await page.locator('.signal-grid').boundingBox();
+    const signalCells=await page.locator('.signal-grid > div').evaluateAll(nodes=>nodes.map(el=>{
+      const r=el.getBoundingClientRect();return {left:r.left,right:r.right};
+    }));
+    for(const cell of signalCells){
+      expect(cell.left).toBeGreaterThanOrEqual(signalBox.x-1);
+      expect(cell.right).toBeLessThanOrEqual(signalBox.x+signalBox.width+1);
+    }
+
+    if(width<=900){
+      const menu=page.locator('.menu-btn');
+      const menuBox=await menu.boundingBox();
+      expect(menuBox.width).toBeGreaterThanOrEqual(44);
+      expect(menuBox.height).toBeGreaterThanOrEqual(44);
+    }
+
     if(width<=680){
       const heroVisual=await page.locator('.hero-visual').boundingBox();
       const dashboard=await page.locator('.hero-dashboard').boundingBox();
@@ -37,11 +53,6 @@ for(const width of widths){
       expect(dashboard).not.toBeNull();
       expect(signal).not.toBeNull();
       expect(dashboard.y+dashboard.height).toBeLessThanOrEqual(signal.y+1);
-
-      const menu=page.locator('.menu-btn');
-      const menuBox=await menu.boundingBox();
-      expect(menuBox.width).toBeGreaterThanOrEqual(44);
-      expect(menuBox.height).toBeGreaterThanOrEqual(44);
 
       await expect(page.locator('.ff-language-switch')).toBeVisible();
     }
