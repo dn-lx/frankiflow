@@ -560,17 +560,19 @@ html.v2-motion-ready .v2-reveal[data-v2-delay="3"]{transition-delay:.18s}
   .signal-grid strong{display:block}
   .signal-grid span{display:block;min-width:0;overflow-wrap:anywhere}
   .calculator-body{
-    padding-bottom:calc(92px + env(safe-area-inset-bottom))!important;
-    scroll-padding-bottom:calc(104px + env(safe-area-inset-bottom));
+    padding-bottom:0!important;
+    scroll-padding-top:112px;
   }
   .mobile-price-bar{
-    position:fixed;
+    position:sticky;
     z-index:45;
-    left:50%;
-    bottom:calc(12px + env(safe-area-inset-bottom));
-    transform:translateX(-50%);
+    top:96px;
+    left:auto;
+    bottom:auto;
+    transform:none;
     width:min(680px,calc(100% - 28px));
     min-height:68px;
+    margin:0 auto 18px;
     display:grid;
     grid-template-columns:minmax(0,1fr) auto;
     align-items:center;
@@ -845,8 +847,9 @@ html.v2-motion-ready .v2-reveal[data-v2-delay="3"]{transition-delay:.18s}
     font-size:12px!important;
   }
   .calc-section{
-    padding:28px 0 60px!important;
+    padding:22px 0 60px!important;
   }
+  .mobile-price-bar{top:84px}
   .calc-card{
     padding:21px!important;
   }
