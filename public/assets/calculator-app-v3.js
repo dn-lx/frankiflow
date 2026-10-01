@@ -79,7 +79,16 @@ function applyLanguage(){
   const meta=document.querySelector('meta[name="description"]');if(meta)meta.content=lang==='de'?'Berechnen Sie Ihren unverbindlichen Richtpreis für Büro-, Wohnungs-, Airbnb-, Treppenhaus- oder Fensterreinigung bei FrankiFlow.':'Calculate a non-binding estimate for office, home, Airbnb, stairwell or window cleaning with FrankiFlow.';
   const placeholders=lang==='de'?{customerName:'Max Mustermann',customerCompany:'optional',customerEmail:'name@beispiel.de',customerPhone:'+49 …',customerAddress:'Straße, PLZ, Ort'}:{customerName:'John Smith',customerCompany:'optional',customerEmail:'name@example.com',customerPhone:'+49 …',customerAddress:'Street, postcode, city'};
   Object.entries(placeholders).forEach(([id,v])=>{const el=$('#'+id);if(el)el.placeholder=v});
-  renderServices();renderSelects();updateDynamicLabels();syncRequestDialogLanguage();recalculate();updateChecklistUi();
+  renderServices();renderSelects();updateDynamicLabels();syncRequestDialogLanguage();syncMobilePriceBarLanguage();recalculate();updateChecklistUi();
+}
+
+function syncMobilePriceBarLanguage(){
+  const bar=$('#mobilePriceBar');if(!bar)return;
+  const en=lang==='en';
+  if($('#mobilePriceLabel'))$('#mobilePriceLabel').textContent=en?'LIVE ESTIMATE':'LIVE-RICHTPREIS';
+  if($('#mobileVisitLabel'))$('#mobileVisitLabel').textContent=en?'Visit':'Termin';
+  if($('#mobileMonthLabel'))$('#mobileMonthLabel').textContent=en?'Month':'Monat';
+  bar.setAttribute('aria-label',en?'Open the full price summary':'Vollständige Preisübersicht öffnen');
 }
 
 function updateDynamicLabels(){
@@ -131,7 +140,7 @@ function summaryRows(result){
 
 function renderSummary(result){
   calc={...result,serviceLabel:localizedServiceLabel(result)};
-  $('#visitPrice').textContent=money(result.visitTotal);$('#monthlyPrice').textContent=money(result.monthly);$('#firstMonthPrice').textContent=money(result.firstMonth);
+  $('#visitPrice').textContent=money(result.visitTotal);$('#monthlyPrice').textContent=money(result.monthly);$('#firstMonthPrice').textContent=money(result.firstMonth);if($('#mobileVisitPrice'))$('#mobileVisitPrice').textContent=money(result.visitTotal);if($('#mobileMonthPrice'))$('#mobileMonthPrice').textContent=money(result.monthly);
   $('#vatStatus').textContent=result.vatRate?t('vatIncluded'):t('vatNotIncluded');$('#promotionBox')?.classList.toggle('hidden',!result.promoPct);$('#discountLabel').textContent=`${result.promoPct}% ${t('discount')}`;
   if($('#contractSaving'))$('#contractSaving').textContent=result.reductionPct?`${result.reductionPct}% ${lang==='de'?'Vorteil auf den Basisanteil':'saving on the base component'}`:'';
   $('#breakdownRows').innerHTML=summaryRows(result).map(([a,b])=>`<div class="breakdown-row"><span>${escapeHtml(a)}</span><b>${escapeHtml(b)}</b></div>`).join('');
@@ -435,8 +444,9 @@ function bind(){
   $('#calculatorForm')?.addEventListener('change',event=>{if(event.target.matches('input[name="serviceKey"]')){if(event.target.value==='fenster'&&frequencies().some(o=>o.key==='once'))$('#frequency').value='once';}recalculate();});
   $('#viewChecklist')?.addEventListener('click',toggleChecklist);$('#includeChecklist')?.addEventListener('change',renderChecklistPreview);
   $('#printQuote')?.addEventListener('click',()=>printDoc('quote'));$('#downloadQuote')?.addEventListener('click',downloadQuotePdf);$('#printInvoice')?.addEventListener('click',createInvoice);
+  $('#mobilePriceBar')?.addEventListener('click',()=>$('#resultCard')?.scrollIntoView({behavior:'smooth',block:'start'}));
   $('#requestService')?.addEventListener('click',openServiceRequest);$('#closeRequestDialog')?.addEventListener('click',closeServiceRequest);$('#cancelRequestDialog')?.addEventListener('click',closeServiceRequest);$('#submitServiceRequest')?.addEventListener('click',submitServiceRequest);$$('[data-close-request]').forEach(el=>el.addEventListener('click',closeServiceRequest));
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('#quoteRequestModal')?.classList.contains('hidden'))closeServiceRequest();});
 }
 
-cfg=clone(FALLBACK);renderServices();renderSelects();updateDynamicLabels();applyLanguage();bind();await detectAdmin();recalculate();updateChecklistUi();void loadRemote();
+cfg=clone(FALLBACK);renderServices();renderSelects();updateDynamicLabels();syncMobilePriceBarLanguage();applyLanguage();bind();await detectAdmin();recalculate();updateChecklistUi();void loadRemote();
