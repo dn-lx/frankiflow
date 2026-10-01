@@ -503,3 +503,373 @@ html.v2-motion-ready .v2-reveal[data-v2-delay="3"]{transition-delay:.18s}
 @media print{
   .v2-reveal{opacity:1!important;transform:none!important}
 }
+
+
+/* V2 responsive audit repairs — Oct 2026 */
+
+/* Keep language controls and mobile navigation comfortably tappable. */
+.site-header .language-switch,
+.calc-site-header .language-switch{
+  display:flex;
+  align-items:center;
+  flex:none;
+}
+.site-header .language-switch button,
+.calc-site-header .language-switch button{
+  min-height:36px;
+}
+
+/* Make disclosure rows usable as touch controls without changing their typography. */
+.about-accordion-item summary,
+.faq-grid summary{
+  min-height:44px;
+  display:flex;
+  align-items:center;
+}
+.card-link{min-height:44px}
+
+/* Mobile live price bar is hidden on wide screens. */
+.mobile-price-bar{display:none}
+
+@media(max-width:900px){
+  .calculator-body{
+    padding-bottom:calc(92px + env(safe-area-inset-bottom))!important;
+    scroll-padding-bottom:calc(104px + env(safe-area-inset-bottom));
+  }
+  .mobile-price-bar{
+    position:fixed;
+    z-index:45;
+    left:50%;
+    bottom:calc(12px + env(safe-area-inset-bottom));
+    transform:translateX(-50%);
+    width:min(680px,calc(100% - 28px));
+    min-height:68px;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    gap:14px;
+    padding:10px 12px 10px 16px;
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:20px;
+    color:#fff;
+    background:
+      radial-gradient(circle at 92% 0,rgba(25,185,174,.22),transparent 38%),
+      linear-gradient(145deg,#061a2a,#0a344a);
+    box-shadow:0 18px 48px rgba(4,25,42,.28);
+    text-align:left;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .mobile-price-bar:focus-visible{
+    outline:3px solid rgba(25,185,174,.42);
+    outline-offset:3px;
+  }
+  .mobile-price-copy{
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr);
+    gap:12px;
+    align-items:center;
+    min-width:0;
+  }
+  .mobile-price-kicker{
+    display:block;
+    font-size:9px;
+    line-height:1.2;
+    font-weight:900;
+    letter-spacing:.1em;
+    color:#81ddd6;
+    text-transform:uppercase;
+  }
+  .mobile-price-values{
+    display:flex;
+    align-items:baseline;
+    gap:13px;
+    min-width:0;
+  }
+  .mobile-price-values span{min-width:0}
+  .mobile-price-values small{
+    display:block;
+    margin-bottom:2px;
+    color:#9eb7c2;
+    font-size:9px;
+    line-height:1.15;
+    font-weight:700;
+  }
+  .mobile-price-values strong{
+    display:block;
+    color:#fff;
+    font-size:16px;
+    line-height:1.1;
+    white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+  }
+  .mobile-price-jump{
+    width:44px;
+    height:44px;
+    display:grid;
+    place-items:center;
+    border-radius:14px;
+    background:var(--v2-teal-2);
+    color:#052833;
+    font-size:20px;
+    font-weight:900;
+  }
+}
+
+@media(max-width:680px){
+  /* Header: preserve branding while giving all primary controls real touch area. */
+  .site-header .nav,.calc-site-header .nav{
+    min-height:76px!important;
+    gap:8px!important;
+  }
+  .site-header .brand,.calc-site-header .brand{
+    width:min(148px,42vw)!important;
+  }
+  .site-header .nav-actions,.calc-site-header .nav-actions{
+    gap:6px!important;
+    margin-left:auto;
+  }
+  .site-header .nav-whatsapp,.calc-site-header .nav-whatsapp{
+    display:none!important;
+  }
+  .site-header .language-switch,.calc-site-header .language-switch{
+    min-height:44px;
+    padding:3px!important;
+    border-radius:11px!important;
+  }
+  .site-header .language-switch button,.calc-site-header .language-switch button{
+    min-width:36px;
+    min-height:38px;
+    padding:6px 8px!important;
+    font-size:11px!important;
+    border-radius:8px!important;
+  }
+  .site-header .menu-btn,.calc-site-header .menu-btn{
+    display:grid!important;
+    place-items:center;
+    width:44px!important;
+    min-width:44px!important;
+    height:44px!important;
+    min-height:44px!important;
+    flex:0 0 44px!important;
+    padding:0!important;
+    border-radius:12px!important;
+    font-size:18px!important;
+  }
+  .site-header .nav-links.open,.calc-site-header .nav-links.open{
+    max-height:calc(100dvh - 76px);
+    overflow:auto;
+    overscroll-behavior:contain;
+  }
+
+  /* Hero: dashboard participates in layout, so it cannot collide with the next section. */
+  .hero{
+    padding:48px 0 58px!important;
+  }
+  .hero-grid{
+    gap:32px!important;
+  }
+  .hero h1{
+    font-size:clamp(38px,10.5vw,46px)!important;
+    line-height:1!important;
+  }
+  .lead{
+    font-size:16px!important;
+    line-height:1.62!important;
+  }
+  .hero-visual{
+    min-height:0!important;
+    height:auto!important;
+    max-width:520px;
+    width:100%;
+    margin:0 auto!important;
+    padding:18px 0 68px 18px;
+    isolation:isolate;
+  }
+  .hero-photo{
+    position:absolute!important;
+    inset:0 8px 18px 0!important;
+    border-radius:28px!important;
+    z-index:-1;
+  }
+  .hero-dashboard{
+    position:relative!important;
+    left:auto!important;
+    right:auto!important;
+    top:auto!important;
+    width:100%!important;
+    margin:18px 0 0!important;
+    padding:16px!important;
+    border-radius:21px!important;
+  }
+  .dashboard-top{
+    gap:8px!important;
+    margin-bottom:12px!important;
+  }
+  .dashboard-top h3{font-size:18px!important}
+  .status-badge{
+    padding:6px 8px!important;
+    font-size:9px!important;
+  }
+  .dashboard-price-card{
+    padding:16px!important;
+    border-radius:16px!important;
+  }
+  .dashboard-price-card strong{font-size:20px!important}
+  .dashboard-price-card a{
+    min-height:44px;
+    padding:10px 12px!important;
+  }
+  .dashboard-services{
+    gap:8px!important;
+    margin-top:10px!important;
+  }
+  .dashboard-services>div{
+    min-width:0;
+    padding:8px 10px!important;
+    gap:8px!important;
+  }
+  .dashboard-services p{min-width:0}
+  .dashboard-services b{font-size:11px!important}
+  .dashboard-services small{font-size:9px!important}
+  .floating-trust{display:none!important}
+  .floating-offer{
+    left:0!important;
+    right:auto!important;
+    bottom:16px!important;
+    padding:11px 14px!important;
+    border-radius:14px!important;
+  }
+
+  /* Trust stats: stack value over copy so two columns can shrink safely. */
+  .signal-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    min-height:0!important;
+  }
+  .signal-grid>div{
+    min-width:0;
+    min-height:112px;
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    align-content:center;
+    align-items:start!important;
+    gap:5px!important;
+    padding:18px 12px!important;
+    border-right:0!important;
+    border-bottom:1px solid rgba(255,255,255,.09)!important;
+  }
+  .signal-grid>div:first-child{padding-left:12px!important}
+  .signal-grid>div:nth-last-child(-n+2){border-bottom:0!important}
+  .signal-grid strong{
+    display:block;
+    font-size:26px!important;
+    line-height:1!important;
+  }
+  .signal-grid span{
+    display:block;
+    min-width:0;
+    font-size:12px!important;
+    line-height:1.4!important;
+    overflow-wrap:anywhere;
+  }
+
+  /* Reduce repetitive mobile height without shrinking content. */
+  .section{padding:72px 0!important}
+  .service-card{
+    min-height:0!important;
+    padding:22px!important;
+  }
+  .service-card h3{
+    margin:26px 0 10px!important;
+    font-size:23px!important;
+  }
+  .service-card p{
+    font-size:14px;
+    line-height:1.6!important;
+  }
+  .service-card .card-link{
+    margin-top:20px!important;
+    padding-top:12px!important;
+  }
+  .about-accordion-item summary,
+  .faq-grid summary{
+    min-height:48px;
+    padding-top:8px;
+    padding-bottom:8px;
+  }
+
+  /* Calculator: get users to Step 01 sooner. */
+  .calc-hero{
+    padding:38px 0 42px!important;
+  }
+  .calc-hero h1{
+    font-size:clamp(38px,10.5vw,48px)!important;
+    line-height:1!important;
+    margin-top:12px!important;
+    margin-bottom:14px!important;
+  }
+  .calc-hero p{
+    font-size:15px!important;
+    line-height:1.62!important;
+  }
+  .calc-trust{
+    gap:8px 14px!important;
+    margin-top:20px!important;
+    font-size:12px!important;
+  }
+  .calc-section{
+    padding:28px 0 60px!important;
+  }
+  .calc-card{
+    padding:21px!important;
+  }
+  .step-head{
+    margin-bottom:22px!important;
+  }
+  .step-head>span{
+    width:44px!important;
+    height:44px!important;
+    flex:0 0 44px;
+  }
+  .service-choice{
+    min-height:76px!important;
+    padding:14px!important;
+  }
+  .addon,.toggle-row,.checklist-include{
+    min-height:72px;
+  }
+  .result-actions .btn-calc{
+    min-height:48px;
+  }
+}
+
+@media(max-width:400px){
+  .site-header .brand,.calc-site-header .brand{width:min(136px,39vw)!important}
+  .site-header .language-switch button,.calc-site-header .language-switch button{
+    min-width:34px;
+    padding-left:6px!important;
+    padding-right:6px!important;
+  }
+  .signal-grid span{font-size:11.5px!important}
+  .mobile-price-bar{
+    width:calc(100% - 20px);
+    gap:8px;
+    padding-left:12px;
+    padding-right:9px;
+  }
+  .mobile-price-copy{
+    gap:8px;
+  }
+  .mobile-price-values{
+    gap:9px;
+  }
+  .mobile-price-values strong{font-size:14px}
+  .mobile-price-jump{
+    width:42px;
+    height:42px;
+  }
+}
+
+@media print{
+  .mobile-price-bar{display:none!important}
+}
