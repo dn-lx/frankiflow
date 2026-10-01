@@ -9,7 +9,7 @@
 <meta content="#071f38" name="theme-color"/>
 <link href="/assets/frankiflow-logo.png" rel="icon" type="image/png"/>
 <link href="/assets/calculator.css?v=20260920-all-print-footers-v1" rel="stylesheet"/>
-<link href="/assets/calculator-site-header.css?v=20260920-unified-nav-v1" rel="stylesheet"/><link href="/assets/frontend-refresh.css?v=20260927" rel="stylesheet"/>\n<link href="/assets/v2-redesign.css?v=20261001" rel="stylesheet"/>
+<link href="/assets/calculator-site-header.css?v=20260920-unified-nav-v1" rel="stylesheet"/><link href="/assets/frontend-refresh.css?v=20260927" rel="stylesheet"/>\n<link href="/assets/v2-redesign.css?v=20261001-responsive-v2" rel="stylesheet"/>
 <link href="https://frankiflow.de/preisrechner/" rel="canonical"/><meta content="index,follow,max-image-preview:large" name="robots"/></head>
 <body class="calculator-body">
 <header class="site-header calc-site-header">
@@ -109,6 +109,16 @@
 </aside>
 </div>
 </section>
+<button aria-controls="resultCard" class="mobile-price-bar" id="mobilePriceBar" type="button">
+<span class="mobile-price-copy">
+<span class="mobile-price-kicker" id="mobilePriceLabel">LIVE-RICHTPREIS</span>
+<span class="mobile-price-values">
+<span><small id="mobileVisitLabel">Termin</small><strong id="mobileVisitPrice">—</strong></span>
+<span><small id="mobileMonthLabel">Monat</small><strong id="mobileMonthPrice">—</strong></span>
+</span>
+</span>
+<span aria-hidden="true" class="mobile-price-jump">↑</span>
+</button>
 <section class="calc-business-cta" aria-labelledby="calcBusinessTitle">
 <div class="calc-container">
 <div class="calc-business-card">
@@ -138,7 +148,7 @@
 
 <footer class="calc-footer"><div class="calc-container"><div class="calc-footer-main"><div><img alt="FrankiFlow" src="/assets/frankiflow-logo.png"/><p>Gebäudereinigung &amp; Objektbetreuung · Frankfurt am Main &amp; Umgebung</p></div><div class="calc-footer-links"><a href="tel:+4917662493041">+49 176 62493041</a><a href="mailto:info@frankiflow.de">info@frankiflow.de</a><a class="footer-whatsapp-link" href="https://wa.link/9knp7y" rel="noopener" target="_blank">WhatsApp</a><a href="https://stay.frankiflow.de/">FrankiHolz Unterkunft / Accommodation ↗</a><a href="/impressum/">Impressum</a><a href="/datenschutz/">Datenschutz</a></div></div><div class="calc-footer-copy">© 2026 FrankiFlow. Mehr als Reinigung.</div></div></footer>
 <script src="/assets/calculator-site-header.js?v=20260920-unified-nav-v1" type="module"></script>
-<script src="/assets/calculator-app-v3.js?v=20260920-unified-nav-v1" type="module"></script>
+<script src="/assets/calculator-app-v3.js?v=20261001-mobile-price-v2" type="module"></script>
 <script src="/assets/calculator-mobile-island.js?v=20260914-v3" defer></script>
 <script src="/assets/v2-motion.js?v=20261001" defer></script>\n</body>
 </html>
