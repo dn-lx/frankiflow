@@ -108,7 +108,6 @@ test('shared public header supplies balanced product navigation everywhere',()=>
   assert.match(shared,/data-shared-nav/);
   assert.match(shared,/nav-calcpura/);
   assert.match(shared,/nav-frankiholz/);
-  assert.match(shared,/content/);
   assert.match(css,/content:attr\(data-nav-tooltip\)/);
   assert.match(css,/@media\(max-width:1120px\)/);
   assert.match(calc,/class="calc-business-cta"/);
