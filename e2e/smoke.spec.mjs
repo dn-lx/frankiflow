@@ -14,7 +14,7 @@ test('price calculator shell renders without external writes', async ({ page }) 
   await page.goto('/calculator/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#calculatorForm')).toBeVisible();
   await expect(page.locator('#visitPrice')).toBeVisible();
-  await expect(page.getByRole('button', { name: /Kostenschätzung|PDF/ })).toBeVisible();
+  await expect(page.locator('#printQuote')).toBeVisible();
 });
 
 
