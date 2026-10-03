@@ -221,3 +221,34 @@ test('Home and Preisrechner content live inside a persistent shell',()=>{
   assert.match(router,/data-shell-content/);
   assert.match(router,/showOnly/);
 });
+
+
+test('Admin promotion settings are the public source of truth',()=>{
+  const admin=read('public/assets/admin-base.js');
+  const home=read('public/index.html');
+  const en=read('public/en/index.html');
+  const app=read('public/assets/app-base.js');
+  const calc=read('public/assets/calculator-app-v3.js');
+
+  assert.match(admin,/from\('pricing_config'\)\.upsert\(payload,\{onConflict:'key'\}\)/);
+  assert.match(app,/from\('pricing_config'\)\.select\('value'\)\.eq\('key','promotion_settings'\)/);
+  assert.match(app,/frankiflow-public-pricing/);
+  assert.match(app,/data-promo-percent/);
+  assert.match(calc,/frankiflow-calculator-pricing/);
+  assert.match(calc,/applyPricingRow/);
+  assert.match(calc,/first_month_discount_pct:20/);
+
+  assert.match(home,/data-promo-percent/);
+  assert.match(en,/data-promo-percent/);
+  assert.doesNotMatch(home,/25% Rabatt|<strong>25%<\/strong>/);
+  assert.doesNotMatch(en,/25% discount|<strong>25%<\/strong>/);
+});
+
+test('active pricing fallbacks use the current 20 percent promotion',()=>{
+  const app=read('public/assets/app-base.js');
+  const pricing=read('public/assets/pricing.js');
+  const calc=read('public/assets/calculator-app-v3.js');
+  assert.match(app,/20% Neukundenrabatt im ersten Monat/);
+  assert.match(pricing,/first_month_discount_pct:20/);
+  assert.match(calc,/first_month_discount_pct:20/);
+});
