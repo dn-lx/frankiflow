@@ -89,13 +89,13 @@ function routeHomepageLanguageSwitch(){
 
 function forceCalculatorSameTab(){
   const normalize=()=>$$('a[href]').forEach(link=>{
-    try{const url=new URL(link.href,location.href);if(url.origin===location.origin&&/^\/preisrechner\/?$/.test(url.pathname)){link.removeAttribute('target');link.removeAttribute('rel')}}catch{}
+    try{const url=new URL(link.href,location.href);if(url.origin===location.origin&&/^\/calculator\/?$/.test(url.pathname)){link.removeAttribute('target');link.removeAttribute('rel')}}catch{}
   });
   normalize();
   document.addEventListener('click',event=>{
     const link=event.target.closest?.('a[href]');if(!link)return;
     let url;try{url=new URL(link.href,location.href)}catch{return}
-    if(url.origin!==location.origin||!/^\/preisrechner\/?$/.test(url.pathname))return;
+    if(url.origin!==location.origin||!/^\/calculator\/?$/.test(url.pathname))return;
     if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
     event.preventDefault();
     location.assign(url.href);
