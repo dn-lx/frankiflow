@@ -9,11 +9,11 @@ let siteSettings=null;
 const fallbackSettings={
   hero_eyebrow:'Mehr als Reinigung.',hero_eyebrow_en:'More than cleaning.',
   hero_title:'Gebäudereinigung, die einfach funktioniert.',hero_title_en:'Cleaning services that simply work.',
-  hero_subtitle:'Professionelle Reinigung und Objektbetreuung für Büros, Wohnungen, Treppenhäuser und Ferienunterkünfte in Frankfurt am Main & Umgebung.',hero_subtitle_en:'Professional cleaning and property care for offices, homes, stairwells and holiday rentals in Frankfurt am Main and surrounding areas.',
+  hero_subtitle:'Professionelle Reinigung und Objektbetreuung für Büros, Wohnungen, Treppenhäuser und Ferienunterkünfte in Frankfurt am Main, Nürnberg & Umgebung.',hero_subtitle_en:'Professional cleaning and property care for offices, homes, stairwells and holiday rentals in Frankfurt, Nuremberg and surrounding areas.',
   offer_title:'25% Neukundenrabatt im ersten Monat',offer_title_en:'25% new-customer discount in the first month',
   offer_text:'Zusätzlich ist eine kostenlose Probereinigung nach Absprache möglich.',offer_text_en:'A free trial cleaning can also be arranged.',
   email:FRANKIFLOW_CONFIG.defaultEmail,phone:FRANKIFLOW_CONFIG.defaultPhone,whatsapp_url:FRANKIFLOW_CONFIG.defaultWhatsApp,
-  service_area:FRANKIFLOW_CONFIG.serviceArea,service_area_en:'Frankfurt am Main & surrounding areas',
+  service_area:FRANKIFLOW_CONFIG.serviceArea,service_area_en:'Frankfurt, Nuremberg & surrounding areas',
   primary_cta_label:'Preis sofort berechnen',primary_cta_label_en:'Calculate price now',
   secondary_cta_label:'Angebot anfragen',secondary_cta_label_en:'Request a quote',hero_image_path:null,
   legal_owner:'Inura Devasurendra',legal_street:'',legal_postcode_city:'Frankfurt am Main'
@@ -28,6 +28,10 @@ function applySiteLanguage(){
 async function loadSite(){
   const {data}=await supabase.from('frankiflow_site_settings').select('*').eq('id',1).maybeSingle();
   siteSettings={...fallbackSettings,...(data||{})};
+  siteSettings.hero_subtitle=String(siteSettings.hero_subtitle||fallbackSettings.hero_subtitle).replace(/Frankfurt am Main\s*&\s*Umgebung/g,'Frankfurt am Main, Nürnberg & Umgebung');
+  siteSettings.hero_subtitle_en=String(siteSettings.hero_subtitle_en||fallbackSettings.hero_subtitle_en).replace(/Frankfurt am Main(?:\s*&| and)\s*surrounding areas/gi,'Frankfurt, Nuremberg & surrounding areas');
+  siteSettings.service_area='Frankfurt am Main, Nürnberg & Umgebung';
+  siteSettings.service_area_en='Frankfurt, Nuremberg & surrounding areas';
   applySiteLanguage();
   $$('[data-mail]').forEach(el=>{el.href=`mailto:${siteSettings.email}`;const strong=el.querySelector('strong');if(strong)strong.textContent=siteSettings.email;else el.textContent=siteSettings.email});
   $$('[data-phone]').forEach(el=>{el.href=`tel:${siteSettings.phone.replace(/\s/g,'')}`;const strong=el.querySelector('strong');if(strong)strong.textContent=siteSettings.phone;else el.textContent=siteSettings.phone});
