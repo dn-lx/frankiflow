@@ -23,7 +23,7 @@
 html{scroll-padding-top:96px}
 body{background:var(--v2-paper);color:var(--v2-ink)}
 .container{width:min(1240px,calc(100% - 48px))}
-.calc-container{width:min(1220px,calc(100% - 48px))}
+.calc-container{width:min(1240px,calc(100% - 48px))}
 
 /* Header */
 .site-header,.calc-site-header{
@@ -302,7 +302,7 @@ body{background:var(--v2-paper);color:var(--v2-ink)}
     #061a2a!important;
 }
 
-/* Preisrechner */
+/* Calculator */
 .calculator-body{background:#f1f5f5!important}
 .calc-hero{
   padding:82px 0 76px!important;
