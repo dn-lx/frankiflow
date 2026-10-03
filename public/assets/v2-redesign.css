@@ -911,3 +911,13 @@ html.v2-motion-ready .v2-reveal[data-v2-delay="3"]{transition-delay:.18s}
 
 
 /* V2 branch-deploy refresh: 2026-10-03 */
+
+
+/* Transparent footer brand asset */
+.site-footer .footer-brand .brand,
+.site-footer .footer-brand .brand img{
+  background:transparent!important;
+}
+.site-footer .footer-brand .brand img{
+  object-fit:contain;
+}
