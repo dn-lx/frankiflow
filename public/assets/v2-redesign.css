@@ -32,7 +32,12 @@ body{background:var(--v2-paper);color:var(--v2-ink)}
   box-shadow:0 6px 30px rgba(7,29,47,.035)!important;
   backdrop-filter:blur(24px) saturate(1.2)!important;
 }
-.site-header .nav,.calc-site-header .nav{min-height:86px!important}
+.site-header .nav,.calc-site-header .nav{
+  min-height:86px!important;
+  width:min(1240px,calc(100% - 48px))!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
 .site-header .brand,.calc-site-header .brand{width:220px}
 .site-header .nav-links,.calc-site-header .nav-links{gap:28px!important}
 .site-header .nav-links a,.calc-site-header .nav-links a{
