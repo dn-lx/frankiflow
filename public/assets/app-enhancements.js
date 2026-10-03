@@ -102,7 +102,7 @@ function setupServiceCards(){
   for(const card of $$('.service-card')){
     const cta=card.querySelector('.card-link');
     const serviceUrl=cta?.getAttribute('href');
-    if(!serviceUrl||serviceUrl==='/preisrechner/'||serviceUrl.startsWith('#'))continue;
+    if(!serviceUrl||serviceUrl==='/calculator/'||serviceUrl.startsWith('#'))continue;
     card.dataset.serviceUrl=serviceUrl;
     card.tabIndex=0;
     card.setAttribute('role','link');
@@ -111,8 +111,8 @@ function setupServiceCards(){
 
     const ctaText=(cta?.textContent||'').toLowerCase();
     if(cta&&(ctaText.includes('preis berechnen')||ctaText.includes('calculate price'))){
-      cta.href='/preisrechner/';
-      cta.setAttribute('aria-label',tr('Preisrechner öffnen','Open Price Calculator'));
+      cta.href='/calculator/';
+      cta.setAttribute('aria-label',tr('Calculator öffnen','Open Calculator'));
     }else if(cta&&(ctaText.includes('anfragen')||ctaText.includes('request'))){
       cta.href=getLanguage()==='en'?'/en/#kontakt':'/#kontakt';
     }
