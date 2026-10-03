@@ -150,3 +150,16 @@ test('shared mobile navigation is local and loaded before page controllers',()=>
   const calcIndex=calc.indexOf('/assets/calculator-app-v3.js');
   assert.ok(sharedIndex>=0);assert.ok(calcIndex>=0);assert.ok(sharedIndex<calcIndex);
 });
+
+test('V2 calculator engine matches the deployed live pricing formula',()=>{
+  const engine=read('public/assets/calculator-engine.js');
+  assert.match(engine,/const gradient=Number\(cfg\.service_settings\?\.gradient_per_sqm\|\|0\)/);
+  assert.match(engine,/const base=Number\(service\.base_1m\|\|0\)/);
+  assert.doesNotMatch(engine,/calibrated_base_1m|service\.gradient_per_sqm/);
+});
+
+test('V2 public pages do not leak literal backslash-n text',()=>{
+  for(const path of ['public/index.html','public/en/index.html','public/calculator/index.html']){
+    assert.doesNotMatch(read(path),/\\n/);
+  }
+});
