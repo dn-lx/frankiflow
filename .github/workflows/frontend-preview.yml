@@ -10,7 +10,7 @@ on:
       - "public/assets/v2-motion.js"
       - "public/index.html"
       - "public/en/index.html"
-      - "public/preisrechner/index.html"
+      - "public/calculator/index.html"
       - ".github/workflows/frontend-preview.yml"
 
 permissions:
@@ -55,8 +55,8 @@ jobs:
           const targets = [
             ['homepage-desktop.png', '/', 1440, 1000],
             ['homepage-mobile.png', '/', 390, 844],
-            ['preisrechner-desktop.png', '/preisrechner/', 1440, 1000],
-            ['preisrechner-mobile.png', '/preisrechner/', 390, 844],
+            ['calculator-desktop.png', '/calculator/', 1440, 1000],
+            ['calculator-mobile.png', '/calculator/', 390, 844],
           ];
 
           for (const [name, path, width, height] of targets) {
