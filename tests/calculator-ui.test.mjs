@@ -14,8 +14,8 @@ test('Homepage and Calculator mount one shared public navigation',()=>{
     assert.match(html,/shared-site-header\.css\?v=/);
     assert.doesNotMatch(html,/calculator-site-header|header-nav\.js/);
   }
-  assert.match(shared,/navOrder=\['home','calculator','services','about','contact','faq','calcpura','stay'\]/);
-  assert.match(shared,/calculator:\['Calculator','\/calculator\/'/);
+  assert.match(shared,/navOrder=\['home','services','about','calculator','calcpura','stay','faq','contact'\]/);
+  assert.match(shared,/calculator:\[en\?'Calculator':'Preisrechner','\/calculator\/'/);
   assert.match(shared,/calcpura\.frankiflow\.de/);
   assert.match(shared,/stay\.frankiflow\.de/);
   assert.match(css,/grid-template-columns:minmax\(170px,1fr\) auto minmax\(170px,1fr\)/);
@@ -40,7 +40,7 @@ test('shared header has route navigation while CalcPura sales CTA stays below th
   const shared=read('public/assets/shared-site-header.js');
   assert.doesNotMatch(shared,/calc-nav-price|Buy calculator for your business|Preisrechner für Ihr Unternehmen kaufen/);
   assert.match(shared,/home:\[en\?'Home':'Startseite'/);
-  assert.match(shared,/calculator:\['Calculator','\/calculator\/'/);
+  assert.match(shared,/calculator:\[en\?'Calculator':'Preisrechner','\/calculator\/'/);
   assert.match(calc,/class="calc-business-cta"/);
   assert.match(calc,/CalcPura für Ihr Unternehmen entdecken/);
   assert.match(calc,/https:\/\/calcpura\.frankiflow\.de\//);
@@ -179,6 +179,32 @@ test('Calculator and generated documents explain estimate before final quotation
 
 test('print mode hides the live Calculator and CalcPura marketing before the estimate sheet',()=>{
   const css=read('public/assets/calculator.css');
-  assert.match(css,/@media print\{[\s\S]*\.site-header,body>main,[\s\S]*\.calc-business-cta,[\s\S]*\.print-sheet\{display:block!important/s);
+  assert.match(css,/@media print\{[\s\S]*\.site-header,\.site-footer,body>main,[\s\S]*\.calc-business-cta,[\s\S]*\.print-sheet\{display:block!important/s);
   assert.match(css,/\.print-estimate-note\{/);
+});
+
+
+test('shared footer shell is identical across Homepage and Preisrechner',()=>{
+  const shared=read('public/assets/shared-site-header.js');
+  const css=read('public/assets/shared-site-header.css');
+  for(const p of ['public/index.html','public/en/index.html','public/calculator/index.html']){
+    const html=read(p);
+    assert.match(html,/footer class="site-footer" data-shared-footer/);
+    assert.doesNotMatch(html,/class="calc-footer"/);
+  }
+  assert.match(shared,/function footerMarkup/);
+  assert.match(shared,/Frankfurt am Main, Nürnberg &amp; Umgebung/);
+  assert.match(shared,/Frankfurt, Nuremberg &amp; surrounding areas/);
+  assert.match(shared,/Preisrechner öffnen ↗/);
+  assert.match(css,/\/\* Shared FrankiFlow public footer \*\//);
+});
+
+test('German public UI uses Preisrechner while English keeps Calculator',()=>{
+  const de=read('public/index.html'),en=read('public/en/index.html'),calc=read('public/assets/calculator-app-v3.js'),shared=read('public/assets/shared-site-header.js');
+  assert.doesNotMatch(de,/>[^<]*Calculator[^<]*</);
+  assert.match(de,/FrankiFlow Preisrechner/);
+  assert.match(en,/FrankiFlow Calculator/);
+  assert.match(calc,/FRANKIFLOW PREISRECHNER/);
+  assert.match(calc,/FRANKIFLOW CALCULATOR/);
+  assert.match(shared,/en\?'Calculator':'Preisrechner'/);
 });
