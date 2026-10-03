@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 const read=p=>readFileSync(p,'utf8');
 
-test('About Us is a homepage accordion only',()=>{assert.equal(existsSync('public/about/index.html'),false);const home=read('public/index.html');const js=read('public/assets/homepage-about-nav.js');assert.match(home,/id="about"/);assert.match(home,/id="aboutAccordion"/);assert.match(home,/href="#about"/);assert.doesNotMatch(home,/href="\/about\/"/);assert.match(js,/slice\(0,3\)/);assert.match(js,/<details class=/);assert.doesNotMatch(js,/padStart|about-page-story-head/)});
+test('About Us is a homepage accordion only',()=>{assert.equal(existsSync('public/about/index.html'),false);const home=read('public/index.html');const js=read('public/assets/homepage-about-nav.js');const shared=read('public/assets/shared-site-header.js');assert.match(home,/id="about"/);assert.match(home,/id="aboutAccordion"/);assert.match(shared,/about:\[en\?'About Us':'Über uns',home\+'#about'/);assert.doesNotMatch(home,/href="\/about\/"/);assert.match(js,/slice\(0,3\)/);assert.match(js,/<details class=/);assert.doesNotMatch(js,/padStart|about-page-story-head/)});
 test('Homepage and Calculator mount one shared public navigation',()=>{
   const shared=read('public/assets/shared-site-header.js');
   const css=read('public/assets/shared-site-header.css');
