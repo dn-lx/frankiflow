@@ -114,7 +114,13 @@ test('shared public header supplies balanced product navigation everywhere',()=>
   assert.match(calc,/class="calc-business-cta"/);
 });
 
-test('homepage header uses the same 1200px content rail as the hero',()=>{const cms=read('public/assets/homepage-cms.css'),base=read('public/assets/styles-base.css'),calc=read('public/assets/calculator.css');assert.doesNotMatch(cms,/1480px/);assert.doesNotMatch(cms,/\.site-header \.brand\{width:(?:410|300)px/);assert.match(cms,/\.site-header \.container\{width:min\(var\(--max\),calc\(100% - 40px\)\)\}/);assert.match(base,/--max:1200px/);assert.match(calc,/\.calc-container\{width:min\(1200px,calc\(100% - 40px\)\);margin:auto\}/);});
+test('Homepage and Calculator use the same V2 content rail',()=>{
+  const v2=read('public/assets/v2-redesign.css');
+  const shared=read('public/assets/shared-site-header.css');
+  assert.match(v2,/\.container\{width:min\(1240px,calc\(100% - 48px\)\)\}/);
+  assert.match(v2,/\.calc-container\{width:min\(1240px,calc\(100% - 48px\)\)\}/);
+  assert.match(shared,/\.site-header \.nav\{/);
+});
 
 
 test('shared header exposes localized product tooltips and accessible names',()=>{
