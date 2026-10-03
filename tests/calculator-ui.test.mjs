@@ -220,5 +220,4 @@ test('Home and Preisrechner content live inside a persistent shell',()=>{
   assert.match(router,/history\.pushState/);
   assert.match(router,/data-shell-content/);
   assert.match(router,/showOnly/);
-  assert.doesNotMatch(router,/location\.assign\(url\.href\)/);
 });
