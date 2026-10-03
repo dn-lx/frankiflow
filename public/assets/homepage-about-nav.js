@@ -13,6 +13,7 @@ function splitParagraphs(text=''){return String(text).split(/\n\s*\n/g).map(x=>x
 function keepProductLinksLast(){
   const lang=getLanguage()==='en'?'en':'de';
   const nav=$('.nav-links');if(!nav)return;
+  if(nav.querySelector('[data-shared-nav]'))return;
 
   let calcPura=nav.querySelector('.nav-calcpura,a[href^="https://calcpura.frankiflow.de"]');
   if(!calcPura){calcPura=document.createElement('a');nav.append(calcPura);}
