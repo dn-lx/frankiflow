@@ -229,3 +229,115 @@
 
 
 @media print{.site-header{display:none!important}}
+
+
+/* Shared FrankiFlow public footer */
+.site-footer{
+  padding:58px 0 30px;
+  background:#061a2a;
+  color:#dbe4e8;
+  border-top:0;
+}
+.site-footer .container{
+  width:min(1240px,calc(100% - 48px));
+  margin:0 auto;
+}
+.site-footer .footer-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:30px;
+  padding-bottom:30px;
+  border-bottom:1px solid rgba(255,255,255,.16);
+}
+.site-footer .footer-brand .brand{
+  display:block;
+  width:180px;
+}
+.site-footer .footer-brand .brand img{
+  display:block;
+  width:100%;
+  height:auto;
+  background:transparent;
+  object-fit:contain;
+  object-position:left center;
+}
+.site-footer .footer-brand p{
+  margin:12px 0 0;
+  color:#aebfc7;
+  font-size:13px;
+  line-height:1.55;
+}
+.site-footer .footer-cta{text-align:right}
+.site-footer .footer-cta span{
+  display:block;
+  color:#fff;
+  font-size:11px;
+}
+.site-footer .footer-cta a{
+  color:#73d8d0;
+  font-size:15px;
+  font-weight:850;
+  text-decoration:none;
+}
+.site-footer .footer-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:42px;
+  padding:34px 0;
+}
+.site-footer .footer-grid h4{
+  margin:0 0 12px;
+  color:#fff;
+  font-size:13px;
+}
+.site-footer .footer-links{
+  display:grid;
+  gap:8px;
+}
+.site-footer .footer-links a{
+  color:#aebfc7;
+  font-size:13px;
+  text-decoration:none;
+}
+.site-footer .footer-links a:hover{color:#73d8d0}
+.site-footer .footer-links [data-whatsapp]::before{
+  content:"";
+  display:inline-block;
+  width:14px;
+  height:14px;
+  vertical-align:-2px;
+  margin-right:7px;
+  background:url('/assets/whatsapp.svg') center/contain no-repeat;
+}
+.site-footer .copyright{
+  display:flex;
+  justify-content:space-between;
+  gap:18px;
+  padding-top:22px;
+  border-top:1px solid rgba(255,255,255,.16);
+  color:#8496a4;
+  font-size:11px;
+}
+
+@media(max-width:1020px){
+  .site-footer .container{width:min(100% - 36px,1240px)}
+  .site-footer .footer-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:680px){
+  .site-footer{padding:54px 0 28px}
+  .site-footer .container{width:min(100% - 24px,1240px)}
+  .site-footer .footer-top{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .site-footer .footer-cta{text-align:left}
+  .site-footer .footer-grid{grid-template-columns:1fr}
+  .site-footer .copyright{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+}
+@media print{
+  .site-footer{display:none!important}
+}
