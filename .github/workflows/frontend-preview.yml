@@ -13,6 +13,9 @@ on:
       - "public/index.html"
       - "public/en/index.html"
       - "public/calculator/index.html"
+      - "tests/**"
+      - "e2e/**"
+      - "package.json"
       - ".github/workflows/frontend-preview.yml"
 
 permissions:
