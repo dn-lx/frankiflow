@@ -73,20 +73,6 @@ async function loadAboutAccordion(){
   renderAboutAccordion();
 }
 
-function routeHomepageLanguageSwitch(){
-  const homepagePaths=new Set(['/','/index.html','/en','/en/','/en/index.html']);
-  document.addEventListener('click',event=>{
-    const button=event.target.closest?.('.ff-language-switch button[data-lang]');
-    if(!button||!homepagePaths.has(location.pathname))return;
-    const lang=button.dataset.lang==='en'?'en':'de';
-    const target=lang==='en'?'/en/':'/';
-    event.preventDefault();event.stopImmediatePropagation();
-    localStorage.setItem('frankiflow-lang',lang);
-    localStorage.setItem('ff-price-lang',lang);
-    location.assign(target+(location.hash||''));
-  },true);
-}
-
 function forceCalculatorSameTab(){
   const normalize=()=>$$('a[href]').forEach(link=>{
     try{const url=new URL(link.href,location.href);if(url.origin===location.origin&&/^\/calculator\/?$/.test(url.pathname)){link.removeAttribute('target');link.removeAttribute('rel')}}catch{}
@@ -102,7 +88,6 @@ function forceCalculatorSameTab(){
   },true);
 }
 
-routeHomepageLanguageSwitch();
 forceCalculatorSameTab();
 cleanAboutSectionChrome();
 syncAboutHeading();
