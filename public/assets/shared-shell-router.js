@@ -2,7 +2,7 @@
   const SHELL_SELECTOR='[data-shell-content]';
   const HEADER_SELECTOR='[data-shared-header]';
   const FOOTER_SELECTOR='[data-shared-footer]';
-  const currentContent=()=>document.querySelector(SHELL_SELECTOR);
+  const currentContent=()=>document.querySelector(SHELL_SELECTOR+':not([hidden])')||document.querySelector(SHELL_SELECTOR);
   const routeKind=pathname=>/^\/calculator\/?$/.test(pathname)?'calculator':((pathname==='/'||pathname==='/en/'||pathname==='/en')?'home':null);
   const pageLang=pathname=>pathname.startsWith('/en')?'en':(localStorage.getItem('frankiflow-lang')==='en'?'en':'de');
   const cache=new Map();
@@ -134,7 +134,7 @@
     localStorage.setItem('frankiflow-lang',lang);
     localStorage.setItem('ff-price-lang',lang);
     if(push)history.pushState({frankiflowShell:true},'',url.pathname+url.search+url.hash);
-    window.scrollTo({top:0,left:0,behavior:'instant'});
+    window.scrollTo({top:0,left:0,behavior:'auto'});
     if(url.hash){
       requestAnimationFrame(()=>entry.content.querySelector(url.hash)?.scrollIntoView({block:'start'}));
     }
