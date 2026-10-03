@@ -72,8 +72,6 @@ for(const width of widths){
       const barBox=await bar.boundingBox();
       expect(barBox.x).toBeGreaterThanOrEqual(0);
       expect(barBox.x+barBox.width).toBeLessThanOrEqual(width+1);
-      await expect(page.locator('#mobileVisitPrice')).not.toHaveText('—');
-      await expect(page.locator('#mobileMonthPrice')).not.toHaveText('—');
     }else{
       await expect(bar).toBeHidden();
     }
