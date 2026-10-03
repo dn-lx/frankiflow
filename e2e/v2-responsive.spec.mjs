@@ -29,6 +29,14 @@ for(const width of widths){
     const geometry=await pageGeometry(page);
     expect(geometry.scrollWidth,JSON.stringify(geometry.offenders,null,2)).toBeLessThanOrEqual(geometry.clientWidth+1);
 
+    if(width>=901){
+      const heading=await page.locator('.hero h1').boundingBox();
+      const visual=await page.locator('.hero-visual').boundingBox();
+      expect(heading).not.toBeNull();
+      expect(visual).not.toBeNull();
+      expect(heading.x+heading.width).toBeLessThanOrEqual(visual.x+1);
+    }
+
     const signalBox=await page.locator('.signal-grid').boundingBox();
     const signalCells=await page.locator('.signal-grid > div').evaluateAll(nodes=>nodes.map(el=>{
       const r=el.getBoundingClientRect();return {left:r.left,right:r.right};
