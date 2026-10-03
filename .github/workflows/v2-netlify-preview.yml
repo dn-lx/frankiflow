@@ -1,0 +1,56 @@
+name: V2 Netlify branch preview
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [v2]
+    paths:
+      - "public/**"
+      - ".github/workflows/v2-netlify-preview.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v2-netlify-preview
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      NETLIFY_SITE_ID: 71b1e9d0-e68a-4503-96d8-a55e94c20cc9
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: Require Netlify deploy credentials
+        run: |
+          if [ -z "$NETLIFY_AUTH_TOKEN" ]; then
+            echo "::error::NETLIFY_AUTH_TOKEN is not configured in GitHub Actions secrets."
+            exit 1
+          fi
+
+      - name: Deploy V2 alias
+        run: |
+          npx --yes netlify-cli@latest deploy \
+            --dir=public \
+            --site="$NETLIFY_SITE_ID" \
+            --auth="$NETLIFY_AUTH_TOKEN" \
+            --alias=v2 \
+            --message="FrankiFlow v2 preview ${GITHUB_SHA}" \
+            --json | tee netlify-v2-deploy.json
+
+      - name: Upload deploy metadata
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: frankiflow-v2-netlify-deploy-${{ github.run_id }}
+          path: netlify-v2-deploy.json
+          if-no-files-found: ignore
+          retention-days: 7
