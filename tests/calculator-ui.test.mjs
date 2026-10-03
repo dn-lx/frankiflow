@@ -179,7 +179,7 @@ test('Calculator and generated documents explain estimate before final quotation
 
 test('print mode hides the live Calculator and CalcPura marketing before the estimate sheet',()=>{
   const css=read('public/assets/calculator.css');
-  assert.match(css,/@media print\{[\s\S]*\.site-header,\.site-footer,body>main,[\s\S]*\.calc-business-cta,[\s\S]*\.print-sheet\{display:block!important/s);
+  assert.match(css,/@media print\{[\s\S]*\.site-header,\.site-footer,\[data-shell-content\]>main,[\s\S]*\.calc-business-cta,[\s\S]*\.print-sheet\{display:block!important/s);
   assert.match(css,/\.print-estimate-note\{/);
 });
 
@@ -207,4 +207,18 @@ test('German public UI uses Preisrechner while English keeps Calculator',()=>{
   assert.match(calc,/FRANKIFLOW PREISRECHNER/);
   assert.match(calc,/FRANKIFLOW CALCULATOR/);
   assert.match(shared,/en\?'Calculator':'Preisrechner'/);
+});
+
+
+test('Home and Preisrechner content live inside a persistent shell',()=>{
+  const router=read('public/assets/shared-shell-router.js');
+  for(const p of ['public/index.html','public/en/index.html','public/calculator/index.html']){
+    const html=read(p);
+    assert.match(html,/data-shell-content/);
+    assert.match(html,/shared-shell-router\.js\?v=/);
+  }
+  assert.match(router,/history\.pushState/);
+  assert.match(router,/data-shell-content/);
+  assert.match(router,/showOnly/);
+  assert.doesNotMatch(router,/location\.assign\(url\.href\)/);
 });
