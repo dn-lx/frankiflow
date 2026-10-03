@@ -18,20 +18,20 @@ function labels(lang){
   const home=en?'/en/':'/';
   return {
     home:[en?'Home':'Startseite',home,''],
-    calculator:['Calculator','/calculator/',''],
     services:[en?'Services':'Leistungen',home+'#leistungen',''],
     about:[en?'About Us':'Über uns',home+'#about',''],
-    contact:[en?'Contact':'Kontakt',home+'#kontakt',''],
-    faq:['FAQ',home+'#faq',''],
+    calculator:[en?'Calculator':'Preisrechner','/calculator/',''],
     calcpura:['CalcPura','https://calcpura.frankiflow.de/',en?'Pricing software for service businesses':'Preissoftware für Dienstleistungsunternehmen'],
-    stay:['FrankiHolz','https://stay.frankiflow.de/',en?'FrankiFlow accommodation & room booking':'FrankiFlow Unterkunft & Zimmerbuchung']
+    stay:['FrankiHolz','https://stay.frankiflow.de/',en?'FrankiFlow accommodation & room booking':'FrankiFlow Unterkunft & Zimmerbuchung'],
+    faq:['FAQ',home+'#faq',''],
+    contact:[en?'Contact':'Kontakt',home+'#kontakt','']
   };
 }
 
 function headerMarkup(lang,page){
   const en=lang==='en';
   const items=labels(lang);
-  const navOrder=['home','calculator','services','about','contact','faq','calcpura','stay'];
+  const navOrder=['home','services','about','calculator','calcpura','stay','faq','contact'];
   const links=navOrder.map(key=>{
     const [label,href,tooltip]=items[key];
     const product=key==='calcpura'||key==='stay';
@@ -61,6 +61,54 @@ function headerMarkup(lang,page){
   '</div>';
 }
 
+function footerMarkup(lang){
+  const en=lang==='en';
+  const home=en?'/en/':'/';
+  const services=en
+    ?[
+      ['Office cleaning','/en/office-cleaning-frankfurt/'],
+      ['Home cleaning','/en/home-cleaning-frankfurt/'],
+      ['Airbnb & holiday rentals','/en/airbnb-cleaning-frankfurt/'],
+      ['Property care','/en/property-care-frankfurt/']
+    ]
+    :[
+      ['Büroreinigung','/bueroreinigung-frankfurt/'],
+      ['Wohnungsreinigung','/wohnungsreinigung-frankfurt/'],
+      ['Airbnb & Ferienwohnungen','/airbnb-reinigung-frankfurt/'],
+      ['Objektbetreuung','/objektbetreuung-frankfurt/']
+    ];
+  const serviceLinks=services.map(([label,href])=>'<a href="'+href+'">'+label+'</a>').join('');
+
+  return '<div class="container">'+
+    '<div class="footer-top">'+
+      '<div class="footer-brand"><a class="brand" href="'+home+'"><img alt="FrankiFlow" src="/assets/brand/frankiflow-full-dark-transparent.svg"/></a><p>'+
+        (en?'Cleaning &amp; property care<br/>Frankfurt, Nuremberg &amp; surrounding areas':'Gebäudereinigung &amp; Objektbetreuung<br/>Frankfurt am Main, Nürnberg &amp; Umgebung')+
+      '</p></div>'+
+      '<div class="footer-cta"><span>'+(en?'Get an instant estimate?':'Preis direkt einschätzen?')+'</span><a href="/calculator/">'+(en?'Open Calculator ↗':'Preisrechner öffnen ↗')+'</a></div>'+
+    '</div>'+
+    '<div class="footer-grid">'+
+      '<div><h4>'+(en?'Services':'Leistungen')+'</h4><div class="footer-links">'+serviceLinks+'</div></div>'+
+      '<div><h4>FrankiFlow</h4><div class="footer-links">'+
+        '<a href="'+home+'#about">'+(en?'About Us':'Über uns')+'</a>'+
+        '<a href="'+home+'#kontakt">'+(en?'Request a quote':'Angebot anfragen')+'</a>'+
+        '<a class="frankiholz-link" href="https://stay.frankiflow.de/">'+(en?'FrankiHolz Accommodation ↗':'FrankiHolz Unterkunft ↗')+'</a>'+
+        '<a data-whatsapp href="'+WHATSAPP_URL+'" rel="noopener" target="_blank">WhatsApp</a>'+
+      '</div></div>'+
+      '<div><h4>'+(en?'Contact & legal':'Kontakt & Rechtliches')+'</h4><div class="footer-links">'+
+        '<a href="tel:+4917662493041">+49 176 62493041</a>'+
+        '<a data-mail href="mailto:info@frankiflow.de">info@frankiflow.de</a>'+
+        '<a href="/impressum/">'+(en?'Legal notice':'Impressum')+'</a>'+
+        '<a href="/datenschutz/">'+(en?'Privacy':'Datenschutz')+'</a>'+
+      '</div></div>'+
+    '</div>'+
+    '<div class="copyright"><span>'+(en?'© 2026 FrankiFlow. More than cleaning.':'© 2026 FrankiFlow. Mehr als Reinigung.')+'</span><span>'+(en?'Frankfurt · Nuremberg':'Frankfurt am Main · Nürnberg')+'</span></div>'+
+  '</div>';
+}
+
+function renderSharedFooters(lang){
+  $$('[data-shared-footer]').forEach(footer=>{footer.innerHTML=footerMarkup(lang);});
+}
+
 function applyHeaderLanguage(header,lang){
   const page=header.dataset.page||'home';
   const items=labels(lang);
@@ -86,22 +134,7 @@ function applyHeaderLanguage(header,lang){
   header.querySelectorAll('.language-switch [data-lang]').forEach(button=>button.classList.toggle('active',button.dataset.lang===lang));
   const menu=header.querySelector('.menu-btn');
   if(menu)menu.setAttribute('aria-label',lang==='en'?'Open menu':'Menü öffnen');
-  applyCalculatorFooterLanguage(lang);
-}
-
-function applyCalculatorFooterLanguage(lang){
-  const footer=document.querySelector('.calc-footer');if(!footer)return;
-  const en=lang==='en';
-  const description=footer.querySelector('.calc-footer-main p');
-  if(description)description.textContent=en?'Building Cleaning & Property Services · Frankfurt am Main & Surroundings':'Gebäudereinigung & Objektbetreuung · Frankfurt am Main & Umgebung';
-  const stay=footer.querySelector('a[href="https://stay.frankiflow.de/"]');
-  if(stay)stay.textContent=en?'FrankiHolz Accommodation ↗':'FrankiHolz Unterkunft ↗';
-  const legal=footer.querySelector('a[href="/impressum/"]');
-  if(legal)legal.textContent=en?'Legal notice':'Impressum';
-  const privacy=footer.querySelector('a[href="/datenschutz/"]');
-  if(privacy)privacy.textContent=en?'Privacy':'Datenschutz';
-  const copy=footer.querySelector('.calc-footer-copy');
-  if(copy)copy.textContent=en?'© 2026 FrankiFlow. More than cleaning.':'© 2026 FrankiFlow. Mehr als Reinigung.';
+  renderSharedFooters(lang);
 }
 
 function bindHeader(header){
@@ -136,11 +169,13 @@ function mountHeader(header){
   const page=header.dataset.page||'home';
   header.innerHTML=headerMarkup(lang,page);
   bindHeader(header);
-  applyCalculatorFooterLanguage(lang);
+  renderSharedFooters(lang);
 }
 
 $$('[data-shared-header]').forEach(mountHeader);
+if(!$('[data-shared-header]'))renderSharedFooters(document.documentElement.lang==='en'?'en':'de');
 window.addEventListener('frankiflow:language',event=>{
   const lang=event.detail?.lang==='en'?'en':'de';
   $$('[data-shared-header]').forEach(header=>applyHeaderLanguage(header,lang));
+  renderSharedFooters(lang);
 });
