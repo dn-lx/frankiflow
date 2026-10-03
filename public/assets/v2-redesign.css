@@ -931,3 +931,27 @@ html.v2-motion-ready .v2-reveal[data-v2-delay="3"]{transition-delay:.18s}
   letter-spacing:inherit!important;
   color:inherit!important;
 }
+
+
+/* Calculator hero contrast correction */
+.calc-hero h1{
+  color:#ffffff!important;
+}
+.calc-hero h1 em{
+  color:#58d3c8!important;
+}
+.calc-hero p{
+  color:rgba(236,247,249,.90)!important;
+}
+.calc-eyebrow{
+  color:#63ddd3!important;
+}
+.calc-trust{
+  color:rgba(244,250,252,.94)!important;
+}
+.calc-hero-mark{
+  opacity:.72;
+}
+.calc-hero-mark img{
+  filter:drop-shadow(0 14px 36px rgba(0,0,0,.18))!important;
+}
