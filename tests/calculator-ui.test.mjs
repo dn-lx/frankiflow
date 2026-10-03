@@ -49,8 +49,8 @@ test('shared header has route navigation while CalcPura sales CTA stays below th
 test('quotation includes property area and supports direct PDF download',()=>{
   const js=read('public/assets/calculator-app-v3.js'),html=read('public/calculator/index.html');
   assert.match(html,/id="downloadQuote"/);
-  assert.match(js,/downloadQuote:'Angebot direkt herunterladen'/);
-  assert.match(js,/downloadQuote:'Download quotation PDF'/);
+  assert.match(js,/downloadQuote:'Kostenschätzung direkt herunterladen'/);
+  assert.match(js,/downloadQuote:'Download estimate PDF'/);
   assert.match(js,/Reinigungsfläche':'Floor area'/);
   assert.match(js,/Glasfläche':'Glass area'/);
   assert.match(js,/jspdf@4\.2\.1/);
@@ -162,4 +162,23 @@ test('V2 public pages do not leak literal backslash-n text',()=>{
   for(const path of ['public/index.html','public/en/index.html','public/calculator/index.html']){
     assert.doesNotMatch(read(path),/\\n/);
   }
+});
+
+
+test('Calculator and generated documents explain estimate before final quotation',()=>{
+  const html=read('public/calculator/index.html'),js=read('public/assets/calculator-app-v3.js');
+  assert.match(html,/Wichtig: unverbindliche Kostenschätzung/);
+  assert.match(html,/ersten Vor-Ort-Termin/);
+  assert.match(js,/KOSTENSCHÄTZUNG/);
+  assert.match(js,/NON-BINDING ESTIMATE/);
+  assert.match(js,/prüfen und vermessen wir die tatsächlichen Flächen/);
+  assert.match(js,/verify and measure the actual areas/);
+  assert.match(js,/Besichtigung & genaues Angebot anfragen/);
+  assert.match(js,/Request site visit & final quotation/);
+});
+
+test('print mode hides the live Calculator and CalcPura marketing before the estimate sheet',()=>{
+  const css=read('public/assets/calculator.css');
+  assert.match(css,/@media print\{[\s\S]*\.site-header,body>main,[\s\S]*\.calc-business-cta,[\s\S]*\.print-sheet\{display:block!important/s);
+  assert.match(css,/\.print-estimate-note\{/);
 });
