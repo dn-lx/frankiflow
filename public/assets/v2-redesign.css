@@ -921,3 +921,13 @@ html.v2-motion-ready .v2-reveal[data-v2-delay="3"]{transition-delay:.18s}
 .site-footer .footer-brand .brand img{
   object-fit:contain;
 }
+
+
+/* Promo percent must match Rabatt/discount typography */
+.floating-offer strong [data-promo-percent]{
+  font-size:inherit!important;
+  font-weight:inherit!important;
+  line-height:inherit!important;
+  letter-spacing:inherit!important;
+  color:inherit!important;
+}
