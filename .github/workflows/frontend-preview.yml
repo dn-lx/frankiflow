@@ -10,6 +10,9 @@ on:
       - "public/assets/v2-motion.js"
       - "public/assets/shared-site-header.js"
       - "public/assets/shared-site-header.css"
+      - "public/assets/calculator.css"
+      - "public/assets/calculator-app-v3.js"
+      - "public/assets/calculator-engine.js"
       - "public/index.html"
       - "public/en/index.html"
       - "public/calculator/index.html"
@@ -81,6 +84,18 @@ jobs:
             if (errors.length) console.log(name + ' page errors:', errors);
             await page.close();
           }
+
+          const printPage = await browser.newPage({ viewport: { width: 900, height: 1200 }, deviceScaleFactor: 1 });
+          await printPage.emulateMedia({ reducedMotion: 'reduce' });
+          await printPage.goto('http://127.0.0.1:4173/calculator/', { waitUntil: 'domcontentloaded' });
+          await printPage.waitForTimeout(2500);
+          await printPage.evaluate(() => { window.print = () => {}; });
+          await printPage.locator('#printQuote').click();
+          await printPage.locator('.print-document').waitFor({ state: 'attached' });
+          await printPage.emulateMedia({ media: 'print', reducedMotion: 'reduce' });
+          await printPage.locator('.print-document').screenshot({ path: 'visual-preview/calculator-print-page1.png' });
+          await printPage.close();
+
           await browser.close();
           EOF
           node capture.mjs
