@@ -903,3 +903,6 @@ html.v2-motion-ready .v2-reveal[data-v2-delay="3"]{transition-delay:.18s}
 @media print{
   .mobile-price-bar{display:none!important}
 }
+
+
+/* V2 branch-deploy refresh: 2026-10-03 */
