@@ -189,3 +189,30 @@ test('Homepage and Preisrechner share the same footer shell', async ({ page }) =
   expect(snapshots[0].cta).toContain('Preisrechner');
   expect(snapshots[0].region).toContain('Nürnberg');
 });
+
+
+test('header and footer stay mounted while route content swaps', async ({ page }) => {
+  await page.goto('/',{waitUntil:'domcontentloaded'});
+  const before=await page.evaluate(()=>{
+    const header=document.querySelector('.site-header');
+    const footer=document.querySelector('.site-footer');
+    header.dataset.persistProbe='header-stays';
+    footer.dataset.persistProbe='footer-stays';
+    const hr=header.getBoundingClientRect();
+    return {height:hr.height,headerText:header.textContent};
+  });
+
+  await page.locator('[data-shared-nav="calculator"]').click();
+  await expect(page).toHaveURL(/\/calculator\/$/);
+  await expect(page.locator('.site-header')).toHaveAttribute('data-persist-probe','header-stays');
+  await expect(page.locator('.site-footer')).toHaveAttribute('data-persist-probe','footer-stays');
+  await expect(page.locator('[data-shell-view="calculator"]:not([hidden])')).toBeVisible();
+
+  const after=await page.locator('.site-header').boundingBox();
+  expect(Math.abs(after.height-before.height)).toBeLessThan(1);
+
+  await page.locator('[data-shared-nav="home"]').click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.locator('.site-header')).toHaveAttribute('data-persist-probe','header-stays');
+  await expect(page.locator('[data-shell-view="home"]:not([hidden])')).toBeVisible();
+});
