@@ -5,12 +5,13 @@ import { loadHeaderLogoWidth } from './header-logo-settings.js';
 
 const $=(s,p=document)=>p.querySelector(s); const $$=(s,p=document)=>[...p.querySelectorAll(s)];
 let siteSettings=null;
+let promotionSettings={label:'20% Neukundenrabatt im ersten Monat',enabled:true,first_month_discount_pct:20};
 
 const fallbackSettings={
   hero_eyebrow:'Mehr als Reinigung.',hero_eyebrow_en:'More than cleaning.',
   hero_title:'Gebäudereinigung, die einfach funktioniert.',hero_title_en:'Cleaning services that simply work.',
   hero_subtitle:'Professionelle Reinigung und Objektbetreuung für Büros, Wohnungen, Treppenhäuser und Ferienunterkünfte in Frankfurt am Main, Nürnberg & Umgebung.',hero_subtitle_en:'Professional cleaning and property care for offices, homes, stairwells and holiday rentals in Frankfurt, Nuremberg and surrounding areas.',
-  offer_title:'25% Neukundenrabatt im ersten Monat',offer_title_en:'25% new-customer discount in the first month',
+  offer_title:'20% Neukundenrabatt im ersten Monat',offer_title_en:'20% new-customer discount in the first month',
   offer_text:'Zusätzlich ist eine kostenlose Probereinigung nach Absprache möglich.',offer_text_en:'A free trial cleaning can also be arranged.',
   email:FRANKIFLOW_CONFIG.defaultEmail,phone:FRANKIFLOW_CONFIG.defaultPhone,whatsapp_url:FRANKIFLOW_CONFIG.defaultWhatsApp,
   service_area:FRANKIFLOW_CONFIG.serviceArea,service_area_en:'Frankfurt, Nuremberg & surrounding areas',
@@ -26,12 +27,18 @@ function applySiteLanguage(){
 }
 
 async function loadSite(){
-  const {data}=await supabase.from('frankiflow_site_settings').select('*').eq('id',1).maybeSingle();
+  const [siteResult,promoResult]=await Promise.all([
+    supabase.from('frankiflow_site_settings').select('*').eq('id',1).maybeSingle(),
+    supabase.from('pricing_config').select('value').eq('key','promotion_settings').eq('is_public',true).maybeSingle()
+  ]);
+  const data=siteResult?.data;
+  if(!promoResult?.error&&promoResult?.data?.value)promotionSettings=normalizePromotion(promoResult.data.value);
   siteSettings={...fallbackSettings,...(data||{})};
   siteSettings.hero_subtitle=String(siteSettings.hero_subtitle||fallbackSettings.hero_subtitle).replace(/Frankfurt am Main\s*&\s*Umgebung/g,'Frankfurt am Main, Nürnberg & Umgebung');
   siteSettings.hero_subtitle_en=String(siteSettings.hero_subtitle_en||fallbackSettings.hero_subtitle_en).replace(/Frankfurt am Main(?:\s*&| and)\s*surrounding areas/gi,'Frankfurt, Nuremberg & surrounding areas');
   siteSettings.service_area='Frankfurt am Main, Nürnberg & Umgebung';
   siteSettings.service_area_en='Frankfurt, Nuremberg & surrounding areas';
+  applyPromotionBindings(document);
   applySiteLanguage();
   $$('[data-mail]').forEach(el=>{el.href=`mailto:${siteSettings.email}`;const strong=el.querySelector('strong');if(strong)strong.textContent=siteSettings.email;else el.textContent=siteSettings.email});
   $$('[data-phone]').forEach(el=>{el.href=`tel:${siteSettings.phone.replace(/\s/g,'')}`;const strong=el.querySelector('strong');if(strong)strong.textContent=siteSettings.phone;else el.textContent=siteSettings.phone});
@@ -70,5 +77,16 @@ async function submitQuote(e){
 function bindUI(){$('#quoteForm')?.addEventListener('submit',submitQuote)}
 
 mountLanguageSwitch($('.nav-actions'),{prepend:true});initI18n();bindUI();
-window.addEventListener('frankiflow:language',()=>{applySiteLanguage();loadAboutMain()});
-await Promise.allSettled([loadSite(),loadGallery(),loadAboutMain(),loadHeaderLogoWidth()]);applySiteLanguage();
+window.addEventListener('frankiflow:language',()=>{applySiteLanguage();applyPromotionBindings(document);loadAboutMain()});
+window.addEventListener('frankiflow:shell-content-mounted',()=>{applySiteLanguage();applyPromotionBindings(document)});
+window.addEventListener('focus',()=>{void loadSite()});
+supabase.channel('frankiflow-public-pricing')
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'pricing_config',filter:'key=eq.promotion_settings'},payload=>{
+    if(payload?.new?.value){
+      promotionSettings=normalizePromotion(payload.new.value);
+      applyPromotionBindings(document);
+      applySiteLanguage();
+    }
+  })
+  .subscribe();
+await Promise.allSettled([loadSite(),loadGallery(),loadAboutMain(),loadHeaderLogoWidth()]);applyPromotionBindings(document);applySiteLanguage();
