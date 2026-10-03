@@ -36,9 +36,9 @@ function keepProductLinksLast(){
 function keepAboutSectionLink(){
   const lang=getLanguage()==='en'?'en':'de';
   const nav=$('.nav-links');
-  let navLink=nav?.querySelector('a[href="#about"],a[href="/about/"],[data-section-link="about"]');
+  let navLink=nav?.querySelector('[data-shared-nav="about"],a[href="#about"],a[href="/about/"],[data-section-link="about"]');
   if(nav&&!navLink){navLink=document.createElement('a');const why=nav.querySelector('a[href="#warum"]');why?nav.insertBefore(navLink,why):nav.append(navLink)}
-  if(navLink){navLink.href='#about';navLink.textContent=lang==='en'?'About Us':'Über uns';navLink.dataset.sectionLink='about';navLink.classList.remove('hidden')}
+  if(navLink){const home=lang==='en'?'/en/':'/';navLink.href=home+'#about';navLink.textContent=lang==='en'?'About Us':'Über uns';navLink.dataset.sectionLink='about';navLink.classList.remove('hidden')}
   $$('.footer-links a[href="/about/"],.footer-links a[href="#about"],[data-section-link="about"]').forEach(link=>{link.href='#about';link.textContent=lang==='en'?'About Us':'Über uns';link.dataset.sectionLink='about'});
 }
 
