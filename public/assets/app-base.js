@@ -22,8 +22,32 @@ const fallbackSettings={
 
 function applySiteLanguage(){
   if(!siteSettings)return;const lang=getLanguage();
-  $$('[data-setting]').forEach(el=>{const key=el.dataset.setting;const langKey=lang==='en'?`${key}_en`:key;const value=siteSettings[langKey]||siteSettings[key]||fallbackSettings[langKey]||fallbackSettings[key];if(value!=null)el.textContent=value});
+  $('[data-setting]').forEach(el=>{const key=el.dataset.setting;const langKey=lang==='en'?`${key}_en`:key;const value=siteSettings[langKey]||siteSettings[key]||fallbackSettings[langKey]||fallbackSettings[key];if(value!=null)el.textContent=value});
   translateDom(document,lang);
+}
+
+
+function normalizePromotion(value){
+  const raw=value&&typeof value==='object'?value:{};
+  const pct=Math.max(0,Math.min(100,Number(raw.first_month_discount_pct??20)||0));
+  return {
+    ...raw,
+    enabled:raw.enabled!==false,
+    first_month_discount_pct:pct,
+    label:String(raw.label||`${pct}% Neukundenrabatt im ersten Monat`)
+  };
+}
+
+function applyPromotionBindings(root=document){
+  promotionSettings=normalizePromotion(promotionSettings);
+  const pct=promotionSettings.first_month_discount_pct;
+  const enabled=promotionSettings.enabled!==false&&pct>0;
+  root.querySelectorAll?.('[data-promo-percent]').forEach(el=>{el.textContent=`${pct}%`;});
+  root.querySelectorAll?.('[data-promo-card],[data-promo-signal],[data-promo-benefit]').forEach(el=>el.classList.toggle('hidden',!enabled));
+  if(siteSettings){
+    siteSettings.offer_title=`${pct}% Neukundenrabatt im ersten Monat`;
+    siteSettings.offer_title_en=`${pct}% new-customer discount in the first month`;
+  }
 }
 
 async function loadSite(){
