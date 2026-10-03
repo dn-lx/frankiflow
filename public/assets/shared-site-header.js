@@ -118,14 +118,17 @@ function bindHeader(header){
     menu?.setAttribute('aria-expanded','false');
   }));
 
-  if(page==='calculator'){
-    header.querySelectorAll('.language-switch [data-lang]').forEach(button=>button.addEventListener('click',()=>{
-      const lang=button.dataset.lang==='en'?'en':'de';
-      localStorage.setItem('frankiflow-lang',lang);
-      localStorage.setItem('ff-price-lang',lang);
+  header.querySelectorAll('.language-switch [data-lang]').forEach(button=>button.addEventListener('click',()=>{
+    const lang=button.dataset.lang==='en'?'en':'de';
+    localStorage.setItem('frankiflow-lang',lang);
+    localStorage.setItem('ff-price-lang',lang);
+    if(page==='calculator'){
       applyHeaderLanguage(header,lang);
-    }));
-  }
+      return;
+    }
+    const target=lang==='en'?'/en/':'/';
+    location.assign(target+(location.hash||''));
+  }));
 }
 
 function mountHeader(header){
