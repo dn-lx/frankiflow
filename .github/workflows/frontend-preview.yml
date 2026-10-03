@@ -8,6 +8,8 @@ on:
       - "public/assets/frontend-refresh.css"
       - "public/assets/v2-redesign.css"
       - "public/assets/v2-motion.js"
+      - "public/assets/shared-site-header.js"
+      - "public/assets/shared-site-header.css"
       - "public/index.html"
       - "public/en/index.html"
       - "public/calculator/index.html"
@@ -44,7 +46,7 @@ jobs:
           done
           cat /tmp/frankiflow-preview.log
           exit 1
-      - name: Capture homepage and Preisrechner
+      - name: Capture homepage and Calculator
         run: |
           cat > capture.mjs <<'EOF'
           import { chromium } from '@playwright/test';
