@@ -80,6 +80,7 @@ function forceCalculatorSameTab(){
   });
   normalize();
   document.addEventListener('click',event=>{
+    if(event.defaultPrevented)return;
     const link=event.target.closest?.('a[href]');if(!link)return;
     let url;try{url=new URL(link.href,location.href)}catch{return}
     if(url.origin!==location.origin||!/^\/calculator\/?$/.test(url.pathname))return;
