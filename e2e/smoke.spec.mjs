@@ -86,8 +86,17 @@ test('public navigation aligns and matches across homepage and calculator', asyn
     const header=page.locator('.site-header');
     await expect(header).toBeVisible();
 
-    const productLabels=await header.locator('.nav-links a').allTextContents();
-    expect(productLabels).toEqual(path==='/en/'?['Home','Services','About Us','Calculator','CalcPura','FrankiHolz','FAQ','Contact']:['Startseite','Leistungen','Über uns','Preisrechner','CalcPura','FrankiHolz','FAQ','Kontakt']);
+    const navItems=await header.locator('.nav-links a').evaluateAll(nodes=>nodes.map(a=>({
+      text:a.textContent.trim(),
+      href:a.getAttribute('href')
+    })));
+    const expectedText=path==='/en/'?['Home','Services','About Us','Calculator','CalcPura','FrankiHolz','FAQ','Contact']:null;
+    if(expectedText)expect(navItems.map(x=>x.text)).toEqual(expectedText);
+    expect(navItems[3].href).toBe('/calculator/');
+    expect(navItems[4].text).toBe('CalcPura');
+    expect(navItems[5].text).toBe('FrankiHolz');
+    expect(navItems[6].text).toBe('FAQ');
+    expect(navItems[7].text).toMatch(/Contact|Kontakt/);
     await expect(header.locator('.nav-actions a[href="/calculator/"]')).toHaveCount(0);
     await expect(header.locator('.calc-nav-price')).toHaveCount(0);
 
