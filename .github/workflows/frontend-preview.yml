@@ -42,6 +42,8 @@ jobs:
           npm test
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
+      - name: Run Chromium UI checks
+        run: npx playwright test e2e/smoke.spec.mjs e2e/accessibility.spec.mjs e2e/v2-responsive.spec.mjs --project=chromium
       - name: Start static site
         run: |
           python3 -m http.server 4173 --directory public > /tmp/frankiflow-preview.log 2>&1 &
@@ -70,6 +72,7 @@ jobs:
 
           for (const [name, path, width, height] of targets) {
             const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 1 });
+            await page.emulateMedia({ reducedMotion: 'reduce' });
             const errors = [];
             page.on('pageerror', err => errors.push(String(err)));
             await page.goto('http://127.0.0.1:4173' + path, { waitUntil: 'domcontentloaded' });
