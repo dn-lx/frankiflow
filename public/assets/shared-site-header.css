@@ -346,27 +346,27 @@
 /* Persistent shell geometry lock */
 :root{
   --ff-header-logo-width:190px!important;
-  --ff-header-height:104px!important;
+  --ff-header-height:152px!important;
 }
 .site-header{
-  height:104px!important;
-  min-height:104px!important;
+  height:152px!important;
+  min-height:152px!important;
 }
 .site-header .nav{
-  height:104px!important;
-  min-height:104px!important;
+  height:152px!important;
+  min-height:152px!important;
   padding:0!important;
 }
 .site-header .brand{
   width:190px!important;
-  height:96px!important;
+  height:144px!important;
   display:flex!important;
   align-items:center!important;
 }
 .site-header .brand img{
-  width:96px!important;
-  height:96px!important;
-  max-height:96px!important;
+  width:144px!important;
+  height:144px!important;
+  max-height:144px!important;
   object-fit:contain!important;
   object-position:left center!important;
 }
@@ -388,32 +388,32 @@
 
 @media(max-width:1120px){
   .site-header,.site-header .nav{
-    height:96px!important;
-    min-height:96px!important;
+    height:138px!important;
+    min-height:138px!important;
   }
   .site-header .brand{
     width:160px!important;
-    height:87px!important;
+    height:131px!important;
   }
   .site-header .brand img{
-    width:87px!important;
-    height:87px!important;
-    max-height:87px!important;
+    width:131px!important;
+    height:131px!important;
+    max-height:131px!important;
   }
 }
 @media(max-width:430px){
   .site-header,.site-header .nav{
-    height:86px!important;
-    min-height:86px!important;
+    height:126px!important;
+    min-height:126px!important;
   }
   .site-header .brand{
     width:136px!important;
-    height:78px!important;
+    height:117px!important;
   }
   .site-header .brand img{
-    width:78px!important;
-    height:78px!important;
-    max-height:78px!important;
+    width:117px!important;
+    height:117px!important;
+    max-height:117px!important;
   }
   .site-footer .footer-brand .brand,
   .site-footer .footer-brand .brand img{
