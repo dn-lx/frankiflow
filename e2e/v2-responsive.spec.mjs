@@ -61,7 +61,7 @@ for(const width of widths){
   test(`calculator V2 has no responsive overflow at ${width}px`,async({page})=>{
     await blockExternalNetwork(page);
     await page.setViewportSize({width,height:width<=430?844:900});
-    await page.goto('/preisrechner/',{waitUntil:'domcontentloaded'});
+    await page.goto('/calculator/',{waitUntil:'domcontentloaded'});
 
     const geometry=await pageGeometry(page);
     expect(geometry.scrollWidth,JSON.stringify(geometry.offenders,null,2)).toBeLessThanOrEqual(geometry.clientWidth+1);
