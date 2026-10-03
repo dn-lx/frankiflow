@@ -216,3 +216,14 @@ test('header and footer stay mounted while route content swaps', async ({ page }
   await expect(page.locator('.site-header')).toHaveAttribute('data-persist-probe','header-stays');
   await expect(page.locator('[data-shell-view="home"]:not([hidden])')).toBeVisible();
 });
+
+
+test('promotion fallback is consistent when backend is unavailable', async ({ page }) => {
+  await page.goto('/',{waitUntil:'domcontentloaded'});
+  const promoValues=await page.locator('[data-promo-percent]').allTextContents();
+  expect(promoValues.length).toBeGreaterThan(0);
+  expect(new Set(promoValues.map(x=>x.trim()))).toEqual(new Set(['20%']));
+
+  await page.goto('/calculator/',{waitUntil:'domcontentloaded'});
+  await expect(page.locator('#promoHint')).toContainText('20%');
+});
