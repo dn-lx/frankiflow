@@ -226,3 +226,6 @@
     padding-right:5px;
   }
 }
+
+
+@media print{.site-header{display:none!important}}
