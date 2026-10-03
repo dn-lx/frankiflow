@@ -11,7 +11,7 @@ test('homepage renders core service UI', async ({ page }) => {
 });
 
 test('price calculator shell renders without external writes', async ({ page }) => {
-  await page.goto('/preisrechner/', { waitUntil: 'domcontentloaded' });
+  await page.goto('/calculator/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#calculatorForm')).toBeVisible();
   await expect(page.locator('#visitPrice')).toBeVisible();
   await expect(page.getByRole('button', { name: /Angebot drucken|PDF/ })).toBeVisible();
@@ -19,7 +19,7 @@ test('price calculator shell renders without external writes', async ({ page }) 
 
 
 test('quotation and checklist print footers stay at the bottom of every short A4 page', async ({ page }) => {
-  await page.goto('/preisrechner/', { waitUntil: 'domcontentloaded' });
+  await page.goto('/calculator/', { waitUntil: 'domcontentloaded' });
   await page.emulateMedia({ media: 'print' });
 
   await page.locator('#printSheet').evaluate(sheet => {
@@ -81,14 +81,14 @@ test('quotation and checklist print footers stay at the bottom of every short A4
 
 
 test('public navigation aligns and matches across homepage and calculator', async ({ page }) => {
-  for (const [path,contentSelector] of [['/en/','.hero-grid'],['/preisrechner/','.calc-hero-grid']]) {
+  for (const [path,contentSelector] of [['/en/','.hero-grid'],['/calculator/','.calc-hero-grid']]) {
     await page.goto(path,{waitUntil:'domcontentloaded'});
     const header=page.locator('.site-header');
     await expect(header).toBeVisible();
 
     const productLabels=await header.locator('.nav-links a').allTextContents();
     expect(productLabels.slice(-2)).toEqual(['CalcPura','FrankiHolz']);
-    await expect(header.locator('.nav-actions a[href="/preisrechner/"]')).toHaveCount(0);
+    await expect(header.locator('.nav-actions a[href="/calculator/"]')).toHaveCount(0);
     await expect(header.locator('.calc-nav-price')).toHaveCount(0);
 
     const rails=await page.evaluate(({contentSelector})=>{
@@ -140,7 +140,7 @@ test('public navigation aligns and matches across homepage and calculator', asyn
 });
 
 test('calculator presents CalcPura business CTA below the calculator', async ({ page }) => {
-  await page.goto('/preisrechner/',{waitUntil:'domcontentloaded'});
+  await page.goto('/calculator/',{waitUntil:'domcontentloaded'});
   const cta=page.locator('.calc-business-cta');
   await expect(cta).toBeVisible();
   await expect(cta.getByRole('link',{name:/CalcPura/i})).toHaveAttribute('href','https://calcpura.frankiflow.de/');
