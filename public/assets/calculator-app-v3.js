@@ -19,7 +19,7 @@ const FALLBACK={
     {key:'weekly2',label:'2× pro Woche',visits_per_month:8},{key:'weekly3',label:'3× pro Woche',visits_per_month:12},
     {key:'weekly4',label:'4× pro Woche',visits_per_month:16},{key:'weekly5',label:'5× pro Woche',visits_per_month:20}
   ]},
-  promotion_settings:{label:'25% Neukundenrabatt im ersten Monat',enabled:true,first_month_discount_pct:25},
+  promotion_settings:{label:'20% Neukundenrabatt im ersten Monat',enabled:true,first_month_discount_pct:20},
   service_settings:{services:{
     buero:{label:'Büroreinigung',base_1m:24,enabled:true},
     airbnb:{label:'Ferienwohnung / Airbnb',base_1m:26,enabled:true},
@@ -431,13 +431,33 @@ async function callAdmin(action){const {data:{session}}=await supabase.auth.getS
 async function detectAdmin(){if(!new URLSearchParams(location.search).has('admin'))return;const {data:{session}}=await supabase.auth.getSession();if(!session)return;const {data}=await supabase.from('pricing_admin_users').select('role,active').eq('user_id',session.user.id).eq('active',true).maybeSingle();if(data?.role==='admin'){isAdmin=true;$('#printInvoice')?.classList.remove('hidden');$('#serviceDateWrap')?.classList.remove('hidden');}}
 async function createInvoice(){if(!isAdmin)return alert(lang==='de'?'Bitte im FrankiFlow Admin anmelden.':'Please sign in through FrankiFlow admin.');if(!$('#customerName').value.trim()||!$('#customerAddress').value.trim())return alert(lang==='de'?'Bitte Name und Adresse eintragen.':'Please enter customer name and address.');const button=$('#printInvoice'),old=button.textContent;button.disabled=true;try{const billing=await callAdmin('get_private_billing');const number=await callAdmin('reserve_invoice_number');await printDoc('invoice',billing.billing,number.invoice_number);}catch(error){alert(error.message)}finally{button.disabled=false;button.textContent=old;}}
 
+function refreshPricingUi(){
+  renderServices();
+  renderSelects();
+  updateDynamicLabels();
+  recalculate();
+  updateChecklistUi();
+}
+
+function applyPricingRow(row){
+  if(!row?.key||!row.value||typeof row.value!=='object'||row.is_public===false)return false;
+  cfg={...cfg,[row.key]:row.value};
+  if(row.key==='window_settings'&&!cfg.window_settings?.contract_reduction_pct){
+    cfg.window_settings={...cfg.window_settings,contract_reduction_pct:{...(cfg.contract_settings?.base_reduction_pct||FALLBACK.window_settings.contract_reduction_pct)}};
+  }
+  return true;
+}
+
 async function loadRemote(){
   const pricingPromise=supabase.from('pricing_config').select('key,value').eq('is_public',true);
   const checklistPromise=supabase.from('frankiflow_checklists').select('service_key,label_de,label_en,sections');
   const [pricing,checklists]=await Promise.allSettled([pricingPromise,checklistPromise]);
-  if(pricing.status==='fulfilled'&&!pricing.value.error&&pricing.value.data?.length){const next=clone(FALLBACK);for(const row of pricing.value.data){if(row?.key&&row.value&&typeof row.value==='object')next[row.key]=row.value;}if(!next.window_settings?.contract_reduction_pct)next.window_settings={...next.window_settings,contract_reduction_pct:{...(next.contract_settings?.base_reduction_pct||FALLBACK.window_settings.contract_reduction_pct)}};cfg=next;}
+  if(pricing.status==='fulfilled'&&!pricing.value.error&&pricing.value.data?.length){
+    cfg=clone(FALLBACK);
+    for(const row of pricing.value.data)applyPricingRow({...row,is_public:true});
+  }
   if(checklists.status==='fulfilled'&&!checklists.value.error&&checklists.value.data?.length)applyChecklistRows(checklists.value.data);
-  renderServices();renderSelects();updateDynamicLabels();recalculate();updateChecklistUi();
+  refreshPricingUi();
 }
 
 function bind(){
@@ -452,4 +472,11 @@ function bind(){
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('#quoteRequestModal')?.classList.contains('hidden'))closeServiceRequest();});
 }
 
-cfg=clone(FALLBACK);renderServices();renderSelects();updateDynamicLabels();syncMobilePriceBarLanguage();applyLanguage();bind();await detectAdmin();recalculate();updateChecklistUi();void loadRemote();
+cfg=clone(FALLBACK);renderServices();renderSelects();updateDynamicLabels();syncMobilePriceBarLanguage();applyLanguage();bind();await detectAdmin();recalculate();updateChecklistUi();
+supabase.channel('frankiflow-calculator-pricing')
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'pricing_config'},payload=>{
+    if(applyPricingRow(payload?.new))refreshPricingUi();
+  })
+  .subscribe();
+window.addEventListener('focus',()=>{void loadRemote()});
+void loadRemote();
