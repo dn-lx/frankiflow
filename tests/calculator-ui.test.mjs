@@ -252,3 +252,12 @@ test('active pricing fallbacks use the current 20 percent promotion',()=>{
   assert.match(pricing,/first_month_discount_pct:20/);
   assert.match(calc,/first_month_discount_pct:20/);
 });
+
+
+test('Calculator numeric inputs default to zero',()=>{
+  const html=read('public/calculator/index.html');
+  assert.match(html,/id="areaSqm"[^>]*value="0"/);
+  assert.match(html,/id="windowSqm"[^>]*value="0"/);
+  assert.doesNotMatch(html,/id="areaSqm"[^>]*value="80"/);
+  assert.doesNotMatch(html,/id="windowSqm"[^>]*value="10"/);
+});
