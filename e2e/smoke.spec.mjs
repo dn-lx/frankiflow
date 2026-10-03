@@ -225,5 +225,5 @@ test('promotion fallback is consistent when backend is unavailable', async ({ pa
   expect(new Set(promoValues.map(x=>x.trim()))).toEqual(new Set(['20%']));
 
   await page.goto('/calculator/',{waitUntil:'domcontentloaded'});
-  await expect(page.locator('#promoHint')).toContainText('20%');
+  await expect(page.locator('#discountLabel')).toContainText('20%');
 });
