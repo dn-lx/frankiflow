@@ -12,7 +12,7 @@ Follow the root AGENTS.md branch and simplicity rules. Verify the current source
 - `public/` is the deployed site. There is no frontend build, Netlify Function, Stripe Checkout or integrated payment system in this repository.
 - `public/index.html` and `public/en/index.html` are the homepage entries; service and legal pages have their own HTML entries. Inspect their script tags before changing a similarly named legacy file.
 - `public/assets/app.js` imports `app-base.js`, then awaits enhancements, homepage refinements and about navigation in order. `admin.js` similarly layers `admin-base.js`, enhancements, logo settings, CMS and unified UI. Preserve these existing loading relationships.
-- `public/preisrechner/index.html` loads `calculator-app-v3.js` as its primary controller. Pricing arithmetic lives in `calculator-engine.js`; `calculator-mobile-island.js` supplies the mobile summary. Do not reconnect the obsolete calculator controllers merely because their files exist.
+- `public/calculator/index.html` loads `calculator-app-v3.js` as its primary controller. Pricing arithmetic lives in `calculator-engine.js`; `calculator-mobile-island.js` supplies the mobile summary. Do not reconnect the obsolete calculator controllers merely because their files exist.
 - `pricing.js` owns the shared Supabase client and pricing fallback; `site-i18n.js` extends `site-i18n-base.js`. Reuse them when applicable.
 
 ## Preserve behavior and boundaries
