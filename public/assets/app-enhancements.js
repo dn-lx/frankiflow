@@ -24,7 +24,7 @@ const fallbackManaged={
     {question_de:'Welche Reinigungsleistungen bietet FrankiFlow an?',answer_de:'Unter anderem Büroreinigung, Wohnungsreinigung, Airbnb- und Ferienwohnungsreinigung, Treppenhausreinigung, Grund- und Endreinigung sowie Objektbetreuung.',question_en:'Which Cleaning Services Does FrankiFlow Offer?',answer_en:'Services include Office Cleaning, Home Cleaning, Airbnb and Holiday-Rental Cleaning, Stairwell Cleaning, Deep/End-of-Tenancy Cleaning and Property Care.'},
     {question_de:'Kann die Büroreinigung außerhalb der Arbeitszeiten stattfinden?',answer_de:'Ja. Einsatzzeiten werden individuell abgestimmt, damit die Reinigung möglichst gut zu Ihrem Betriebsablauf passt.',question_en:'Can Office Cleaning Take Place Outside Working Hours?',answer_en:'Yes. Cleaning Times are agreed individually to fit your Business Operations as well as possible.'},
     {question_de:'Können Reinigungsmittel und Equipment gestellt werden?',answer_de:'Ja. Je nach Auftrag können Material und Equipment durch FrankiFlow gestellt oder vorhandene Mittel vor Ort genutzt werden. Die Vereinbarung wird vor Beginn klar festgehalten.',question_en:'Can Cleaning Supplies and Equipment Be Provided?',answer_en:'Yes. Depending on the Job, FrankiFlow can provide Supplies and Equipment or use suitable Materials already on site. This is agreed clearly before Work begins.'},
-    {question_de:'Wie erhalte ich ein konkretes Angebot?',answer_de:'Nutzen Sie den Calculator oder senden Sie eine Anfrage mit Objektart, Fläche, gewünschter Häufigkeit und Besonderheiten. Wir melden uns persönlich zur Abstimmung.',question_en:'How Do I Get a Specific Quote?',answer_en:'Use the Price Calculator or send an Enquiry with the Property Type, Area, preferred Frequency and any special Requirements. We will contact you personally to agree the Details.'}
+    {question_de:'Wie erhalte ich ein konkretes Angebot?',answer_de:'Nutzen Sie den Preisrechner oder senden Sie eine Anfrage mit Objektart, Fläche, gewünschter Häufigkeit und Besonderheiten. Wir melden uns persönlich zur Abstimmung.',question_en:'How Do I Get a Specific Quote?',answer_en:'Use the Price Calculator or send an Enquiry with the Property Type, Area, preferred Frequency and any special Requirements. We will contact you personally to agree the Details.'}
   ]
 };
 
@@ -112,7 +112,7 @@ function setupServiceCards(){
     const ctaText=(cta?.textContent||'').toLowerCase();
     if(cta&&(ctaText.includes('preis berechnen')||ctaText.includes('calculate price'))){
       cta.href='/calculator/';
-      cta.setAttribute('aria-label',tr('Calculator öffnen','Open Calculator'));
+      cta.setAttribute('aria-label',tr('Preisrechner öffnen','Open Calculator'));
     }else if(cta&&(ctaText.includes('anfragen')||ctaText.includes('request'))){
       cta.href=getLanguage()==='en'?'/en/#kontakt':'/#kontakt';
     }
