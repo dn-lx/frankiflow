@@ -70,8 +70,8 @@ for(const width of widths){
     if(width<=900){
       await expect(bar).toBeVisible();
       const barBox=await bar.boundingBox();
-      expect(barBox.left).toBeGreaterThanOrEqual(0);
-      expect(barBox.left+barBox.width).toBeLessThanOrEqual(width+1);
+      expect(barBox.x).toBeGreaterThanOrEqual(0);
+      expect(barBox.x+barBox.width).toBeLessThanOrEqual(width+1);
       await expect(page.locator('#mobileVisitPrice')).not.toHaveText('—');
       await expect(page.locator('#mobileMonthPrice')).not.toHaveText('—');
     }else{
