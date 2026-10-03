@@ -95,9 +95,9 @@ body{background:var(--v2-paper);color:var(--v2-ink)}
   color:var(--v2-teal)!important;
 }
 .hero h1{
-  max-width:760px!important;
+  max-width:700px!important;
   margin:20px 0 28px!important;
-  font-size:clamp(56px,6.35vw,88px)!important;
+  font-size:clamp(50px,5.4vw,74px)!important;
   line-height:.93!important;
   letter-spacing:-.067em!important;
   font-weight:850!important;
@@ -441,7 +441,7 @@ html.v2-motion-ready .v2-reveal[data-v2-delay="3"]{transition-delay:.18s}
 
 @media(max-width:1100px){
   .hero-grid{grid-template-columns:1fr .9fr!important;gap:54px!important}
-  .hero h1{font-size:clamp(52px,7.2vw,76px)!important}
+  .hero h1{font-size:clamp(48px,6.2vw,66px)!important}
   .modern-services .service-card,.modern-services .service-featured,.modern-services .service-dark{grid-column:span 6}
   .calculator-banner{padding:52px!important;gap:44px!important}
   .calculator-layout{grid-template-columns:minmax(0,1fr) 380px!important}
