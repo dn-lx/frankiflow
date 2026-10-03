@@ -87,7 +87,7 @@ test('public navigation aligns and matches across homepage and calculator', asyn
     await expect(header).toBeVisible();
 
     const productLabels=await header.locator('.nav-links a').allTextContents();
-    expect(productLabels.slice(-2)).toEqual(['CalcPura','FrankiHolz']);
+    expect(productLabels).toEqual(path==='/en/'?['Home','Services','About Us','Calculator','CalcPura','FrankiHolz','FAQ','Contact']:['Startseite','Leistungen','Über uns','Preisrechner','CalcPura','FrankiHolz','FAQ','Kontakt']);
     await expect(header.locator('.nav-actions a[href="/calculator/"]')).toHaveCount(0);
     await expect(header.locator('.calc-nav-price')).toHaveCount(0);
 
@@ -160,4 +160,23 @@ test('print media excludes the live Calculator and CalcPura CTA', async ({ page 
   await expect(page.locator('#printSheet')).toBeVisible();
   await expect(page.locator('.print-document')).toBeVisible();
   await expect(page.locator('.print-estimate-note')).toContainText('NON-BINDING ESTIMATE');
+});
+
+
+test('Homepage and Preisrechner share the same footer shell', async ({ page }) => {
+  const snapshots=[];
+  for (const path of ['/', '/calculator/']) {
+    await page.goto(path,{waitUntil:'domcontentloaded'});
+    const footer=page.locator('.site-footer');
+    await expect(footer).toBeVisible();
+    snapshots.push(await footer.evaluate(el=>({
+      className:el.className,
+      columns:[...el.querySelectorAll('.footer-grid > div > h4')].map(x=>x.textContent.trim()),
+      cta:el.querySelector('.footer-cta a')?.textContent.trim(),
+      region:el.querySelector('.footer-brand p')?.textContent.trim()
+    })));
+  }
+  expect(snapshots[1]).toEqual(snapshots[0]);
+  expect(snapshots[0].cta).toContain('Preisrechner');
+  expect(snapshots[0].region).toContain('Nürnberg');
 });
