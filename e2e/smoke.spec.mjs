@@ -14,7 +14,7 @@ test('price calculator shell renders without external writes', async ({ page }) 
   await page.goto('/calculator/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#calculatorForm')).toBeVisible();
   await expect(page.locator('#visitPrice')).toBeVisible();
-  await expect(page.getByRole('button', { name: /Angebot drucken|PDF/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Kostenschätzung|PDF/ })).toBeVisible();
 });
 
 
@@ -144,4 +144,20 @@ test('calculator presents CalcPura business CTA below the calculator', async ({ 
   const cta=page.locator('.calc-business-cta');
   await expect(cta).toBeVisible();
   await expect(cta.getByRole('link',{name:/CalcPura/i})).toHaveAttribute('href','https://calcpura.frankiflow.de/');
+});
+
+
+test('print media excludes the live Calculator and CalcPura CTA', async ({ page }) => {
+  await page.goto('/calculator/', { waitUntil: 'domcontentloaded' });
+  await page.locator('#printSheet').evaluate(sheet => {
+    sheet.setAttribute('aria-hidden','false');
+    sheet.innerHTML='<div class="print-document"><div class="print-estimate-note"><strong>NON-BINDING ESTIMATE</strong><p>Estimate only.</p></div></div>';
+  });
+  await page.emulateMedia({ media: 'print' });
+  await expect(page.locator('.site-header')).toBeHidden();
+  await expect(page.locator('body > main')).toBeHidden();
+  await expect(page.locator('.calc-business-cta')).toBeHidden();
+  await expect(page.locator('#printSheet')).toBeVisible();
+  await expect(page.locator('.print-document')).toBeVisible();
+  await expect(page.locator('.print-estimate-note')).toContainText('NON-BINDING ESTIMATE');
 });
