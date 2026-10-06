@@ -22,7 +22,7 @@ test('Homepage and Calculator mount one shared public navigation',()=>{
 });
 
 test('calculator page loads exactly one primary controller',()=>{const html=read('public/calculator/index.html');assert.match(html,/calculator-app-v3\.js\?v=/);assert.doesNotMatch(html,/calculator\.js\?v=/);assert.doesNotMatch(html,/calculator-runtime-fix\.js\?v=/);assert.equal((html.match(/createClient/g)||[]).length,0)});
-test('calculator controller wires print, contact and checklist buttons',()=>{const js=read('public/assets/calculator-app-v3.js'),html=read('public/calculator/index.html');for(const id of ['printQuote','requestService','viewChecklist','quoteRequestModal','checklistPreview'])assert.match(html,new RegExp(`id="${id}"`));assert.match(js,/addEventListener\('click',\(\)=>printDoc\('quote'\)\)/);assert.match(js,/addEventListener\('click',openServiceRequest\)/);assert.match(js,/addEventListener\('click',toggleChecklist\)/)});
+test('calculator controller wires print, contact and checklist buttons',()=>{const js=read('public/assets/calculator-app-v3.js'),html=read('public/calculator/index.html');for(const id of ['printQuote','requestService','viewChecklist','quoteRequestModal','checklistPreview'])assert.match(html,new RegExp(`id="${id}"`));assert.match(js,/estimate_print_started/);assert.match(js,/printDoc\('quote'\)/);assert.match(js,/addEventListener\('click',openServiceRequest\)/);assert.match(js,/addEventListener\('click',toggleChecklist\)/)});
 test('contact with quotation sends admin and customer email events',()=>{const js=read('public/assets/calculator-app-v3.js');assert.match(js,/event_type:'admin_enquiry'/);assert.match(js,/attach_quote:true/);assert.match(js,/event_type:'enquiry_received'/);assert.match(js,/frankiflow_quote_requests/)});
 test('print includes logo, organisation and founder',()=>{const js=read('public/assets/calculator-app-v3.js');assert.match(js,/frankiflow-full-transparent-1024\.png/);assert.match(js,/FrankiFlow Gebäudereinigung &amp; Objektbetreuung/);assert.match(js,/Inura Devasurendra/);assert.doesNotMatch(js,/FrankiFlow Unternehmensdaten/);assert.match(js,/await waitForImages\(sheet\)/)});
 test('admin exposes editable window contract reductions',()=>{assert.match(read('public/admin/index.html'),/id="windowContractGrid"/);const js=read('public/assets/admin-base.js');assert.match(js,/data-window-contract/);assert.match(js,/contract_reduction_pct:windowReductions/)});
@@ -327,6 +327,7 @@ test('custom analytics events carry only allowlisted non-PII context',()=>{
   assert.match(calc,/estimate_pdf_downloaded/);
   assert.match(calc,/estimate_print_started/);
   assert.match(calc,/estimate_request_opened/);
-  assert.doesNotMatch(base,/frankiflowAnalytics\?\.capture\([^\n]*customer_email/);
-  assert.doesNotMatch(calc,/frankiflowAnalytics\?\.capture\([^\n]*requestEmail/);
+  assert.match(base,/capture\('enquiry_submitted',\{source:'homepage',service_key:payload\.service_key,language:getLanguage\(\)\}\)/);
+  assert.match(calc,/capture\('enquiry_submitted',\{source:'calculator',service_key:calc\.serviceKey,language:lang\}\)/);
+  assert.doesNotMatch(analytics,/customer_email|customer_phone|customer_name|message|address/i);
 });
