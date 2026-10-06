@@ -17,6 +17,7 @@ on:
       - "public/impressum/index.html"
       - "public/datenschutz/index.html"
       - "public/assets/app-base.js"
+      - "public/assets/app-enhancements.js"
       - "public/assets/posthog.js"
       - "public/index.html"
       - "public/en/index.html"
