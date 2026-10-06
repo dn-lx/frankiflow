@@ -125,8 +125,13 @@ a.company-data-item:hover strong{color:#79ddd6}
 .contact-form .check{align-items:flex-start!important}
 .contact-form .check input[type="checkbox"]{
   width:14px!important;
-  height:14px;
+  min-width:14px!important;
+  max-width:14px!important;
+  height:14px!important;
+  min-height:14px!important;
+  max-height:14px!important;
   flex:0 0 14px;
+  align-self:flex-start;
   margin:1px 0 0!important;
   padding:0!important;
 }
