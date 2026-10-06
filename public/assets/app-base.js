@@ -96,7 +96,7 @@ async function submitQuote(e){
     supabase.functions.invoke('frankiflow-email',{body:{event_type:'admin_enquiry',...emailBody,attach_quote:false,quote_snapshot:{service_label:form.querySelector('[name=service_key] option:checked')?.textContent||payload.service_key}}}),
     supabase.functions.invoke('frankiflow-email',{body:{event_type:'enquiry_received',...emailBody}})
   ]);
-  form.reset();notice.textContent=tr('Vielen Dank! Ihre Anfrage ist eingegangen. Wir melden uns persönlich bei Ihnen.','Thank you! We received your enquiry and will contact you personally.');notice.className='notice';
+  window.frankiflowAnalytics?.capture('enquiry_submitted',{source:'homepage',service_key:payload.service_key,language:getLanguage()});form.reset();notice.textContent=tr('Vielen Dank! Ihre Anfrage ist eingegangen. Wir melden uns persönlich bei Ihnen.','Thank you! We received your enquiry and will contact you personally.');notice.className='notice';
 }
 function bindUI(){$('#quoteForm')?.addEventListener('submit',submitQuote)}
 
