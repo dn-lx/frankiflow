@@ -347,7 +347,7 @@
 /* Persistent shell geometry — controlled by Admin/Supabase values. */
 :root{
   --ff-header-logo-width:135px;
-  --ff-header-height:100px;
+  --ff-header-height:135px;
 }
 .site-header{
   height:var(--ff-header-height)!important;
@@ -368,7 +368,7 @@
 .site-header .brand img{
   width:var(--ff-header-logo-width)!important;
   height:auto!important;
-  max-height:calc(var(--ff-header-height) - 16px)!important;
+  max-height:var(--ff-header-height)!important;
   object-fit:contain!important;
   object-position:left center!important;
 }
@@ -400,7 +400,7 @@
   .site-header .brand img{
     width:min(var(--ff-header-logo-width),160px)!important;
     height:auto!important;
-    max-height:calc(var(--ff-header-height) - 16px)!important;
+    max-height:var(--ff-header-height)!important;
   }
 }
 @media(max-width:430px){
@@ -415,7 +415,7 @@
   .site-header .brand img{
     width:min(var(--ff-header-logo-width),136px)!important;
     height:auto!important;
-    max-height:calc(var(--ff-header-height) - 14px)!important;
+    max-height:var(--ff-header-height)!important;
   }
   .site-footer .footer-brand .brand,
   .site-footer .footer-brand .brand img{
