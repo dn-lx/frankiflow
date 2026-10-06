@@ -1,26 +1,18 @@
-const TOKEN='phc_xuY964YyWsLwaeQYJGBXtRqYvtvkmDaMLUTqazhuHRU3';
-const API_HOST='https://us.i.posthog.com';
+import { FRANKIFLOW_CONFIG } from './config.js';
 
-const hostname=location.hostname.toLowerCase();
-const environment=
-  hostname==='frankiflow.de'||hostname==='www.frankiflow.de'?'production':
-  hostname.startsWith('develop--')||hostname==='frankiflow.shipstatic.com'?'development':
-  hostname.startsWith('v2--')?'v2-preview':
-  hostname==='localhost'||hostname==='127.0.0.1'?'local':'preview';
-
-const allowedEvents=new Map([
+const endpoint=`${FRANKIFLOW_CONFIG.supabaseUrl}/functions/v1/frankiflow-analytics`;
+const distinctId=crypto.randomUUID();
+const customEvents=new Map([
   ['enquiry_submitted',new Set(['source','service_key','language'])],
   ['estimate_pdf_downloaded',new Set(['service_key','language'])],
   ['estimate_print_started',new Set(['service_key','language'])],
   ['estimate_request_opened',new Set(['service_key','language'])],
 ]);
 
-const queued=[];
-
-function cleanProperties(event,properties={}){
-  const allowed=allowedEvents.get(event);
+function clean(event,properties={}){
+  const allowed=customEvents.get(event);
   if(!allowed)return {};
-  const out={environment,app:'frankiflow'};
+  const out={};
   for(const key of allowed){
     const value=properties[key];
     if(['string','number','boolean'].includes(typeof value))out[key]=value;
@@ -28,45 +20,45 @@ function cleanProperties(event,properties={}){
   return out;
 }
 
-function capture(event,properties={}){
-  if(!allowedEvents.has(event))return;
-  const payload=cleanProperties(event,properties);
-  if(window.posthog?.capture){
-    window.posthog.capture(event,payload);
-    return;
-  }
-  queued.push([event,payload]);
-}
-
-window.frankiflowAnalytics=Object.freeze({capture,environment});
-
-function loadPostHog(){
-  if(window.__frankiflowPostHogLoading||window.posthog?.__loaded)return;
-  window.__frankiflowPostHogLoading=true;
-  const script=document.createElement('script');
-  script.async=true;
-  script.src=API_HOST+'/static/1/array.js';
-  script.crossOrigin='anonymous';
-  script.onload=()=>{
-    if(!window.posthog?.init)return;
-    window.posthog.init(TOKEN,{
-      api_host:API_HOST,
-      defaults:'2026-05-30',
-      autocapture:false,
-      capture_pageview:'history_change',
-      capture_pageleave:false,
-      disable_session_recording:true,
-      persistence:'memory',
-      person_profiles:'never',
-      advanced_disable_flags:true,
-      loaded:posthog=>{
-        posthog.register({environment,app:'frankiflow'});
-        for(const [event,payload] of queued.splice(0))posthog.capture(event,payload);
-      },
-    });
+async function send(event,properties={}){
+  if(event!=='$pageview'&&!customEvents.has(event))return;
+  const payload={
+    event,
+    distinct_id:distinctId,
+    pathname:location.pathname,
+    properties:event==='$pageview'?{}:clean(event,properties)
   };
-  script.onerror=()=>{window.__frankiflowPostHogLoading=false;};
-  document.head.append(script);
+  try{
+    await fetch(endpoint,{
+      method:'POST',
+      keepalive:true,
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':FRANKIFLOW_CONFIG.supabasePublishableKey
+      },
+      body:JSON.stringify(payload)
+    });
+  }catch{
+    // Analytics must never block or alter the customer flow.
+  }
 }
 
-loadPostHog();
+function capture(event,properties={}){void send(event,properties)}
+function pageview(){void send('$pageview')}
+
+window.frankiflowAnalytics=Object.freeze({capture});
+pageview();
+
+const originalPush=history.pushState.bind(history);
+history.pushState=(...args)=>{
+  const value=originalPush(...args);
+  queueMicrotask(pageview);
+  return value;
+};
+const originalReplace=history.replaceState.bind(history);
+history.replaceState=(...args)=>{
+  const value=originalReplace(...args);
+  queueMicrotask(pageview);
+  return value;
+};
+window.addEventListener('popstate',()=>queueMicrotask(pageview));
