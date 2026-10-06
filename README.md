@@ -7,7 +7,7 @@ Production source for **FrankiFlow Gebäudereinigung & Objektbetreuung**.
 - Production: https://frankiflow.de
 - Frontend: static files in `public/`
 - Backend/data: Supabase
-- Main public calculator: `/preisrechner/`
+- Main public Calculator: `/calculator/`
 - Admin: `/admin/`
 
 FrankiFlow does **not** use Stripe Checkout, an integrated payment system, or Netlify Functions. Customer payments are handled outside this website.

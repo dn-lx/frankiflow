@@ -1,0 +1,424 @@
+/* Shared FrankiFlow public header — homepage and Calculator use this exact component. */
+.site-header{
+  position:sticky;
+  top:0;
+  z-index:60;
+  overflow:visible;
+  background:rgba(251,252,251,.9);
+  border-bottom:1px solid rgba(7,29,47,.07);
+  backdrop-filter:blur(20px);
+}
+.site-header .nav{
+  min-height:78px;
+  display:grid;
+  grid-template-columns:minmax(170px,1fr) auto minmax(170px,1fr);
+  align-items:center;
+  gap:24px;
+  position:relative;
+}
+.site-header .brand{
+  justify-self:start;
+  width:190px;
+  height:auto;
+  display:flex;
+  align-items:center;
+  overflow:visible;
+}
+.site-header .brand img{
+  width:100%;
+  height:auto;
+  display:block;
+  object-fit:contain;
+}
+.site-header .nav-links{
+  justify-self:center;
+  display:flex;
+  align-items:center;
+  gap:20px;
+  font-size:13px;
+  font-weight:750;
+  white-space:nowrap;
+}
+.site-header .nav-links a{
+  position:relative;
+  color:#405a69;
+  text-decoration:none;
+}
+.site-header .nav-links a:hover,
+.site-header .nav-links a.is-active{color:#087f79}
+.site-header .nav-links a.is-active::before{
+  content:"";
+  position:absolute;
+  left:0;right:0;bottom:-10px;
+  height:2px;
+  border-radius:999px;
+  background:#0aa39a;
+}
+.site-header .nav-actions{
+  justify-self:end;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.site-header .language-switch{
+  display:flex;
+  align-items:center;
+  padding:3px;
+  border:1px solid rgba(7,29,47,.07);
+  border-radius:11px;
+  background:#eef4f4;
+}
+.site-header .language-switch button{
+  min-width:34px;
+  min-height:34px;
+  padding:5px 7px;
+  border:0;
+  border-radius:8px;
+  background:transparent;
+  color:#617381;
+  font-size:11px;
+  font-weight:850;
+  cursor:pointer;
+}
+.site-header .language-switch button.active{
+  background:#fff;
+  color:#071d2f;
+  box-shadow:0 2px 8px rgba(5,32,55,.08);
+}
+.site-header .nav-whatsapp{
+  width:40px;
+  height:40px;
+  min-width:40px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  font-size:0;
+}
+.site-header .nav-whatsapp::before{
+  content:"";
+  width:19px;
+  height:19px;
+  flex:0 0 19px;
+  background:url('/assets/whatsapp.svg') center/contain no-repeat;
+  margin:0!important;
+}
+.site-header .nav-whatsapp:hover{background:rgba(37,211,102,.08)}
+.site-header .menu-btn{
+  display:none;
+  width:44px;
+  height:44px;
+  padding:0;
+  border:1px solid #d8e3e5;
+  border-radius:12px;
+  background:#fff;
+  color:#071d2f;
+  font-size:18px;
+  cursor:pointer;
+}
+.site-header .nav-product{position:relative}
+.site-header .nav-product::after{
+  content:attr(data-nav-tooltip);
+  position:absolute;
+  left:50%;
+  top:calc(100% + 13px);
+  transform:translate(-50%,-4px);
+  width:max-content;
+  max-width:240px;
+  padding:9px 11px;
+  border-radius:10px;
+  background:#071d2f;
+  color:#fff;
+  font-size:11px;
+  font-weight:650;
+  line-height:1.4;
+  white-space:normal;
+  text-align:center;
+  box-shadow:0 12px 30px rgba(11,33,52,.18);
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  z-index:100;
+  transition:opacity .16s ease,transform .16s ease,visibility .16s ease;
+}
+.site-header .nav-product:hover::after,
+.site-header .nav-product:focus-visible::after{
+  opacity:1;
+  visibility:visible;
+  transform:translate(-50%,0);
+}
+
+@media(max-width:1120px){
+  .site-header .nav{
+    display:flex;
+    min-height:76px;
+  }
+  .site-header .brand{
+    width:min(170px,40vw);
+    flex:0 0 auto;
+  }
+  .site-header .nav-links{display:none}
+  .site-header .menu-btn{
+    display:grid;
+    place-items:center;
+    flex:0 0 44px;
+  }
+  .site-header .nav-actions{
+    margin-left:auto;
+    gap:7px;
+  }
+  .site-header .nav-whatsapp{display:none}
+  .site-header .nav-links.open{
+    position:absolute;
+    display:flex;
+    left:0;
+    right:0;
+    top:100%;
+    max-height:calc(100dvh - 76px);
+    overflow:auto;
+    overscroll-behavior:contain;
+    flex-direction:column;
+    align-items:stretch;
+    gap:0;
+    padding:10px;
+    border:1px solid #dce6e7;
+    border-top:0;
+    border-radius:0 0 18px 18px;
+    background:#fff;
+    box-shadow:0 18px 40px rgba(7,29,47,.12);
+  }
+  .site-header .nav-links.open a{
+    min-height:46px;
+    display:flex;
+    align-items:center;
+    padding:10px 12px;
+    border-radius:10px;
+  }
+  .site-header .nav-links.open a.is-active{background:#eef8f6}
+  .site-header .nav-links.open a::before{display:none}
+  .site-header .nav-links.open .nav-product{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:center;
+  }
+  .site-header .nav-links.open .nav-product::after{
+    position:static;
+    transform:none;
+    opacity:1;
+    visibility:visible;
+    background:transparent;
+    color:#7a8d9a;
+    box-shadow:none;
+    padding:2px 0 0;
+    max-width:280px;
+    text-align:left;
+    font-size:10px;
+  }
+}
+
+@media(max-width:430px){
+  .site-header .nav{gap:6px}
+  .site-header .brand{width:min(136px,39vw)}
+  .site-header .language-switch button{
+    min-width:32px;
+    padding-left:5px;
+    padding-right:5px;
+  }
+}
+
+
+@media print{.site-header{display:none!important}}
+
+
+/* Shared FrankiFlow public footer */
+.site-footer{
+  padding:58px 0 30px;
+  background:#061a2a;
+  color:#dbe4e8;
+  border-top:0;
+}
+.site-footer .container{
+  width:min(1240px,calc(100% - 48px));
+  margin:0 auto;
+}
+.site-footer .footer-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:30px;
+  padding-bottom:30px;
+  border-bottom:1px solid rgba(255,255,255,.16);
+}
+.site-footer .footer-brand .brand{
+  display:block;
+  width:180px;
+}
+.site-footer .footer-brand .brand img{
+  display:block;
+  width:100%;
+  height:auto;
+  background:transparent;
+  object-fit:contain;
+  object-position:left center;
+}
+.site-footer .footer-brand p{
+  margin:12px 0 0;
+  color:#aebfc7;
+  font-size:13px;
+  line-height:1.55;
+}
+.site-footer .footer-cta{text-align:right}
+.site-footer .footer-cta span{
+  display:block;
+  color:#fff;
+  font-size:11px;
+}
+.site-footer .footer-cta a{
+  color:#73d8d0;
+  font-size:15px;
+  font-weight:850;
+  text-decoration:none;
+}
+.site-footer .footer-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:42px;
+  padding:34px 0;
+}
+.site-footer .footer-grid h4{
+  margin:0 0 12px;
+  color:#fff;
+  font-size:13px;
+}
+.site-footer .footer-links{
+  display:grid;
+  gap:8px;
+}
+.site-footer .footer-links a{
+  color:#aebfc7;
+  font-size:13px;
+  text-decoration:none;
+}
+.site-footer .footer-links a:hover{color:#73d8d0}
+.site-footer .footer-company-id{color:#8496a4;font-size:11px;line-height:1.45}
+.site-footer .footer-links [data-whatsapp]::before{
+  content:"";
+  display:inline-block;
+  width:14px;
+  height:14px;
+  vertical-align:-2px;
+  margin-right:7px;
+  background:url('/assets/whatsapp.svg') center/contain no-repeat;
+}
+.site-footer .copyright{
+  display:flex;
+  justify-content:space-between;
+  gap:18px;
+  padding-top:22px;
+  border-top:1px solid rgba(255,255,255,.16);
+  color:#8496a4;
+  font-size:11px;
+}
+
+@media(max-width:1020px){
+  .site-footer .container{width:min(100% - 36px,1240px)}
+  .site-footer .footer-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:680px){
+  .site-footer{padding:54px 0 28px}
+  .site-footer .container{width:min(100% - 24px,1240px)}
+  .site-footer .footer-top{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .site-footer .footer-cta{text-align:left}
+  .site-footer .footer-grid{grid-template-columns:1fr}
+  .site-footer .copyright{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+}
+@media print{
+  .site-footer{display:none!important}
+}
+
+
+/* Persistent shell geometry lock */
+:root{
+  --ff-header-logo-width:190px!important;
+  --ff-header-height:152px!important;
+}
+.site-header{
+  height:152px!important;
+  min-height:152px!important;
+}
+.site-header .nav{
+  height:152px!important;
+  min-height:152px!important;
+  padding:0!important;
+}
+.site-header .brand{
+  width:190px!important;
+  height:144px!important;
+  display:flex!important;
+  align-items:center!important;
+}
+.site-header .brand img{
+  width:144px!important;
+  height:144px!important;
+  max-height:144px!important;
+  object-fit:contain!important;
+  object-position:left center!important;
+}
+.site-footer .footer-brand .brand{
+  width:150px!important;
+  height:150px!important;
+  display:block!important;
+}
+.site-footer .footer-brand .brand img{
+  width:150px!important;
+  height:150px!important;
+  max-height:none!important;
+  aspect-ratio:1 / 1!important;
+  object-fit:contain!important;
+  object-position:center!important;
+}
+
+[data-shell-content][hidden]{display:none!important}
+
+@media(max-width:1120px){
+  .site-header,.site-header .nav{
+    height:138px!important;
+    min-height:138px!important;
+  }
+  .site-header .brand{
+    width:160px!important;
+    height:131px!important;
+  }
+  .site-header .brand img{
+    width:131px!important;
+    height:131px!important;
+    max-height:131px!important;
+  }
+}
+@media(max-width:430px){
+  .site-header,.site-header .nav{
+    height:126px!important;
+    min-height:126px!important;
+  }
+  .site-header .brand{
+    width:136px!important;
+    height:117px!important;
+  }
+  .site-header .brand img{
+    width:117px!important;
+    height:117px!important;
+    max-height:117px!important;
+  }
+  .site-footer .footer-brand .brand,
+  .site-footer .footer-brand .brand img{
+    width:140px!important;
+    height:140px!important;
+  }
+}

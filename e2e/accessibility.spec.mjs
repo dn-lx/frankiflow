@@ -4,7 +4,7 @@ import { blockExternalNetwork } from './helpers.mjs';
 
 const pages = [
   ['homepage', '/'],
-  ['calculator', '/preisrechner/']
+  ['calculator', '/calculator/']
 ];
 
 for (const [name, path] of pages) {

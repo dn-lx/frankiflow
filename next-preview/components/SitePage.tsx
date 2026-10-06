@@ -182,7 +182,7 @@ export default function SitePage({ lang }: { lang: Lang }) {
               <span>·</span>
               <a className={!isDe ? "active" : ""} href="/en/">EN</a>
             </div>
-            <a className="nav-cta" href="https://frankiflow.de/preisrechner/">
+            <a className="nav-cta" href="https://frankiflow.de/calculator/">
               {t.hero.primary} <Arrow />
             </a>
           </div>
@@ -204,7 +204,7 @@ export default function SitePage({ lang }: { lang: Lang }) {
             </h1>
             <p className="hero-body">{t.hero.body}</p>
             <div className="hero-actions">
-              <a className="button button-primary" href="https://frankiflow.de/preisrechner/">
+              <a className="button button-primary" href="https://frankiflow.de/calculator/">
                 {t.hero.primary} <Arrow />
               </a>
               <a className="button button-secondary" href="#contact">
@@ -235,7 +235,7 @@ export default function SitePage({ lang }: { lang: Lang }) {
                   </div>
                 ))}
               </div>
-              <a href="https://frankiflow.de/preisrechner/">
+              <a href="https://frankiflow.de/calculator/">
                 {t.panel.cta} <Arrow />
               </a>
               <small>{t.panel.note}</small>
@@ -275,7 +275,7 @@ export default function SitePage({ lang }: { lang: Lang }) {
                 </div>
                 <h3>{title}</h3>
                 <p>{body}</p>
-                <a href="https://frankiflow.de/preisrechner/">
+                <a href="https://frankiflow.de/calculator/">
                   {isDe ? "Preis berechnen" : "Calculate price"} <Arrow />
                 </a>
               </article>
@@ -362,7 +362,7 @@ export default function SitePage({ lang }: { lang: Lang }) {
             <p>{t.contact.body}</p>
           </div>
           <div className="contact-actions">
-            <a className="button button-white" href="https://frankiflow.de/preisrechner/">{t.contact.calc} <Arrow /></a>
+            <a className="button button-white" href="https://frankiflow.de/calculator/">{t.contact.calc} <Arrow /></a>
             <a className="button button-outline-light" href="mailto:info@frankiflow.de">{t.contact.mail}</a>
           </div>
           <div className="contact-meta">

@@ -2,7 +2,7 @@ module.exports = {
   ci: {
     collect: {
       staticDistDir: './public',
-      url: ['http://localhost/', 'http://localhost/preisrechner/'],
+      url: ['http://localhost/', 'http://localhost/calculator/'],
       numberOfRuns: 1,
       settings: { chromeFlags: '--headless --no-sandbox' }
     },

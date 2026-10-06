@@ -26,15 +26,15 @@ const state=serviceKey=>({
   newCustomer:false,deep:false,equipment:false,vat:false,windows:false,windowArea:0
 });
 
-test('service-specific gradients override the legacy global gradient',()=>{
-  assert.equal(calculatePricing(cfg,state('buero')).visitTotal,37.6);
-  assert.equal(calculatePricing(cfg,state('wohnung')).visitTotal,95.6);
-  assert.equal(calculatePricing(cfg,state('airbnb')).visitTotal,105.4);
-  assert.equal(calculatePricing(cfg,state('treppenhaus')).visitTotal,44);
+test('live production pricing ignores service-specific gradients and uses the shared gradient',()=>{
+  assert.equal(calculatePricing(cfg,state('buero')).visitTotal,42.43);
+  assert.equal(calculatePricing(cfg,state('wohnung')).visitTotal,48.43);
+  assert.equal(calculatePricing(cfg,state('airbnb')).visitTotal,53.43);
+  assert.equal(calculatePricing(cfg,state('treppenhaus')).visitTotal,42.43);
 });
 
-test('legacy services still fall back to the global gradient',()=>{
-  const legacy=structuredClone(cfg);
-  delete legacy.service_settings.services.buero.gradient_per_sqm;
-  assert.equal(calculatePricing(legacy,state('buero')).visitTotal,42.43);
+test('live production pricing uses base_1m rather than calibrated service bases',()=>{
+  const withCalibration=structuredClone(cfg);
+  withCalibration.service_settings.services.buero.calibrated_base_1m=999;
+  assert.equal(calculatePricing(withCalibration,state('buero')).visitTotal,42.43);
 });
