@@ -210,6 +210,18 @@ test('German public UI uses Preisrechner while English keeps Calculator',()=>{
 });
 
 
+test('public header uses Admin-controlled compact geometry without square logo forcing',()=>{
+  const css=read('public/assets/shared-site-header.css');
+  const settings=read('public/assets/header-logo-settings.js');
+  assert.match(css,/height:var\(--ff-header-height\)!important/);
+  assert.match(css,/width:var\(--ff-header-logo-width\)!important/);
+  assert.match(css,/height:auto!important/);
+  assert.doesNotMatch(css,/height:152px!important/);
+  assert.doesNotMatch(css,/width:144px!important/);
+  assert.match(settings,/DEFAULT_WIDTH=90/);
+  assert.match(settings,/DEFAULT_HEADER_HEIGHT=100/);
+});
+
 test('Home and Preisrechner content live inside a persistent shell',()=>{
   const router=read('public/assets/shared-shell-router.js');
   for(const p of ['public/index.html','public/en/index.html','public/calculator/index.html']){
