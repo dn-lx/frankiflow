@@ -465,6 +465,9 @@ html.v2-motion-ready .v2-reveal[data-v2-delay="3"]{transition-delay:.18s}
 }
 
 @media(max-width:680px){
+  /* Mobile: the top sticky live-price bar duplicates the bottom price island. */
+  .mobile-price-bar{display:none!important}
+
   html{scroll-padding-top:78px}
   .container,.calc-container{width:min(100% - 24px,1240px)}
   .site-header .nav,.calc-site-header .nav{min-height:72px!important}
