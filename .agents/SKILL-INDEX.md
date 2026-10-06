@@ -14,12 +14,15 @@ Load this file only when the correct specialist path is not already obvious. Do 
 | Context/token reduction | `memory-context` |
 | Non-trivial delivery plan | `implementation-planning` |
 | Test harness/fixtures/regression coverage | `test-engineering` |
-| Focused UI bug: contrast/alignment/overflow/clipping/responsive | `frontend-verification` |\n| Broad mobile/responsive breakpoint audit | `responsive-ui-audit` + `frontend-verification` |
+| Focused UI bug: contrast/alignment/overflow/clipping/responsive | `frontend-verification` |
+| Broad mobile/responsive breakpoint audit | `responsive-ui-audit` + `frontend-verification` |
 | Major design/redesign/UX direction | `design-stack` |
 | Runtime animation beyond CSS | `motion-runtime` |
 | Accessibility/screenshot regression | `accessibility-visual-regression` |
 | Performance regression/budget | `performance-budget` |
 | Analytics/events/flags | `analytics-contract` |
+| PostHog analytics verification / flags / release evidence | `posthog-analytics` + `analytics-contract` |
+| Current public-web research / site map / crawl | `firecrawl-research` |
 | Auth/secrets/privacy/trust boundaries | `security-boundary-review` |
 | Risk-based checks | `quality-gates` |
 | Production readiness | `release-readiness` |
