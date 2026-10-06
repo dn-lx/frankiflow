@@ -39,8 +39,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
       - name: Install dependencies
@@ -106,14 +106,14 @@ jobs:
           EOF
           node capture.mjs
       - name: Upload screenshots
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: frankiflow-frontend-preview-${{ github.run_id }}
           path: visual-preview/*.png
           retention-days: 7
 
       - name: Upload deploy bundle
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: frankiflow-v2-site-${{ github.run_id }}
           path: public/
