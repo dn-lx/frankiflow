@@ -11,6 +11,6 @@ Use this skill before opening or reviewing a `develop` to `main` release PR. Fol
 2. Review the complete release diff for unrelated or unfinished work.
 3. Confirm required syntax, unit, browser, accessibility, security and dependency checks passed.
 4. Review migrations, environment variables, redirects, headers and external-service changes.
-5. Confirm Sentry release tagging and the relevant PostHog verification events are ready when those services are connected.
+5. Confirm Sentry release tagging and the relevant PostHog verification events are ready when those services are connected. Use Firecrawl for a bounded public-route/content crawl and TinyFish/Playwright for interactive browser verification.
 6. Record the rollback path and any irreversible data operation.
 7. Report exact evidence and unresolved risks; do not mark the release ready on assumptions.
