@@ -28,7 +28,7 @@ export function normalizeHeaderHeight(value){
 
 export function headerHeightForLogoWidth(value){
   const width=normalizeHeaderLogoWidth(value);
-  return Math.min(MAX_HEADER_HEIGHT,Math.max(MIN_HEADER_HEIGHT,Math.round(width*.42+20)));
+  return Math.min(MAX_HEADER_HEIGHT,Math.max(MIN_HEADER_HEIGHT,width));
 }
 
 export function effectiveHeaderHeight(widthValue,heightValue){
