@@ -1,6 +1,7 @@
 import { FRANKIFLOW_CONFIG } from './config.js';
 
 const DEFAULT_WIDTH=90;
+const PUBLIC_LOGO_SCALE=1.5;
 const MIN_WIDTH=90;
 const MAX_WIDTH=250;
 const DEFAULT_HEADER_HEIGHT=100;
@@ -11,6 +12,12 @@ export function normalizeHeaderLogoWidth(value){
   const parsed=Number(value);
   if(!Number.isFinite(parsed))return DEFAULT_WIDTH;
   return Math.min(MAX_WIDTH,Math.max(MIN_WIDTH,Math.round(parsed)));
+}
+
+function publicHeaderLogoWidth(value=DEFAULT_WIDTH){
+  const parsed=Number(value);
+  const baseWidth=Number.isFinite(parsed)?parsed:DEFAULT_WIDTH;
+  return normalizeHeaderLogoWidth(baseWidth*PUBLIC_LOGO_SCALE);
 }
 
 export function normalizeHeaderHeight(value){
@@ -46,14 +53,14 @@ export async function loadHeaderLogoWidth(){
   const query=new URLSearchParams({id:'eq.1',select:'header_logo_width_px,header_height_px',limit:'1'});
   try{
     const response=await fetch(`${base}/rest/v1/frankiflow_site_settings?${query.toString()}`,{headers:{apikey:FRANKIFLOW_CONFIG.supabasePublishableKey,Authorization:`Bearer ${FRANKIFLOW_CONFIG.supabasePublishableKey}`}});
-    if(!response.ok)return applyHeaderSettings(DEFAULT_WIDTH,DEFAULT_HEADER_HEIGHT).width;
+    if(!response.ok)return applyHeaderSettings(publicHeaderLogoWidth(DEFAULT_WIDTH),DEFAULT_HEADER_HEIGHT).width;
     const rows=await response.json();
-    const settings=applyHeaderSettings(rows?.[0]?.header_logo_width_px??DEFAULT_WIDTH,rows?.[0]?.header_height_px??DEFAULT_HEADER_HEIGHT);
+    const settings=applyHeaderSettings(publicHeaderLogoWidth(rows?.[0]?.header_logo_width_px??DEFAULT_WIDTH),rows?.[0]?.header_height_px??DEFAULT_HEADER_HEIGHT);
     return settings.width;
   }catch(error){
     console.warn('FrankiFlow header settings could not be loaded',error);
-    return applyHeaderSettings(DEFAULT_WIDTH,DEFAULT_HEADER_HEIGHT).width;
+    return applyHeaderSettings(publicHeaderLogoWidth(DEFAULT_WIDTH),DEFAULT_HEADER_HEIGHT).width;
   }
 }
 
-applyHeaderSettings(DEFAULT_WIDTH,DEFAULT_HEADER_HEIGHT);
+applyHeaderSettings(publicHeaderLogoWidth(DEFAULT_WIDTH),DEFAULT_HEADER_HEIGHT);
