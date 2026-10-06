@@ -98,7 +98,7 @@ function footerMarkup(lang){
         '<a href="tel:+4917662493041">+49 176 62493041</a>'+
         '<a data-mail href="mailto:info@frankiflow.de">info@frankiflow.de</a>'+
         '<a href="/impressum/">'+(en?'Legal notice':'Impressum')+'</a>'+
-        '<a href="/datenschutz/">'+(en?'Privacy':'Datenschutz')+'</a>'+
+        '<a href="/datenschutz/">'+(en?'Privacy':'Datenschutz')+'</a>'+'<span class="footer-company-id">'+(en?'Business no. 4323852':'Betriebsnummer 4323852')+'</span>'+
       '</div></div>'+
     '</div>'+
     '<div class="copyright"><span>'+(en?'© 2026 FrankiFlow. More than cleaning.':'© 2026 FrankiFlow. Mehr als Reinigung.')+'</span><span>'+(en?'Frankfurt · Nuremberg':'Frankfurt am Main · Nürnberg')+'</span></div>'+
