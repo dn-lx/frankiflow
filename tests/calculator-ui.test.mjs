@@ -288,18 +288,20 @@ test('PostHog runtime is privacy-minimized and non-authoritative',()=>{
   const analytics=read('public/assets/posthog.js');
   const netlify=read('netlify.toml');
   const privacy=read('public/datenschutz/index.html');
-  assert.match(analytics,/autocapture:false/);
-  assert.match(analytics,/disable_session_recording:true/);
-  assert.match(analytics,/persistence:'memory'/);
-  assert.match(analytics,/person_profiles:'never'/);
-  assert.match(analytics,/capture_pageview:'history_change'/);
-  assert.match(analytics,/allowedEvents=new Map/);
+  assert.match(analytics,/frankiflow-analytics/);
+  assert.match(analytics,/crypto\.randomUUID\(\)/);
+  assert.match(analytics,/customEvents=new Map/);
+  assert.match(analytics,/event==='\$pageview'/);
+  assert.match(analytics,/history\.pushState/);
+  assert.doesNotMatch(analytics,/phc_[A-Za-z0-9]+/);
+  assert.doesNotMatch(analytics,/localStorage|document\.cookie/);
   for(const forbidden of ['customer_name','customer_email','customer_phone','requestMessage','customerAddress']){
     assert.doesNotMatch(analytics,new RegExp(forbidden));
   }
-  assert.match(netlify,/https:\/\/us\.i\.posthog\.com/);
+  assert.doesNotMatch(netlify,/us\.i\.posthog\.com/);
   assert.match(privacy,/Nutzungsanalyse mit PostHog/);
-  assert.match(privacy,/Sitzungsaufzeichnungen sind deaktiviert/);
+  assert.match(privacy,/keine Analyse-Cookies/);
+  assert.match(privacy,/serverseitig an PostHog/);
 });
 
 test('enquiry success requires the admin notification email',()=>{
