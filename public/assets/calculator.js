@@ -15,7 +15,7 @@ const fallback={
   deep_cleaning_settings:{label:'Grundreinigung',enabled:true,surcharge_pct:30},
   equipment_settings:{base:5,enabled:true,gradient_per_sqm:.01},
   frequency_settings:{options:[{key:'once',label:'Einmalig',visits_per_month:1},{key:'monthly',label:'1× pro Monat',visits_per_month:1},{key:'biweekly',label:'Alle 2 Wochen',visits_per_month:2},{key:'weekly1',label:'1× pro Woche',visits_per_month:4},{key:'weekly2',label:'2× pro Woche',visits_per_month:8},{key:'weekly3',label:'3× pro Woche',visits_per_month:12},{key:'weekly4',label:'4× pro Woche',visits_per_month:16},{key:'weekly5',label:'5× pro Woche',visits_per_month:20}]},
-  promotion_settings:{label:'25% Neukundenrabatt im ersten Monat',enabled:true,first_month_discount_pct:25},
+  promotion_settings:{label:'20% Neukundenrabatt im ersten Monat',enabled:true,first_month_discount_pct:20},
   service_settings:{services:{buero:{label:'Büroreinigung',base_1m:24,enabled:true},airbnb:{label:'Ferienwohnung / Airbnb',base_1m:26,enabled:true},wohnung:{label:'Wohnungsreinigung',base_1m:30,enabled:true},treppenhaus:{label:'Treppenhausreinigung',base_1m:24,enabled:true}},gradient_per_sqm:.2304,minimum_cleaning_charge:30},
   vat_settings:{label:'MwSt. zum Rechnungsbetrag hinzufügen',enabled:true,rate_pct:19,customer_pays_default:false},
   window_settings:{base:5,enabled:true,minimum:35,gradient_per_sqm:3,contract_reduction_pct:{1:0,3:2,6:4,9:6,12:8,24:10}}
@@ -76,7 +76,7 @@ function updateChecklistUi(){
   renderChecklistPreview();
 }
 function printCompanyFooterHtml(taxNote=''){
-  return `<footer class="print-company-footer"><div class="print-footer-title">FrankiFlow Gebäudereinigung &amp; Objektbetreuung</div><div class="print-footer-founder">Inura Devasurendra · ${currentLang==='de'?'Gründer':'Founder'}</div><div class="print-company-grid"><div><span>${currentLang==='de'?'Telefon':'Phone'}</span><strong>+49 176 62493041</strong></div><div><span>${currentLang==='de'?'E-Mail':'Email'}</span><strong>info@frankiflow.de</strong></div><div><span>Website</span><strong>www.frankiflow.de</strong></div><div><span>${currentLang==='de'?'Steuernummer':'Tax no.'}</span><strong>014/811/68462</strong></div><div><span>${currentLang==='de'?'Betriebsnummer':'Employer no.'}</span><strong>69471447</strong></div><div><span>W-IdNr.</span><strong>DE464605581</strong></div></div>${taxNote?`<div class="print-tax-note">${taxNote}</div>`:''}</footer>`;
+  return `<footer class="print-company-footer"><div class="print-footer-title">FrankiFlow Gebäudereinigung &amp; Objektbetreuung</div><div class="print-footer-founder">Inura Devasurendra · ${currentLang==='de'?'Gründer':'Founder'}</div><div class="print-company-grid"><div><span>${currentLang==='de'?'Telefon':'Phone'}</span><strong>+49 176 62493041</strong></div><div><span>${currentLang==='de'?'E-Mail':'Email'}</span><strong>info@frankiflow.de</strong></div><div><span>Website</span><strong>www.frankiflow.de</strong></div><div><span>${currentLang==='de'?'Steuernummer':'Tax no.'}</span><strong>014/811/68462</strong></div><div><span>${currentLang==='de'?'Betriebsnummer':'Employer no.'}</span><strong>4323852</strong></div><div><span>W-IdNr.</span><strong>DE464605581</strong></div></div>${taxNote?`<div class="print-tax-note">${taxNote}</div>`:''}</footer>`;
 }
 function buildChecklistPrintPages(customerPrimary,customerSecondary){
   const groups=getChecklistGroups();

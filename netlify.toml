@@ -10,19 +10,39 @@
   status = 301
 
 [[redirects]]
-  from = "/preisrechner"
-  to = "/preisrechner/"
+  from = "/calculator"
+  to = "/calculator/"
   status = 301
 
 [[redirects]]
   from = "/preisrechner/admin"
   to = "/admin/"
   status = 301
+  force = true
 
 [[redirects]]
   from = "/preisrechner/admin/*"
   to = "/admin/"
   status = 301
+  force = true
+
+[[redirects]]
+  from = "/preisrechner"
+  to = "/calculator/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/preisrechner/"
+  to = "/calculator/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/preisrechner/*"
+  to = "/calculator/:splat"
+  status = 301
+  force = true
 
 [[redirects]]
   from = "/impressum"

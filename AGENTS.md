@@ -26,6 +26,8 @@ Use these repository-local skills when relevant:
 - [Frontend Design](.agents/skills/frontend-design/SKILL.md) for substantial UI/design work.
 - [Headroom pilot](.agents/skills/headroom-pilot/SKILL.md) only when large repetitive context is a measurable bottleneck; do not use compressed context as the sole evidence for high-risk logic.
 - [Release Readiness](.agents/skills/release-readiness/SKILL.md) before a `develop` to `main` release review.
+- [PostHog Analytics](.agents/skills/posthog-analytics/SKILL.md) for analytics/flags/release evidence when connected.
+- [Firecrawl Research](.agents/skills/firecrawl-research/SKILL.md) for public-web search, route mapping and bounded crawl verification.
 - [Security Boundary Review](.agents/skills/security-boundary-review/SKILL.md) for authentication, Supabase, storage or customer-data changes.
 
 The agentic stack status is tracked in [docs/AGENTIC-STACK-STATUS.md](docs/AGENTIC-STACK-STATUS.md). Current source, tests and accepted ADRs override agent memory, compressed context or stale graph output.

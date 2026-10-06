@@ -123,7 +123,7 @@ function installCalculatorHeaderTheme(){
   document.head.append(style);
 }
 
-if(location.pathname.includes('/preisrechner/')){
+if(location.pathname.includes('/calculator/')){
   installCalculatorHeaderTheme();
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded',()=>{

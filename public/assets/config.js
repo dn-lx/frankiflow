@@ -18,5 +18,5 @@ export const FRANKIFLOW_CONFIG = Object.freeze({
   defaultPhone: '+49 176 62493041',
   defaultEmail: 'info@frankiflow.de',
   defaultWhatsApp: 'https://wa.link/9knp7y',
-  serviceArea: 'Frankfurt am Main & Umgebung'
+  serviceArea: 'Frankfurt am Main, Nürnberg & Umgebung'
 });

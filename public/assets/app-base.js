@@ -5,15 +5,16 @@ import { loadHeaderLogoWidth } from './header-logo-settings.js';
 
 const $=(s,p=document)=>p.querySelector(s); const $$=(s,p=document)=>[...p.querySelectorAll(s)];
 let siteSettings=null;
+let promotionSettings={label:'20% Neukundenrabatt im ersten Monat',enabled:true,first_month_discount_pct:20};
 
 const fallbackSettings={
   hero_eyebrow:'Mehr als Reinigung.',hero_eyebrow_en:'More than cleaning.',
   hero_title:'Gebäudereinigung, die einfach funktioniert.',hero_title_en:'Cleaning services that simply work.',
-  hero_subtitle:'Professionelle Reinigung und Objektbetreuung für Büros, Wohnungen, Treppenhäuser und Ferienunterkünfte in Frankfurt am Main & Umgebung.',hero_subtitle_en:'Professional cleaning and property care for offices, homes, stairwells and holiday rentals in Frankfurt am Main and surrounding areas.',
-  offer_title:'25% Neukundenrabatt im ersten Monat',offer_title_en:'25% new-customer discount in the first month',
+  hero_subtitle:'Professionelle Reinigung und Objektbetreuung für Büros, Wohnungen, Treppenhäuser und Ferienunterkünfte in Frankfurt am Main, Nürnberg & Umgebung.',hero_subtitle_en:'Professional cleaning and property care for offices, homes, stairwells and holiday rentals in Frankfurt, Nuremberg and surrounding areas.',
+  offer_title:'20% Neukundenrabatt im ersten Monat',offer_title_en:'20% new-customer discount in the first month',
   offer_text:'Zusätzlich ist eine kostenlose Probereinigung nach Absprache möglich.',offer_text_en:'A free trial cleaning can also be arranged.',
   email:FRANKIFLOW_CONFIG.defaultEmail,phone:FRANKIFLOW_CONFIG.defaultPhone,whatsapp_url:FRANKIFLOW_CONFIG.defaultWhatsApp,
-  service_area:FRANKIFLOW_CONFIG.serviceArea,service_area_en:'Frankfurt am Main & surrounding areas',
+  service_area:FRANKIFLOW_CONFIG.serviceArea,service_area_en:'Frankfurt, Nuremberg & surrounding areas',
   primary_cta_label:'Preis sofort berechnen',primary_cta_label_en:'Calculate price now',
   secondary_cta_label:'Angebot anfragen',secondary_cta_label_en:'Request a quote',hero_image_path:null,
   legal_owner:'Inura Devasurendra',legal_street:'',legal_postcode_city:'Frankfurt am Main'
@@ -25,9 +26,43 @@ function applySiteLanguage(){
   translateDom(document,lang);
 }
 
+
+function normalizePromotion(value){
+  const raw=value&&typeof value==='object'?value:{};
+  const pct=Math.max(0,Math.min(100,Number(raw.first_month_discount_pct??20)||0));
+  return {
+    ...raw,
+    enabled:raw.enabled!==false,
+    first_month_discount_pct:pct,
+    label:String(raw.label||`${pct}% Neukundenrabatt im ersten Monat`)
+  };
+}
+
+function applyPromotionBindings(root=document){
+  promotionSettings=normalizePromotion(promotionSettings);
+  const pct=promotionSettings.first_month_discount_pct;
+  const enabled=promotionSettings.enabled!==false&&pct>0;
+  root.querySelectorAll?.('[data-promo-percent]').forEach(el=>{el.textContent=`${pct}%`;});
+  root.querySelectorAll?.('[data-promo-card],[data-promo-signal],[data-promo-benefit]').forEach(el=>el.classList.toggle('hidden',!enabled));
+  if(siteSettings){
+    siteSettings.offer_title=`${pct}% Neukundenrabatt im ersten Monat`;
+    siteSettings.offer_title_en=`${pct}% new-customer discount in the first month`;
+  }
+}
+
 async function loadSite(){
-  const {data}=await supabase.from('frankiflow_site_settings').select('*').eq('id',1).maybeSingle();
+  const [siteResult,promoResult]=await Promise.all([
+    supabase.from('frankiflow_site_settings').select('*').eq('id',1).maybeSingle(),
+    supabase.from('pricing_config').select('value').eq('key','promotion_settings').eq('is_public',true).maybeSingle()
+  ]);
+  const data=siteResult?.data;
+  if(!promoResult?.error&&promoResult?.data?.value)promotionSettings=normalizePromotion(promoResult.data.value);
   siteSettings={...fallbackSettings,...(data||{})};
+  siteSettings.hero_subtitle=String(siteSettings.hero_subtitle||fallbackSettings.hero_subtitle).replace(/Frankfurt am Main\s*&\s*Umgebung/g,'Frankfurt am Main, Nürnberg & Umgebung');
+  siteSettings.hero_subtitle_en=String(siteSettings.hero_subtitle_en||fallbackSettings.hero_subtitle_en).replace(/Frankfurt am Main(?:\s*&| and)\s*surrounding areas/gi,'Frankfurt, Nuremberg & surrounding areas');
+  siteSettings.service_area='Frankfurt am Main, Nürnberg & Umgebung';
+  siteSettings.service_area_en='Frankfurt, Nuremberg & surrounding areas';
+  applyPromotionBindings(document);
   applySiteLanguage();
   $$('[data-mail]').forEach(el=>{el.href=`mailto:${siteSettings.email}`;const strong=el.querySelector('strong');if(strong)strong.textContent=siteSettings.email;else el.textContent=siteSettings.email});
   $$('[data-phone]').forEach(el=>{el.href=`tel:${siteSettings.phone.replace(/\s/g,'')}`;const strong=el.querySelector('strong');if(strong)strong.textContent=siteSettings.phone;else el.textContent=siteSettings.phone});
@@ -57,14 +92,39 @@ async function submitQuote(e){
   const {data:created,error}=await supabase.from('frankiflow_quote_requests').insert(payload).select('id').single();btn.disabled=false;btn.innerHTML=old;translateDom(btn,getLanguage());
   if(error){notice.innerHTML=tr(`Die Online-Anfrage konnte nicht gesendet werden. Schreiben Sie uns bitte direkt an <a href="mailto:${siteSettings?.email||FRANKIFLOW_CONFIG.defaultEmail}">${siteSettings?.email||FRANKIFLOW_CONFIG.defaultEmail}</a>.`,`The online enquiry could not be sent. Please email us directly at <a href="mailto:${siteSettings?.email||FRANKIFLOW_CONFIG.defaultEmail}">${siteSettings?.email||FRANKIFLOW_CONFIG.defaultEmail}</a>.`);notice.className='notice error';return}
   const emailBody={quote_request_id:created.id,customer_email:String(payload.customer_email||'').trim().toLowerCase(),language:getLanguage()};
-  await Promise.allSettled([
+  const results=await Promise.allSettled([
     supabase.functions.invoke('frankiflow-email',{body:{event_type:'admin_enquiry',...emailBody,attach_quote:false,quote_snapshot:{service_label:form.querySelector('[name=service_key] option:checked')?.textContent||payload.service_key}}}),
     supabase.functions.invoke('frankiflow-email',{body:{event_type:'enquiry_received',...emailBody}})
   ]);
+  const admin=results[0],customer=results[1];
+  const adminFailed=admin.status==='rejected'||admin.value?.error;
+  if(adminFailed){
+    console.error('FrankiFlow admin enquiry email failed',admin.status==='rejected'?admin.reason:admin.value?.error);
+    notice.textContent=tr('Ihre Anfrage wurde gespeichert, aber die E-Mail an FrankiFlow konnte nicht versendet werden. Bitte schreiben Sie uns zusätzlich an info@frankiflow.de.','Your enquiry was saved, but the notification email to FrankiFlow could not be sent. Please also email info@frankiflow.de.');
+    notice.className='notice error';
+    return;
+  }
+  if(customer.status==='rejected'||customer.value?.error)console.warn('Customer confirmation email failed',customer.status==='rejected'?customer.reason:customer.value?.error);
+  window.frankiflowAnalytics?.capture('enquiry_submitted',{source:'homepage',service_key:payload.service_key,language:getLanguage()});
   form.reset();notice.textContent=tr('Vielen Dank! Ihre Anfrage ist eingegangen. Wir melden uns persönlich bei Ihnen.','Thank you! We received your enquiry and will contact you personally.');notice.className='notice';
 }
 function bindUI(){$('#quoteForm')?.addEventListener('submit',submitQuote)}
 
 mountLanguageSwitch($('.nav-actions'),{prepend:true});initI18n();bindUI();
-window.addEventListener('frankiflow:language',()=>{applySiteLanguage();loadAboutMain()});
-await Promise.allSettled([loadSite(),loadGallery(),loadAboutMain(),loadHeaderLogoWidth()]);applySiteLanguage();
+window.addEventListener('frankiflow:language',()=>{applySiteLanguage();applyPromotionBindings(document);loadAboutMain()});
+window.addEventListener('frankiflow:shell-content-mounted',()=>{applySiteLanguage();applyPromotionBindings(document)});
+window.addEventListener('focus',()=>{void loadSite()});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')void loadSite()});
+supabase.channel('frankiflow-public-pricing')
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'pricing_config',filter:'key=eq.promotion_settings'},payload=>{
+    if(payload?.new?.value){
+      promotionSettings=normalizePromotion(payload.new.value);
+      applyPromotionBindings(document);
+      applySiteLanguage();
+    }
+  })
+  .on('postgres_changes',{event:'*',schema:'public',table:'frankiflow_site_settings'},()=>{
+    void Promise.allSettled([loadSite(),loadAboutMain()]);
+  })
+  .subscribe();
+await Promise.allSettled([loadSite(),loadGallery(),loadAboutMain(),loadHeaderLogoWidth()]);applyPromotionBindings(document);applySiteLanguage();

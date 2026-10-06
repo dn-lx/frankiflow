@@ -3,41 +3,54 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 const read=p=>readFileSync(p,'utf8');
 
-test('About Us is a homepage accordion only',()=>{assert.equal(existsSync('public/about/index.html'),false);const home=read('public/index.html');const js=read('public/assets/homepage-about-nav.js');assert.match(home,/id="about"/);assert.match(home,/id="aboutAccordion"/);assert.match(home,/href="#about"/);assert.doesNotMatch(home,/href="\/about\/"/);assert.match(js,/slice\(0,3\)/);assert.match(js,/<details class=/);assert.doesNotMatch(js,/padStart|about-page-story-head/)});
-test('CalcPura and FrankiHolz finish the public navigation in the same order',()=>{for(const p of ['public/index.html','public/en/index.html','public/preisrechner/index.html']){const s=read(p);const nav=s.match(/<nav[^>]*class="nav-links"[^>]*>([\s\S]*?)<\/nav>/)?.[1]||'';assert.ok(nav.lastIndexOf('CalcPura')>nav.lastIndexOf('FAQ'));assert.ok(nav.lastIndexOf('FrankiHolz')>nav.lastIndexOf('CalcPura'));assert.match(nav,/calcpura\.frankiflow\.de/);assert.match(nav,/stay\.frankiflow\.de/)}});
+test('About Us is a homepage accordion only',()=>{assert.equal(existsSync('public/about/index.html'),false);const home=read('public/index.html');const js=read('public/assets/homepage-about-nav.js');const shared=read('public/assets/shared-site-header.js');assert.match(home,/id="about"/);assert.match(home,/id="aboutAccordion"/);assert.match(shared,/about:\[en\?'About Us':'Über uns',home\+'#about'/);assert.doesNotMatch(home,/href="\/about\/"/);assert.match(js,/slice\(0,3\)/);assert.match(js,/<details class=/);assert.doesNotMatch(js,/padStart|about-page-story-head/)});
+test('Homepage and Calculator mount one shared public navigation',()=>{
+  const shared=read('public/assets/shared-site-header.js');
+  const css=read('public/assets/shared-site-header.css');
+  for(const p of ['public/index.html','public/en/index.html','public/calculator/index.html']){
+    const html=read(p);
+    assert.match(html,/data-shared-header/);
+    assert.match(html,/shared-site-header\.js\?v=/);
+    assert.match(html,/shared-site-header\.css\?v=/);
+    assert.doesNotMatch(html,/calculator-site-header|header-nav\.js/);
+  }
+  assert.match(shared,/navOrder=\['home','services','about','calculator','calcpura','stay','faq','contact'\]/);
+  assert.match(shared,/calculator:\[en\?'Calculator':'Preisrechner','\/calculator\/'/);
+  assert.match(shared,/calcpura\.frankiflow\.de/);
+  assert.match(shared,/stay\.frankiflow\.de/);
+  assert.match(css,/grid-template-columns:minmax\(170px,1fr\) auto minmax\(170px,1fr\)/);
+});
 
-test('calculator page loads exactly one primary controller',()=>{const html=read('public/preisrechner/index.html');assert.match(html,/calculator-app-v3\.js\?v=/);assert.doesNotMatch(html,/calculator\.js\?v=/);assert.doesNotMatch(html,/calculator-runtime-fix\.js\?v=/);assert.equal((html.match(/createClient/g)||[]).length,0)});
-test('calculator controller wires print, contact and checklist buttons',()=>{const js=read('public/assets/calculator-app-v3.js'),html=read('public/preisrechner/index.html');for(const id of ['printQuote','requestService','viewChecklist','quoteRequestModal','checklistPreview'])assert.match(html,new RegExp(`id="${id}"`));assert.match(js,/addEventListener\('click',\(\)=>printDoc\('quote'\)\)/);assert.match(js,/addEventListener\('click',openServiceRequest\)/);assert.match(js,/addEventListener\('click',toggleChecklist\)/)});
+test('calculator page loads exactly one primary controller',()=>{const html=read('public/calculator/index.html');assert.match(html,/calculator-app-v3\.js\?v=/);assert.doesNotMatch(html,/calculator\.js\?v=/);assert.doesNotMatch(html,/calculator-runtime-fix\.js\?v=/);assert.equal((html.match(/createClient/g)||[]).length,0)});
+test('calculator controller wires print, contact and checklist buttons',()=>{const js=read('public/assets/calculator-app-v3.js'),html=read('public/calculator/index.html');for(const id of ['printQuote','requestService','viewChecklist','quoteRequestModal','checklistPreview'])assert.match(html,new RegExp(`id="${id}"`));assert.match(js,/estimate_print_started/);assert.match(js,/printDoc\('quote'\)/);assert.match(js,/addEventListener\('click',openServiceRequest\)/);assert.match(js,/addEventListener\('click',toggleChecklist\)/)});
 test('contact with quotation sends admin and customer email events',()=>{const js=read('public/assets/calculator-app-v3.js');assert.match(js,/event_type:'admin_enquiry'/);assert.match(js,/attach_quote:true/);assert.match(js,/event_type:'enquiry_received'/);assert.match(js,/frankiflow_quote_requests/)});
 test('print includes logo, organisation and founder',()=>{const js=read('public/assets/calculator-app-v3.js');assert.match(js,/frankiflow-full-transparent-1024\.png/);assert.match(js,/FrankiFlow Gebäudereinigung &amp; Objektbetreuung/);assert.match(js,/Inura Devasurendra/);assert.doesNotMatch(js,/FrankiFlow Unternehmensdaten/);assert.match(js,/await waitForImages\(sheet\)/)});
 test('admin exposes editable window contract reductions',()=>{assert.match(read('public/admin/index.html'),/id="windowContractGrid"/);const js=read('public/assets/admin-base.js');assert.match(js,/data-window-contract/);assert.match(js,/contract_reduction_pct:windowReductions/)});
 test('language switch is handled by the single controller and persists selection',()=>{const js=read('public/assets/calculator-app-v3.js');assert.match(js,/localStorage\.setItem\('frankiflow-lang',lang\)/);assert.match(js,/\.language-switch \[data-lang\]/);assert.match(js,/const prev=n\.value\|\|'yes'/)});
-test('calculator has immediate static defaults before remote pricing loads',()=>{const html=read('public/preisrechner/index.html');assert.match(html,/id="frequency"><option value="weekly1">1× pro Woche<\/option>/);assert.match(html,/id="contractMonths"><option value="1">1 Monat<\/option>/)});
+test('calculator has immediate static defaults before remote pricing loads',()=>{const html=read('public/calculator/index.html');assert.match(html,/id="frequency"><option value="weekly1">1× pro Woche<\/option>/);assert.match(html,/id="contractMonths"><option value="1">1 Monat<\/option>/)});
 test('single controller renders styled summary rows and total per visit',()=>{const js=read('public/assets/calculator-app-v3.js');assert.match(js,/class="breakdown-row"/);assert.match(js,/Gesamt \/ Termin/);assert.match(js,/Total \/ visit/);assert.match(js,/result\.visitTotal/)});
 test('window cleaning is a per-visit add-on in engine and UI',()=>{const app=read('public/assets/calculator-app-v3.js'),engine=read('public/assets/calculator-engine.js');assert.match(app,/t\('windowCleaning'\).*visitWord/);assert.match(app,/result\.windowCharge/);assert.match(engine,/floorVisit\+equipmentVisit\+\(s\.windows\?windowCharge:0\)/);assert.match(engine,/monthly=round2\(visitTotal\*visits\)/)});
 test('checklist uses database data with built-in fallback and responsive CSS',()=>{const app=read('public/assets/calculator-app-v3.js'),checklists=read('public/assets/checklists.js'),css=read('public/assets/calculator.css');assert.match(app,/frankiflow_checklists/);assert.match(app,/applyChecklistRows/);assert.match(app,/localizeChecklistSections/);assert.match(app,/renderChecklistPreview/);for(const key of ['buero','wohnung','airbnb','treppenhaus','deep','windows'])assert.match(checklists,new RegExp(`\\b${key}:`));assert.match(css,/\.checklist-screen-items/);assert.match(css,/grid-template-columns:repeat\(2/);assert.match(css,/@media\(max-width:700px\)/)});
-test('calculator page retains mobile live-price island',()=>{const html=read('public/preisrechner/index.html'),island=read('public/assets/calculator-mobile-island.js');assert.match(html,/calculator-mobile-island\.js\?v=/);assert.match(island,/mobile-price-island/);assert.match(island,/MutationObserver/)});
+test('calculator page retains mobile live-price island',()=>{const html=read('public/calculator/index.html'),island=read('public/assets/calculator-mobile-island.js');assert.match(html,/calculator-mobile-island\.js\?v=/);assert.match(island,/mobile-price-island/);assert.match(island,/MutationObserver/)});
+test('calculator controller syncs the V2 mobile live-price rail',()=>{const app=read('public/assets/calculator-app-v3.js'),html=read('public/calculator/index.html');assert.match(html,/id="mobileVisitPrice"/);assert.match(html,/id="mobileMonthPrice"/);assert.match(app,/mobileVisitPrice/);assert.match(app,/mobileMonthPrice/);assert.match(app,/money\(result\.visitTotal\)/);assert.match(app,/money\(result\.monthly\)/)});
 test('config does not auto-start stale calculator side-effect modules',()=>{const cfg=read('public/assets/config.js');assert.doesNotMatch(cfg,/calculator-overrides|calculator-mobile-island|calculator-header-revert/)});
 
-test('header sales CTAs are removed and CalcPura sales CTA lives below the calculator',()=>{
-  const home=read('public/index.html'),homeEn=read('public/en/index.html'),calc=read('public/preisrechner/index.html'),header=read('public/assets/calculator-site-header.js');
-  const deActions=home.match(/<div class="nav-actions">([\s\S]*?)<\/div>/)?.[1]||'';
-  const enActions=homeEn.match(/<div class="nav-actions">([\s\S]*?)<\/div>/)?.[1]||'';
-  const calcHeader=calc.match(/<header class="site-header calc-site-header">([\s\S]*?)<\/header>/)?.[1]||'';
-  assert.doesNotMatch(deActions,/Preis berechnen|btn-primary/);
-  assert.doesNotMatch(enActions,/Calculate Price|Preis berechnen|btn-primary/);
-  assert.doesNotMatch(calcHeader,/calc-nav-price|Buy calculator for your business|Preisrechner für Ihr Unternehmen kaufen/);
-  assert.doesNotMatch(header,/calc-nav-price|Buy calculator for your business|Preisrechner für Ihr Unternehmen kaufen/);
+test('shared header has route navigation while CalcPura sales CTA stays below the calculator',()=>{
+  const calc=read('public/calculator/index.html');
+  const shared=read('public/assets/shared-site-header.js');
+  assert.doesNotMatch(shared,/calc-nav-price|Buy calculator for your business|Preisrechner für Ihr Unternehmen kaufen/);
+  assert.match(shared,/home:\[en\?'Home':'Startseite'/);
+  assert.match(shared,/calculator:\[en\?'Calculator':'Preisrechner','\/calculator\/'/);
   assert.match(calc,/class="calc-business-cta"/);
   assert.match(calc,/CalcPura für Ihr Unternehmen entdecken/);
   assert.match(calc,/https:\/\/calcpura\.frankiflow\.de\//);
 });
 
 test('quotation includes property area and supports direct PDF download',()=>{
-  const js=read('public/assets/calculator-app-v3.js'),html=read('public/preisrechner/index.html');
+  const js=read('public/assets/calculator-app-v3.js'),html=read('public/calculator/index.html');
   assert.match(html,/id="downloadQuote"/);
-  assert.match(js,/downloadQuote:'Angebot direkt herunterladen'/);
-  assert.match(js,/downloadQuote:'Download quotation PDF'/);
+  assert.match(js,/downloadQuote:'Kostenschätzung direkt herunterladen'/);
+  assert.match(js,/downloadQuote:'Download estimate PDF'/);
   assert.match(js,/Reinigungsfläche':'Floor area'/);
   assert.match(js,/Glasfläche':'Glass area'/);
   assert.match(js,/jspdf@4\.2\.1/);
@@ -85,16 +98,236 @@ test('print pagination is iOS-safe and only breaks when a following print page e
 test('every browser-print page anchors the company footer to the bottom without fixed page height',()=>{const css=read('public/assets/calculator.css'),js=read('public/assets/calculator-app-v3.js');assert.match(css,/\.print-document\{[^}]*height:auto;min-height:296mm[^}]*display:flex[^}]*flex-direction:column/s);assert.match(css,/\.print-checklist-document\{[^}]*height:auto;min-height:296mm[^}]*display:flex[^}]*flex-direction:column/s);assert.match(css,/\.print-company-footer\{[^}]*position:static[^}]*margin-top:auto[^}]*border-top:/s);assert.doesNotMatch(css,/\.print-document\{[^}]*;height:29[67]mm(?:;|})/s);assert.doesNotMatch(css,/\.print-checklist-document\{[^}]*;height:29[67]mm(?:;|})/s);assert.match(js,/print-checklist-note[\s\S]*\$\{companyFooter\(''\)\}/);assert.match(js,/pdfFooter\(doc\);doc\.addPage/);assert.match(js,/pdfFooter\(doc\);\n\}/);});
 
 
-test('public headers remove sales CTAs and use balanced product navigation',()=>{const de=read('public/index.html'),en=read('public/en/index.html'),calc=read('public/preisrechner/index.html'),siteCss=read('public/assets/styles.css'),calcCss=read('public/assets/calculator-site-header.css');for(const html of [de,en]){const header=html.match(/<header class="site-header">[\s\S]*?<\/header>/)?.[0]||'';assert.doesNotMatch(header,/Preis berechnen/);assert.match(header,/data-nav-tooltip=/);}const calcHeader=calc.match(/<header class="site-header calc-site-header">[\s\S]*?<\/header>/)?.[0]||'';assert.doesNotMatch(calcHeader,/calc-nav-price|Buy calculator for your business|Preisrechner für Ihr Unternehmen kaufen/);assert.match(calcHeader,/data-calc-nav="calcpura"/);assert.match(calc,/class="calc-business-cta"/);assert.match(calc,/calcpura\.frankiflow\.de/);assert.match(siteCss,/grid-template-columns:minmax\(180px,1fr\) auto minmax\(180px,1fr\)/);assert.match(calcCss,/grid-template-columns:minmax\(180px,1fr\) auto minmax\(180px,1fr\)/);assert.match(siteCss,/content:attr\(data-nav-tooltip\)/);assert.match(calcCss,/content:attr\(data-nav-tooltip\)/);});
+test('shared public header supplies balanced product navigation everywhere',()=>{
+  const shared=read('public/assets/shared-site-header.js');
+  const css=read('public/assets/shared-site-header.css');
+  const de=read('public/index.html'),en=read('public/en/index.html'),calc=read('public/calculator/index.html');
+  for(const html of [de,en,calc]){
+    assert.match(html,/data-shared-header/);
+    assert.match(html,/shared-site-header\.js\?v=/);
+  }
+  assert.match(shared,/data-shared-nav/);
+  assert.match(shared,/nav-calcpura/);
+  assert.match(shared,/nav-frankiholz/);
+  assert.match(css,/content:attr\(data-nav-tooltip\)/);
+  assert.match(css,/@media\(max-width:1120px\)/);
+  assert.match(calc,/class="calc-business-cta"/);
+});
+
+test('Homepage and Calculator use the same V2 content rail',()=>{
+  const v2=read('public/assets/v2-redesign.css');
+  const shared=read('public/assets/shared-site-header.css');
+  assert.match(v2,/\.container\{width:min\(1240px,calc\(100% - 48px\)\)\}/);
+  assert.match(v2,/\.calc-container\{width:min\(1240px,calc\(100% - 48px\)\)\}/);
+  assert.match(shared,/\.site-header \.nav\{/);
+});
 
 
-test('homepage header uses the same 1200px content rail as the hero',()=>{const cms=read('public/assets/homepage-cms.css'),base=read('public/assets/styles-base.css'),calc=read('public/assets/calculator.css');assert.doesNotMatch(cms,/1480px/);assert.doesNotMatch(cms,/\.site-header \.brand\{width:(?:410|300)px/);assert.match(cms,/\.site-header \.container\{width:min\(var\(--max\),calc\(100% - 40px\)\)\}/);assert.match(base,/--max:1200px/);assert.match(calc,/\.calc-container\{width:min\(1200px,calc\(100% - 40px\)\);margin:auto\}/);});
-
-
-test('CalcPura and FrankiHolz tooltips are exposed as localized accessible names',()=>{const de=read('public/index.html'),en=read('public/en/index.html'),calc=read('public/preisrechner/index.html'),homeNav=read('public/assets/homepage-about-nav.js'),calcNav=read('public/assets/calculator-site-header.js');assert.match(de,/aria-label="CalcPura — Preissoftware für Dienstleistungsunternehmen"/);assert.match(de,/aria-label="FrankiHolz — FrankiFlow Unterkunft &amp; Zimmerbuchung"/);assert.match(en,/aria-label="CalcPura — Pricing software for service businesses"/);assert.match(en,/aria-label="FrankiHolz — FrankiFlow accommodation &amp; room booking"/);assert.match(calc,/aria-label="CalcPura — Preissoftware für Dienstleistungsunternehmen"/);assert.match(homeNav,/setAttribute\('aria-label',`CalcPura — \$\{calcPura\.dataset\.navTooltip\}`\)/);assert.match(homeNav,/setAttribute\('aria-label',`FrankiHolz — \$\{frankiHolz\.dataset\.navTooltip\}`\)/);assert.match(calcNav,/setAttribute\('aria-label',`\$\{label\} — \$\{tooltip\}`\)/);});
-
+test('shared header exposes localized product tooltips and accessible names',()=>{
+  const shared=read('public/assets/shared-site-header.js');
+  assert.match(shared,/Pricing software for service businesses/);
+  assert.match(shared,/Preissoftware für Dienstleistungsunternehmen/);
+  assert.match(shared,/FrankiFlow accommodation & room booking/);
+  assert.match(shared,/FrankiFlow Unterkunft & Zimmerbuchung/);
+  assert.match(shared,/setAttribute\('aria-label',label\+' — '\+tooltip\)/);
+});
 
 test('homepage binds navigation before awaiting remote content',()=>{const js=read('public/assets/app-base.js');const bind=js.lastIndexOf('initI18n();bindUI();');const wait=js.lastIndexOf('await Promise.allSettled([loadSite(),loadGallery(),loadAboutMain(),loadHeaderLogoWidth()])');assert.ok(bind>=0);assert.ok(wait>=0);assert.ok(bind<wait);});
 
 
-test('public mobile navigation is local and independent of remote app imports',()=>{const nav=read('public/assets/header-nav.js'),de=read('public/index.html'),en=read('public/en/index.html'),app=read('public/assets/app-base.js');assert.doesNotMatch(nav,/\bimport\b|https?:\/\//);assert.match(nav,/classList\.toggle\('open'\)/);for(const html of [de,en]){const navIndex=html.indexOf('/assets/header-nav.js');const appIndex=html.indexOf('/assets/app.js');assert.ok(navIndex>=0);assert.ok(appIndex>=0);assert.ok(navIndex<appIndex);}assert.doesNotMatch(app,/menu\?\.addEventListener\('click'/);});
+test('shared mobile navigation is local and loaded before page controllers',()=>{
+  const nav=read('public/assets/shared-site-header.js');
+  const de=read('public/index.html'),en=read('public/en/index.html'),calc=read('public/calculator/index.html');
+  assert.doesNotMatch(nav,/\bimport\b/);
+  assert.match(nav,/classList\.toggle\('open'\)/);
+  assert.match(nav,/\/calculator\//);
+  for(const html of [de,en]){
+    const navIndex=html.indexOf('/assets/shared-site-header.js');
+    const appIndex=html.indexOf('/assets/app.js');
+    assert.ok(navIndex>=0);assert.ok(appIndex>=0);assert.ok(navIndex<appIndex);
+  }
+  const sharedIndex=calc.indexOf('/assets/shared-site-header.js');
+  const calcIndex=calc.indexOf('/assets/calculator-app-v3.js');
+  assert.ok(sharedIndex>=0);assert.ok(calcIndex>=0);assert.ok(sharedIndex<calcIndex);
+});
+
+test('V2 calculator engine matches the deployed live pricing formula',()=>{
+  const engine=read('public/assets/calculator-engine.js');
+  assert.match(engine,/const gradient=Number\(cfg\.service_settings\?\.gradient_per_sqm\|\|0\)/);
+  assert.match(engine,/const base=Number\(service\.base_1m\|\|0\)/);
+  assert.doesNotMatch(engine,/calibrated_base_1m|service\.gradient_per_sqm/);
+});
+
+test('V2 public pages do not leak literal backslash-n text',()=>{
+  for(const path of ['public/index.html','public/en/index.html','public/calculator/index.html']){
+    assert.doesNotMatch(read(path),/\\n/);
+  }
+});
+
+
+test('Calculator and generated documents explain estimate before final quotation',()=>{
+  const html=read('public/calculator/index.html'),js=read('public/assets/calculator-app-v3.js');
+  assert.match(html,/Wichtig: unverbindliche Kostenschätzung/);
+  assert.match(html,/ersten Vor-Ort-Termin/);
+  assert.match(js,/KOSTENSCHÄTZUNG/);
+  assert.match(js,/NON-BINDING ESTIMATE/);
+  assert.match(js,/prüfen und vermessen wir die tatsächlichen Flächen/);
+  assert.match(js,/verify and measure the actual areas/);
+  assert.match(js,/Besichtigung & genaues Angebot anfragen/);
+  assert.match(js,/Request site visit & final quotation/);
+});
+
+test('print mode hides the live Calculator and CalcPura marketing before the estimate sheet',()=>{
+  const css=read('public/assets/calculator.css');
+  assert.match(css,/@media print\{[\s\S]*\.site-header,\.site-footer,\[data-shell-content\]>main,[\s\S]*\.calc-business-cta,[\s\S]*\.print-sheet\{display:block!important/s);
+  assert.match(css,/\.print-estimate-note\{/);
+});
+
+
+test('shared footer shell is identical across Homepage and Preisrechner',()=>{
+  const shared=read('public/assets/shared-site-header.js');
+  const css=read('public/assets/shared-site-header.css');
+  for(const p of ['public/index.html','public/en/index.html','public/calculator/index.html']){
+    const html=read(p);
+    assert.match(html,/footer class="site-footer" data-shared-footer/);
+    assert.doesNotMatch(html,/class="calc-footer"/);
+  }
+  assert.match(shared,/function footerMarkup/);
+  assert.match(shared,/Frankfurt am Main, Nürnberg &amp; Umgebung/);
+  assert.match(shared,/Frankfurt, Nuremberg &amp; surrounding areas/);
+  assert.match(shared,/Preisrechner öffnen ↗/);
+  assert.match(css,/\/\* Shared FrankiFlow public footer \*\//);
+});
+
+test('German public UI uses Preisrechner while English keeps Calculator',()=>{
+  const de=read('public/index.html'),en=read('public/en/index.html'),calc=read('public/assets/calculator-app-v3.js'),shared=read('public/assets/shared-site-header.js');
+  assert.doesNotMatch(de,/>[^<]*Calculator[^<]*</);
+  assert.match(de,/FrankiFlow Preisrechner/);
+  assert.match(en,/FrankiFlow Calculator/);
+  assert.match(calc,/FRANKIFLOW PREISRECHNER/);
+  assert.match(calc,/FRANKIFLOW CALCULATOR/);
+  assert.match(shared,/en\?'Calculator':'Preisrechner'/);
+});
+
+
+test('Home and Preisrechner content live inside a persistent shell',()=>{
+  const router=read('public/assets/shared-shell-router.js');
+  for(const p of ['public/index.html','public/en/index.html','public/calculator/index.html']){
+    const html=read(p);
+    assert.match(html,/data-shell-content/);
+    assert.match(html,/shared-shell-router\.js\?v=/);
+  }
+  assert.match(router,/history\.pushState/);
+  assert.match(router,/data-shell-content/);
+  assert.match(router,/showOnly/);
+});
+
+
+test('Admin promotion settings are the public source of truth',()=>{
+  const admin=read('public/assets/admin-base.js');
+  const home=read('public/index.html');
+  const en=read('public/en/index.html');
+  const app=read('public/assets/app-base.js');
+  const calc=read('public/assets/calculator-app-v3.js');
+
+  assert.match(admin,/from\('pricing_config'\)\.upsert\(payload,\{onConflict:'key'\}\)/);
+  assert.match(app,/from\('pricing_config'\)\.select\('value'\)\.eq\('key','promotion_settings'\)/);
+  assert.match(app,/frankiflow-public-pricing/);
+  assert.match(app,/data-promo-percent/);
+  assert.match(calc,/frankiflow-calculator-pricing/);
+  assert.match(calc,/applyPricingRow/);
+  assert.match(calc,/first_month_discount_pct:20/);
+
+  assert.match(home,/data-promo-percent/);
+  assert.match(en,/data-promo-percent/);
+  assert.doesNotMatch(home,/25% Rabatt|<strong>25%<\/strong>/);
+  assert.doesNotMatch(en,/25% discount|<strong>25%<\/strong>/);
+});
+
+test('active pricing fallbacks use the current 20 percent promotion',()=>{
+  const app=read('public/assets/app-base.js');
+  const pricing=read('public/assets/pricing.js');
+  const calc=read('public/assets/calculator-app-v3.js');
+  assert.match(app,/20% Neukundenrabatt im ersten Monat/);
+  assert.match(pricing,/first_month_discount_pct:20/);
+  assert.match(calc,/first_month_discount_pct:20/);
+});
+
+
+test('Calculator numeric inputs default to zero',()=>{
+  const html=read('public/calculator/index.html');
+  assert.match(html,/id="areaSqm"[^>]*value="0"/);
+  assert.match(html,/id="windowSqm"[^>]*value="0"/);
+  assert.doesNotMatch(html,/id="areaSqm"[^>]*value="80"/);
+  assert.doesNotMatch(html,/id="windowSqm"[^>]*value="10"/);
+});
+
+
+test('current HWK Betriebsnummer is used in public legal and generated documents',()=>{
+  const app=read('public/assets/calculator-app-v3.js');
+  const legacy=read('public/assets/calculator.js');
+  const footer=read('public/assets/shared-site-header.js');
+  const legal=read('public/impressum/index.html');
+  for(const src of [app,legacy,footer,legal])assert.match(src,/4323852/);
+  assert.doesNotMatch(app,/69471447/);
+  assert.doesNotMatch(legacy,/69471447/);
+});
+
+test('PostHog and Firecrawl workflows are available to FrankiFlow agents',()=>{
+  const index=read('.agents/SKILL-INDEX.md');
+  const posthog=read('.agents/skills/posthog-analytics/SKILL.md');
+  const firecrawl=read('.agents/skills/firecrawl-research/SKILL.md');
+  assert.match(index,/posthog-analytics/);
+  assert.match(index,/firecrawl-research/);
+  assert.match(posthog,/enquiry_submitted/);
+  assert.match(firecrawl,/\/calculator\//);
+});
+
+
+test('PostHog runtime is privacy-minimized and non-authoritative',()=>{
+  const analytics=read('public/assets/posthog.js');
+  const netlify=read('netlify.toml');
+  const privacy=read('public/datenschutz/index.html');
+  assert.match(analytics,/frankiflow-analytics/);
+  assert.match(analytics,/crypto\.randomUUID\(\)/);
+  assert.match(analytics,/customEvents=new Map/);
+  assert.match(analytics,/event==='\$pageview'/);
+  assert.match(analytics,/history\.pushState/);
+  assert.doesNotMatch(analytics,/phc_[A-Za-z0-9]+/);
+  assert.doesNotMatch(analytics,/localStorage|document\.cookie/);
+  for(const forbidden of ['customer_name','customer_email','customer_phone','requestMessage','customerAddress']){
+    assert.doesNotMatch(analytics,new RegExp(forbidden));
+  }
+  assert.doesNotMatch(netlify,/us\.i\.posthog\.com/);
+  assert.match(privacy,/Nutzungsanalyse mit PostHog/);
+  assert.match(privacy,/keine Analyse-Cookies/);
+  assert.match(privacy,/serverseitig an PostHog/);
+});
+
+test('enquiry success requires the admin notification email',()=>{
+  const base=read('public/assets/app-base.js');
+  const enhanced=read('public/assets/app-enhancements.js');
+  const calc=read('public/assets/calculator-app-v3.js');
+  for(const src of [base,enhanced,calc]){
+    assert.match(src,/admin_enquiry/);
+    assert.match(src,/adminFailed/);
+  }
+  assert.match(base,/info@frankiflow\.de/);
+  assert.match(enhanced,/info@frankiflow\.de/);
+});
+
+test('custom analytics events carry only allowlisted non-PII context',()=>{
+  const analytics=read('public/assets/posthog.js');
+  const base=read('public/assets/app-base.js');
+  const calc=read('public/assets/calculator-app-v3.js');
+  for(const event of ['enquiry_submitted','estimate_pdf_downloaded','estimate_print_started','estimate_request_opened']){
+    assert.match(analytics,new RegExp(event));
+  }
+  assert.match(base,/enquiry_submitted/);
+  assert.match(calc,/estimate_pdf_downloaded/);
+  assert.match(calc,/estimate_print_started/);
+  assert.match(calc,/estimate_request_opened/);
+  assert.match(base,/capture\('enquiry_submitted',\{source:'homepage',service_key:payload\.service_key,language:getLanguage\(\)\}\)/);
+  assert.match(calc,/capture\('enquiry_submitted',\{source:'calculator',service_key:calc\.serviceKey,language:lang\}\)/);
+  assert.doesNotMatch(analytics,/customer_email|customer_phone|customer_name|message|address/i);
+});
