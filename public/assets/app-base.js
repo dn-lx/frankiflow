@@ -92,11 +92,21 @@ async function submitQuote(e){
   const {data:created,error}=await supabase.from('frankiflow_quote_requests').insert(payload).select('id').single();btn.disabled=false;btn.innerHTML=old;translateDom(btn,getLanguage());
   if(error){notice.innerHTML=tr(`Die Online-Anfrage konnte nicht gesendet werden. Schreiben Sie uns bitte direkt an <a href="mailto:${siteSettings?.email||FRANKIFLOW_CONFIG.defaultEmail}">${siteSettings?.email||FRANKIFLOW_CONFIG.defaultEmail}</a>.`,`The online enquiry could not be sent. Please email us directly at <a href="mailto:${siteSettings?.email||FRANKIFLOW_CONFIG.defaultEmail}">${siteSettings?.email||FRANKIFLOW_CONFIG.defaultEmail}</a>.`);notice.className='notice error';return}
   const emailBody={quote_request_id:created.id,customer_email:String(payload.customer_email||'').trim().toLowerCase(),language:getLanguage()};
-  await Promise.allSettled([
+  const results=await Promise.allSettled([
     supabase.functions.invoke('frankiflow-email',{body:{event_type:'admin_enquiry',...emailBody,attach_quote:false,quote_snapshot:{service_label:form.querySelector('[name=service_key] option:checked')?.textContent||payload.service_key}}}),
     supabase.functions.invoke('frankiflow-email',{body:{event_type:'enquiry_received',...emailBody}})
   ]);
-  window.frankiflowAnalytics?.capture('enquiry_submitted',{source:'homepage',service_key:payload.service_key,language:getLanguage()});form.reset();notice.textContent=tr('Vielen Dank! Ihre Anfrage ist eingegangen. Wir melden uns persönlich bei Ihnen.','Thank you! We received your enquiry and will contact you personally.');notice.className='notice';
+  const admin=results[0],customer=results[1];
+  const adminFailed=admin.status==='rejected'||admin.value?.error;
+  if(adminFailed){
+    console.error('FrankiFlow admin enquiry email failed',admin.status==='rejected'?admin.reason:admin.value?.error);
+    notice.textContent=tr('Ihre Anfrage wurde gespeichert, aber die E-Mail an FrankiFlow konnte nicht versendet werden. Bitte schreiben Sie uns zusätzlich an info@frankiflow.de.','Your enquiry was saved, but the notification email to FrankiFlow could not be sent. Please also email info@frankiflow.de.');
+    notice.className='notice error';
+    return;
+  }
+  if(customer.status==='rejected'||customer.value?.error)console.warn('Customer confirmation email failed',customer.status==='rejected'?customer.reason:customer.value?.error);
+  window.frankiflowAnalytics?.capture('enquiry_submitted',{source:'homepage',service_key:payload.service_key,language:getLanguage()});
+  form.reset();notice.textContent=tr('Vielen Dank! Ihre Anfrage ist eingegangen. Wir melden uns persönlich bei Ihnen.','Thank you! We received your enquiry and will contact you personally.');notice.className='notice';
 }
 function bindUI(){$('#quoteForm')?.addEventListener('submit',submitQuote)}
 
