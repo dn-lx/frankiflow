@@ -478,7 +478,7 @@ function queueRemoteRefresh(){
   clearTimeout(remoteRefreshTimer);
   remoteRefreshTimer=setTimeout(()=>{void loadRemote()},120);
 }
-supabase.channel('frankiflow-calculator-admin-sync')
+supabase.channel('frankiflow-calculator-pricing')
   .on('postgres_changes',{event:'*',schema:'public',table:'pricing_config'},queueRemoteRefresh)
   .on('postgres_changes',{event:'*',schema:'public',table:'frankiflow_checklists'},queueRemoteRefresh)
   .subscribe();
