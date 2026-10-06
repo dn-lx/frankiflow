@@ -119,3 +119,19 @@ a.company-data-item:hover strong{color:#79ddd6}
 .standard-footer .footer-whatsapp-link::before,.calc-footer .footer-whatsapp-link::before{content:"";display:inline-block;width:14px;height:14px;vertical-align:-2px;margin-right:7px;background:url('/assets/whatsapp.svg') center/contain no-repeat}
 @media(max-width:760px){.standard-footer-grid{grid-template-columns:1fr 1fr}.standard-footer-brand{grid-column:1/-1}.standard-footer-bottom{display:block}.standard-footer-bottom span{display:block;margin-top:5px}}
 @media(max-width:520px){.standard-footer-grid{grid-template-columns:1fr}}
+
+
+/* Contact privacy consent: align checkbox with the first line of the statement. */
+.contact-form .check{align-items:flex-start!important}
+.contact-form .check input[type="checkbox"]{
+  width:14px!important;
+  height:14px;
+  flex:0 0 14px;
+  margin:1px 0 0!important;
+  padding:0!important;
+}
+.contact-form .check span{
+  display:block;
+  flex:1 1 auto;
+  line-height:1.45;
+}
