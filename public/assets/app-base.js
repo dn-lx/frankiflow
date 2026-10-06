@@ -1,7 +1,7 @@
 import { FRANKIFLOW_CONFIG } from './config.js';
 import { supabase } from './pricing.js';
 import { getLanguage, initI18n, mountLanguageSwitch, translateDom, tr } from './site-i18n.js';
-import { loadHeaderLogoWidth } from './header-logo-settings.js';
+import { loadHeaderLogoWidth } from './header-logo-settings.js?v=20261006-logo-checkbox-v2';
 
 const $=(s,p=document)=>p.querySelector(s); const $$=(s,p=document)=>[...p.querySelectorAll(s)];
 let siteSettings=null;

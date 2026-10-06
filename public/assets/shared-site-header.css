@@ -344,30 +344,31 @@
 }
 
 
-/* Persistent shell geometry lock */
+/* Persistent shell geometry — controlled by Admin/Supabase values. */
 :root{
-  --ff-header-logo-width:190px!important;
-  --ff-header-height:152px!important;
+  --ff-header-logo-width:135px;
+  --ff-header-height:135px;
 }
 .site-header{
-  height:152px!important;
-  min-height:152px!important;
+  height:var(--ff-header-height)!important;
+  min-height:var(--ff-header-height)!important;
 }
 .site-header .nav{
-  height:152px!important;
-  min-height:152px!important;
+  height:var(--ff-header-height)!important;
+  min-height:var(--ff-header-height)!important;
   padding:0!important;
 }
 .site-header .brand{
-  width:190px!important;
-  height:144px!important;
+  width:var(--ff-header-logo-width)!important;
+  height:auto!important;
+  min-height:0!important;
   display:flex!important;
   align-items:center!important;
 }
 .site-header .brand img{
-  width:144px!important;
-  height:144px!important;
-  max-height:144px!important;
+  width:var(--ff-header-logo-width)!important;
+  height:auto!important;
+  max-height:var(--ff-header-height)!important;
   object-fit:contain!important;
   object-position:left center!important;
 }
@@ -389,32 +390,32 @@
 
 @media(max-width:1120px){
   .site-header,.site-header .nav{
-    height:138px!important;
-    min-height:138px!important;
+    height:var(--ff-header-height)!important;
+    min-height:var(--ff-header-height)!important;
   }
   .site-header .brand{
-    width:160px!important;
-    height:131px!important;
+    width:min(var(--ff-header-logo-width),160px)!important;
+    height:auto!important;
   }
   .site-header .brand img{
-    width:131px!important;
-    height:131px!important;
-    max-height:131px!important;
+    width:min(var(--ff-header-logo-width),160px)!important;
+    height:auto!important;
+    max-height:var(--ff-header-height)!important;
   }
 }
 @media(max-width:430px){
   .site-header,.site-header .nav{
-    height:126px!important;
-    min-height:126px!important;
+    height:var(--ff-header-height)!important;
+    min-height:var(--ff-header-height)!important;
   }
   .site-header .brand{
-    width:136px!important;
-    height:117px!important;
+    width:min(var(--ff-header-logo-width),136px)!important;
+    height:auto!important;
   }
   .site-header .brand img{
-    width:117px!important;
-    height:117px!important;
-    max-height:117px!important;
+    width:min(var(--ff-header-logo-width),136px)!important;
+    height:auto!important;
+    max-height:var(--ff-header-height)!important;
   }
   .site-footer .footer-brand .brand,
   .site-footer .footer-brand .brand img{
