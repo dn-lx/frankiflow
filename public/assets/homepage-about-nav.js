@@ -13,6 +13,7 @@ function splitParagraphs(text=''){return String(text).split(/\n\s*\n/g).map(x=>x
 function keepProductLinksLast(){
   const lang=getLanguage()==='en'?'en':'de';
   const nav=$('.nav-links');if(!nav)return;
+  if(nav.querySelector('[data-shared-nav]'))return;
 
   let calcPura=nav.querySelector('.nav-calcpura,a[href^="https://calcpura.frankiflow.de"]');
   if(!calcPura){calcPura=document.createElement('a');nav.append(calcPura);}
@@ -36,9 +37,9 @@ function keepProductLinksLast(){
 function keepAboutSectionLink(){
   const lang=getLanguage()==='en'?'en':'de';
   const nav=$('.nav-links');
-  let navLink=nav?.querySelector('a[href="#about"],a[href="/about/"],[data-section-link="about"]');
+  let navLink=nav?.querySelector('[data-shared-nav="about"],a[href="#about"],a[href="/about/"],[data-section-link="about"]');
   if(nav&&!navLink){navLink=document.createElement('a');const why=nav.querySelector('a[href="#warum"]');why?nav.insertBefore(navLink,why):nav.append(navLink)}
-  if(navLink){navLink.href='#about';navLink.textContent=lang==='en'?'About Us':'Über uns';navLink.dataset.sectionLink='about';navLink.classList.remove('hidden')}
+  if(navLink){const home=lang==='en'?'/en/':'/';navLink.href=home+'#about';navLink.textContent=lang==='en'?'About Us':'Über uns';navLink.dataset.sectionLink='about';navLink.classList.remove('hidden')}
   $$('.footer-links a[href="/about/"],.footer-links a[href="#about"],[data-section-link="about"]').forEach(link=>{link.href='#about';link.textContent=lang==='en'?'About Us':'Über uns';link.dataset.sectionLink='about'});
 }
 
@@ -73,36 +74,22 @@ async function loadAboutAccordion(){
   renderAboutAccordion();
 }
 
-function routeHomepageLanguageSwitch(){
-  const homepagePaths=new Set(['/','/index.html','/en','/en/','/en/index.html']);
-  document.addEventListener('click',event=>{
-    const button=event.target.closest?.('.ff-language-switch button[data-lang]');
-    if(!button||!homepagePaths.has(location.pathname))return;
-    const lang=button.dataset.lang==='en'?'en':'de';
-    const target=lang==='en'?'/en/':'/';
-    event.preventDefault();event.stopImmediatePropagation();
-    localStorage.setItem('frankiflow-lang',lang);
-    localStorage.setItem('ff-price-lang',lang);
-    location.assign(target+(location.hash||''));
-  },true);
-}
-
 function forceCalculatorSameTab(){
   const normalize=()=>$$('a[href]').forEach(link=>{
-    try{const url=new URL(link.href,location.href);if(url.origin===location.origin&&/^\/preisrechner\/?$/.test(url.pathname)){link.removeAttribute('target');link.removeAttribute('rel')}}catch{}
+    try{const url=new URL(link.href,location.href);if(url.origin===location.origin&&/^\/calculator\/?$/.test(url.pathname)){link.removeAttribute('target');link.removeAttribute('rel')}}catch{}
   });
   normalize();
   document.addEventListener('click',event=>{
+    if(event.defaultPrevented)return;
     const link=event.target.closest?.('a[href]');if(!link)return;
     let url;try{url=new URL(link.href,location.href)}catch{return}
-    if(url.origin!==location.origin||!/^\/preisrechner\/?$/.test(url.pathname))return;
+    if(url.origin!==location.origin||!/^\/calculator\/?$/.test(url.pathname))return;
     if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
     event.preventDefault();
     location.assign(url.href);
   },true);
 }
 
-routeHomepageLanguageSwitch();
 forceCalculatorSameTab();
 cleanAboutSectionChrome();
 syncAboutHeading();

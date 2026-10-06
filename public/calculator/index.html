@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<html lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>FrankiFlow Preisrechner | Reinigung in Frankfurt &amp; Nürnberg</title>
+<meta content="Berechnen Sie Ihren unverbindlichen Richtpreis für Büro-, Wohnungs-, Airbnb-, Treppenhaus- oder Fensterreinigung bei FrankiFlow." name="description"/>
+<meta content="#071f38" name="theme-color"/>
+<link href="/assets/frankiflow-logo.png" rel="icon" type="image/png"/>
+<link href="/assets/calculator.css?v=20260920-all-print-footers-v1" rel="stylesheet"/>
+<link href="/assets/shared-site-header.css?v=20261003-shell-v5" rel="stylesheet"/>
+<link href="/assets/frontend-refresh.css?v=20260927" rel="stylesheet"/>
+<link href="/assets/v2-redesign.css?v=20261003-calc-contrast-v6" rel="stylesheet"/>
+<link href="https://frankiflow.de/calculator/" rel="canonical"/><meta content="index,follow,max-image-preview:large" name="robots"/></head>
+<body class="calculator-body">
+<header class="site-header" data-shared-header data-page="calculator"></header>
+<div data-shell-content data-shell-view="calculator">
+<main>
+<section class="calc-hero">
+<div class="calc-container calc-hero-grid">
+<div>
+<span class="calc-eyebrow" data-i18n="eyebrow">FRANKIFLOW PREISRECHNER</span>
+<h1 data-i18n="title">Ihr Reinigungspreis. <em>Transparent berechnet.</em></h1>
+<p data-i18n="intro">Wählen Sie Leistung, Fläche und Häufigkeit. Sie erhalten sofort einen unverbindlichen Richtpreis – ohne Registrierung.</p>
+<div class="calc-trust"><span>✓ <b data-i18n="instant">Sofortiger Richtpreis</b></span><span>✓ <b data-i18n="noReg">Keine Registrierung</b></span><span>✓ <b data-i18n="frankfurt">Frankfurt, Nürnberg &amp; Umgebung</b></span></div>
+</div>
+<div aria-hidden="true" class="calc-hero-mark"><img alt="" src="/assets/frankiflow-hero.png"/></div>
+</div>
+</section>
+<section class="calc-section">
+<button aria-controls="resultCard" class="mobile-price-bar" id="mobilePriceBar" type="button">
+<span class="mobile-price-copy">
+<span class="mobile-price-kicker" id="mobilePriceLabel">LIVE-RICHTPREIS</span>
+<span class="mobile-price-values">
+<span><small id="mobileVisitLabel">Termin</small><strong id="mobileVisitPrice">—</strong></span>
+<span><small id="mobileMonthLabel">Monat</small><strong id="mobileMonthPrice">—</strong></span>
+</span>
+</span>
+<span aria-hidden="true" class="mobile-price-jump">↑</span>
+</button>
+<div class="calc-container calculator-layout">
+<form autocomplete="off" class="calc-form" id="calculatorForm">
+<section class="calc-card">
+<div class="step-head"><span>01</span><div><h2 data-i18n="serviceTitle">Welche Reinigung benötigen Sie?</h2><p data-i18n="serviceHint">Wählen Sie die Leistung, die am besten passt.</p></div></div>
+<div class="service-options" id="serviceOptions" role="radiogroup"></div>
+</section>
+<section class="calc-card">
+<div class="step-head"><span>02</span><div><h2 data-i18n="scopeTitle">Objekt &amp; Umfang</h2><p data-i18n="scopeHint">Fläche und Reinigungsrhythmus bestimmen den Richtpreis.</p></div></div>
+<div class="form-grid two">
+<label class="field" id="areaFieldWrap"><span data-i18n="area">Reinigungsfläche</span><div class="input-suffix"><input id="areaSqm" inputmode="decimal" max="5000" min="0" step="1" type="number" value="0"/><em>m²</em></div><small data-i18n="areaHelp">Bei reiner Fensterreinigung kann die Fläche 0 sein.</small></label>
+<label class="field"><span data-i18n="frequency">Häufigkeit</span><select id="frequency"><option value="weekly1">1× pro Woche</option></select></label>
+<label class="field"><span data-i18n="contract">Vertragslaufzeit</span><select id="contractMonths"><option value="1">1 Monat</option></select><small id="contractSaving"></small></label>
+<label class="field"><span data-i18n="newCustomer">Neukunde?</span><select id="newCustomer"><option value="yes">Ja</option><option value="no">Nein</option></select><small id="promoHint"></small></label>
+<div class="window-primary-slot hidden" id="windowPrimarySlot"></div>
+</div>
+</section>
+<section class="calc-card">
+<div class="step-head"><span>03</span><div><h2 data-i18n="extrasTitle">Optionale Leistungen</h2><p data-i18n="extrasHint">Nur auswählen, wenn Sie diese Leistungen benötigen.</p></div></div>
+<div class="addon-grid">
+<label class="addon" id="deepWrap"><input id="deepCleaning" type="checkbox"/><span class="switch"></span><div><strong id="deepLabel">Grundreinigung</strong><small id="deepHint">Intensivere Reinigung des gesamten Bereichs.</small></div></label>
+<label class="addon" id="equipmentWrap"><input id="equipment" type="checkbox"/><span class="switch"></span><div><strong data-i18n="equipment">Reinigungsmittel &amp; Equipment</strong><small data-i18n="equipmentHint">FrankiFlow stellt benötigte Materialien.</small></div></label>
+<label class="addon" id="vatWrap"><input id="includeVat" type="checkbox"/><span class="switch"></span><div><strong data-i18n="vat">MwSt. hinzufügen</strong><small id="vatHint">19% MwSt.</small></div></label>
+<label class="addon addon-window" id="windowWrap"><input id="windowCleaning" type="checkbox"/><span class="switch"></span><div><strong data-i18n="windows">Fensterreinigung</strong><small data-i18n="windowsHint">Optional nach Glasfläche.</small></div></label>
+</div>
+<div id="windowExtraSlot"><div class="window-area hidden" id="windowAreaWrap"><label class="field"><span data-i18n="glassArea">Glasfläche</span><div class="input-suffix"><input id="windowSqm" max="1000" min="0" step="0.5" type="number" value="0"/><em>m²</em></div></label></div></div>
+</section>
+<section class="calc-card quote-card">
+<div class="step-head"><span>04</span><div><h2 data-i18n="quoteTitle">Kostenschätzung vorbereiten</h2><p data-i18n="quoteHint">Optional: Tragen Sie Ihre Daten ein, wenn Sie die Kostenschätzung drucken, als PDF speichern oder eine Besichtigung anfragen möchten.</p></div></div>
+<div class="form-grid two">
+<label class="field"><span data-i18n="name">Name</span><input id="customerName" placeholder="Max Mustermann"/></label>
+<label class="field"><span data-i18n="company">Firma / Objekt</span><input id="customerCompany" placeholder="optional"/></label>
+<label class="field"><span>E-Mail</span><input id="customerEmail" placeholder="name@beispiel.de" type="email"/></label>
+<label class="field"><span data-i18n="phone">Telefon</span><input id="customerPhone" placeholder="+49 …" type="tel"/></label>
+<label class="field full"><span data-i18n="address">Adresse / Leistungsort</span><input id="customerAddress" placeholder="Straße, PLZ, Ort"/></label>
+<label class="field hidden" id="serviceDateWrap"><span data-i18n="serviceDate">Leistungsdatum / Zeitraum</span><input id="serviceDate" placeholder="z. B. September 2026"/></label>
+</div>
+</section>
+<section class="calc-card checklist-card">
+<div class="step-head"><span>05</span><div><h2 id="checklistTitle">Leistungscheckliste</h2><p id="checklistHint">Sehen Sie vor dem Drucken, welche Standardleistungen für die gewählte Reinigung enthalten sind.</p></div></div>
+<div class="checklist-toolbar">
+<button class="btn-calc secondary checklist-view-btn" id="viewChecklist" type="button">Checkliste ansehen</button>
+<label class="checklist-include"><input checked="" id="includeChecklist" type="checkbox"/><span class="checkmark-box">✓</span><div><strong id="includeChecklistLabel">Checkliste der Kostenschätzung beifügen</strong><small id="includeChecklistHint">Die Leistungscheckliste wird der Kostenschätzung als zusätzliche PDF-Seite(n) beigefügt.</small></div></label>
+</div>
+<div class="checklist-preview hidden" id="checklistPreview"></div>
+</section>
+</form>
+<aside class="result-column">
+<div class="result-card" id="resultCard">
+<div class="result-top"><span data-i18n="yourPrice">IHR RICHTPREIS</span><span class="live-pill" id="liveStatus"><i></i> LIVE</span></div>
+<div class="result-primary"><small data-i18n="perVisit">Preis pro Termin</small><strong id="visitPrice">—</strong></div>
+<div class="result-secondary"><div><small data-i18n="perMonth">Preis pro Monat</small><strong id="monthlyPrice">—</strong></div><span id="vatStatus">MwSt. nicht enthalten</span></div>
+<div class="promotion-box" id="promotionBox"><span data-i18n="firstMonth">1. Monat als Neukunde</span><strong id="firstMonthPrice">—</strong><small id="discountLabel">20% Rabatt berücksichtigt</small></div>
+<div class="breakdown"><h3 data-i18n="overview">Übersicht</h3><div id="breakdownRows"></div></div>
+<div class="result-actions">
+<button class="btn-calc primary" data-i18n="printQuote" id="printQuote" type="button">Kostenschätzung drucken / als PDF sichern</button>
+<button class="btn-calc secondary" data-i18n="downloadQuote" id="downloadQuote" type="button">Kostenschätzung direkt herunterladen</button>
+<button class="btn-calc secondary hidden" data-i18n="printInvoice" id="printInvoice" type="button">Rechnung erstellen</button>
+<button class="btn-calc ghost" data-i18n="request" id="requestService" type="button">Besichtigung &amp; genaues Angebot anfragen</button>
+</div>
+<div class="estimate-notice"><strong data-i18n="estimateTitle">Wichtig: unverbindliche Kostenschätzung</strong><p data-i18n="disclaimer">Diese Berechnung ist eine unverbindliche Kostenschätzung auf Basis Ihrer Angaben. Nach dem ersten Vor-Ort-Termin prüfen und vermessen wir die tatsächlichen Flächen und berücksichtigen Zustand, Zugänglichkeit sowie weitere objektspezifische Faktoren. Anschließend erstellen wir Ihnen ein genaues Angebot.</p></div>
+</div>
+</aside>
+</div>
+</section>
+<section class="calc-business-cta" aria-labelledby="calcBusinessTitle">
+<div class="calc-container">
+<div class="calc-business-card">
+<div class="calc-business-copy">
+<span class="calc-business-kicker" data-i18n="businessCtaEyebrow">CALCPURA FÜR UNTERNEHMEN</span>
+<h2 id="calcBusinessTitle" data-i18n="businessCtaTitle">Diesen Preisrechner für Ihr Unternehmen nutzen.</h2>
+<p data-i18n="businessCtaText">CalcPura bringt transparente, konfigurierbare Preisberechnung in Ihr eigenes Dienstleistungsunternehmen.</p>
+</div>
+<a class="calc-business-button" href="https://calcpura.frankiflow.de/"><span data-i18n="businessCtaButton">CalcPura für Ihr Unternehmen entdecken</span><span aria-hidden="true">→</span></a>
+</div>
+</div>
+</section>
+</main>
+<section aria-hidden="true" class="print-sheet" id="printSheet"></section>
+<div aria-hidden="true" class="quote-request-modal hidden" id="quoteRequestModal">
+<div class="quote-request-backdrop" data-close-request></div>
+<section aria-labelledby="requestDialogTitle" aria-modal="true" class="quote-request-dialog" role="dialog">
+<button aria-label="Schließen" class="quote-request-close" id="closeRequestDialog" type="button">×</button>
+<div class="quote-request-heading"><span>FRANKIFLOW</span><h2 id="requestDialogTitle">Besichtigung &amp; genaues Angebot anfragen</h2><p id="requestDialogIntro">Senden Sie Ihre aktuelle Kostenschätzung und Kontaktdaten an FrankiFlow. Wir stimmen anschließend einen Vor-Ort-Termin ab und erstellen das genaue Angebot nach Prüfung und Vermessung des Objekts.</p></div>
+<div class="request-quote-summary" id="requestQuoteSummary"></div>
+<div class="request-form-grid"><label class="field"><span id="requestNameLabel">Name</span><input id="requestName" autocomplete="name"></label><label class="field"><span id="requestEmailLabel">E-Mail</span><input id="requestEmail" type="email" autocomplete="email"></label><label class="field full"><span id="requestPhoneLabel">Telefon</span><input id="requestPhone" type="tel" autocomplete="tel"></label><label class="field full"><span id="requestMessageLabel">Nachricht / Hinweise</span><textarea id="requestMessage" rows="4"></textarea></label></div>
+<label class="request-consent"><input id="requestPrivacy" type="checkbox"><span id="requestPrivacyText">Ich stimme der Verarbeitung meiner Angaben zur Bearbeitung dieser Angebotsanfrage zu.</span> <a href="/datenschutz/" target="_blank">Datenschutz</a></label>
+<div class="request-notice hidden" id="requestNotice"></div>
+<div class="quote-request-actions"><button class="btn-calc ghost" id="cancelRequestDialog" type="button">Abbrechen</button><button class="btn-calc primary" id="submitServiceRequest" type="button">Besichtigung anfragen</button></div>
+</section>
+</div>
+</div>
+
+<footer class="site-footer" data-shared-footer></footer>
+<script src="/assets/shared-site-header.js?v=20261003-shell-v2"></script>
+<script src="/assets/shared-shell-router.js?v=20261003-shell-router-v1"></script>
+<script src="/assets/calculator-app-v3.js?v=20261001-mobile-price-v2" type="module"></script>
+<script src="/assets/calculator-mobile-island.js?v=20260914-v3" defer></script>
+<script src="/assets/v2-motion.js?v=20261001" defer></script>
+<script src="/assets/posthog.js?v=20261006" type="module"></script></body>
+</html>

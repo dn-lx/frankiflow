@@ -11,15 +11,15 @@ test('homepage renders core service UI', async ({ page }) => {
 });
 
 test('price calculator shell renders without external writes', async ({ page }) => {
-  await page.goto('/preisrechner/', { waitUntil: 'domcontentloaded' });
+  await page.goto('/calculator/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#calculatorForm')).toBeVisible();
   await expect(page.locator('#visitPrice')).toBeVisible();
-  await expect(page.getByRole('button', { name: /Angebot drucken|PDF/ })).toBeVisible();
+  await expect(page.locator('#printQuote')).toBeVisible();
 });
 
 
 test('quotation and checklist print footers stay at the bottom of every short A4 page', async ({ page }) => {
-  await page.goto('/preisrechner/', { waitUntil: 'domcontentloaded' });
+  await page.goto('/calculator/', { waitUntil: 'domcontentloaded' });
   await page.emulateMedia({ media: 'print' });
 
   await page.locator('#printSheet').evaluate(sheet => {
@@ -81,14 +81,23 @@ test('quotation and checklist print footers stay at the bottom of every short A4
 
 
 test('public navigation aligns and matches across homepage and calculator', async ({ page }) => {
-  for (const [path,contentSelector] of [['/en/','.hero-grid'],['/preisrechner/','.calc-hero-grid']]) {
+  for (const [path,contentSelector] of [['/en/','.hero-grid'],['/calculator/','.calc-hero-grid']]) {
     await page.goto(path,{waitUntil:'domcontentloaded'});
     const header=page.locator('.site-header');
     await expect(header).toBeVisible();
 
-    const productLabels=await header.locator('.nav-links a').allTextContents();
-    expect(productLabels.slice(-2)).toEqual(['CalcPura','FrankiHolz']);
-    await expect(header.locator('.nav-actions a[href="/preisrechner/"]')).toHaveCount(0);
+    const navItems=await header.locator('.nav-links a').evaluateAll(nodes=>nodes.map(a=>({
+      text:a.textContent.trim(),
+      href:a.getAttribute('href')
+    })));
+    const expectedText=path==='/en/'?['Home','Services','About Us','Calculator','CalcPura','FrankiHolz','FAQ','Contact']:null;
+    if(expectedText)expect(navItems.map(x=>x.text)).toEqual(expectedText);
+    expect(navItems[3].href).toBe('/calculator/');
+    expect(navItems[4].text).toBe('CalcPura');
+    expect(navItems[5].text).toBe('FrankiHolz');
+    expect(navItems[6].text).toBe('FAQ');
+    expect(navItems[7].text).toMatch(/Contact|Kontakt/);
+    await expect(header.locator('.nav-actions a[href="/calculator/"]')).toHaveCount(0);
     await expect(header.locator('.calc-nav-price')).toHaveCount(0);
 
     const rails=await page.evaluate(({contentSelector})=>{
@@ -140,8 +149,81 @@ test('public navigation aligns and matches across homepage and calculator', asyn
 });
 
 test('calculator presents CalcPura business CTA below the calculator', async ({ page }) => {
-  await page.goto('/preisrechner/',{waitUntil:'domcontentloaded'});
+  await page.goto('/calculator/',{waitUntil:'domcontentloaded'});
   const cta=page.locator('.calc-business-cta');
   await expect(cta).toBeVisible();
   await expect(cta.getByRole('link',{name:/CalcPura/i})).toHaveAttribute('href','https://calcpura.frankiflow.de/');
+});
+
+
+test('print media excludes the live Calculator and CalcPura CTA', async ({ page }) => {
+  await page.goto('/calculator/', { waitUntil: 'domcontentloaded' });
+  await page.locator('#printSheet').evaluate(sheet => {
+    sheet.setAttribute('aria-hidden','false');
+    sheet.innerHTML='<div class="print-document"><div class="print-estimate-note"><strong>NON-BINDING ESTIMATE</strong><p>Estimate only.</p></div></div>';
+  });
+  await page.emulateMedia({ media: 'print' });
+  await expect(page.locator('.site-header')).toBeHidden();
+  await expect(page.locator('body > main')).toBeHidden();
+  await expect(page.locator('.calc-business-cta')).toBeHidden();
+  await expect(page.locator('#printSheet')).toBeVisible();
+  await expect(page.locator('.print-document')).toBeVisible();
+  await expect(page.locator('.print-estimate-note')).toContainText('NON-BINDING ESTIMATE');
+});
+
+
+test('Homepage and Preisrechner share the same footer shell', async ({ page }) => {
+  const snapshots=[];
+  for (const path of ['/', '/calculator/']) {
+    await page.goto(path,{waitUntil:'domcontentloaded'});
+    const footer=page.locator('.site-footer');
+    await expect(footer).toBeVisible();
+    snapshots.push(await footer.evaluate(el=>({
+      className:el.className,
+      columns:[...el.querySelectorAll('.footer-grid > div > h4')].map(x=>x.textContent.trim()),
+      cta:el.querySelector('.footer-cta a')?.textContent.trim(),
+      region:el.querySelector('.footer-brand p')?.textContent.trim()
+    })));
+  }
+  expect(snapshots[1]).toEqual(snapshots[0]);
+  expect(snapshots[0].cta).toContain('Preisrechner');
+  expect(snapshots[0].region).toContain('Nürnberg');
+});
+
+
+test('header and footer stay mounted while route content swaps', async ({ page }) => {
+  await page.goto('/',{waitUntil:'domcontentloaded'});
+  const before=await page.evaluate(()=>{
+    const header=document.querySelector('.site-header');
+    const footer=document.querySelector('.site-footer');
+    header.dataset.persistProbe='header-stays';
+    footer.dataset.persistProbe='footer-stays';
+    const hr=header.getBoundingClientRect();
+    return {height:hr.height,headerText:header.textContent};
+  });
+
+  await page.locator('[data-shared-nav="calculator"]').click();
+  await expect(page).toHaveURL(/\/calculator\/$/);
+  await expect(page.locator('.site-header')).toHaveAttribute('data-persist-probe','header-stays');
+  await expect(page.locator('.site-footer')).toHaveAttribute('data-persist-probe','footer-stays');
+  await expect(page.locator('[data-shell-view="calculator"]:not([hidden])')).toBeVisible();
+
+  const after=await page.locator('.site-header').boundingBox();
+  expect(Math.abs(after.height-before.height)).toBeLessThan(1);
+
+  await page.locator('[data-shared-nav="home"]').click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.locator('.site-header')).toHaveAttribute('data-persist-probe','header-stays');
+  await expect(page.locator('[data-shell-view="home"]:not([hidden])')).toBeVisible();
+});
+
+
+test('promotion fallback is consistent when backend is unavailable', async ({ page }) => {
+  await page.goto('/',{waitUntil:'domcontentloaded'});
+  const promoValues=await page.locator('[data-promo-percent]').allTextContents();
+  expect(promoValues.length).toBeGreaterThan(0);
+  expect(new Set(promoValues.map(x=>x.trim()))).toEqual(new Set(['20%']));
+
+  await page.goto('/calculator/',{waitUntil:'domcontentloaded'});
+  await expect(page.locator('#discountLabel')).toContainText('20%');
 });

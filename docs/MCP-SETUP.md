@@ -13,6 +13,7 @@ External tool access is host-specific. The repository documents required capabil
 | Payments | Stripe when applicable | Test/sandbox payment flows and configuration |
 | Transactional email | Resend when applicable | Email delivery, templates, logs and webhooks |
 | Product analytics | PostHog when applicable | Events, flags, experiments and diagnostics |
+| Public web research / crawl | Firecrawl when applicable | Search, scrape, map and bounded crawl verification |
 | Business/project documents | Google Drive when applicable | Existing documentation and business artifacts |
 
 Only connect the providers needed by the task.
@@ -62,9 +63,18 @@ Configuration present in the repository is not evidence that an external integra
 | Browser verification | Recommended for UI changes | Playwright / preview | Run repository smoke checks |
 | Code relationships | Recommended | Graphify local | Query a known symbol/module and confirm in source |
 | Runtime observability | Optional / activation-dependent | Sentry scaffold | Read project/config metadata |
-| Product analytics/flags | Optional / task-dependent | PostHog when connected | Read project/flag metadata |
+| Product analytics/flags | Recommended for release analytics when connected | PostHog | Read project/flag/event metadata |
+| Public web research / crawl | Recommended for public-site release checks | Firecrawl | Scrape/map a known FrankiFlow public route |
 | Payments | Not a default website capability | Stripe only for an explicitly added payment flow | Read account/context before any test write |
 | Transactional email | Task-dependent | Resend / shared backend email functions | Read delivery/webhook metadata |
 | Business/project documents | Optional | Google Drive when connected | List/read a known project document |
 
 Provider availability is agent-host specific. Repository documentation is not proof that a connector is currently active.
+
+
+## FrankiFlow specialist workflows
+
+- PostHog analytics/flags/release evidence: `.agents/skills/posthog-analytics/SKILL.md`
+- Firecrawl public-site research/crawl verification: `.agents/skills/firecrawl-research/SKILL.md`
+
+These complement, and do not replace, Playwright/TinyFish browser verification.
