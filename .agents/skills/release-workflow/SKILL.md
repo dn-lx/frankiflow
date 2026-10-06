@@ -123,6 +123,7 @@ Preferred stack:
 - Supabase tooling for schema/RLS/security-advisor work when the repository uses Supabase;
 - Netlify tooling for deploy verification when the repository is hosted there;
 - PostHog for product analytics, feature flags and production error visibility once connected;
+- Firecrawl for public route, metadata and crawl-based release evidence;
 - Codex Security for deeper repository security investigation once connected.
 
 Real-device iPhone/iPad Safari testing is recommended for release-critical print/PDF flows because desktop WebKit is not a perfect substitute for iOS/iPadOS printing.
