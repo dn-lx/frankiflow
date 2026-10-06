@@ -22,7 +22,7 @@ const fallbackSettings={
 
 function applySiteLanguage(){
   if(!siteSettings)return;const lang=getLanguage();
-  $('[data-setting]').forEach(el=>{const key=el.dataset.setting;const langKey=lang==='en'?`${key}_en`:key;const value=siteSettings[langKey]||siteSettings[key]||fallbackSettings[langKey]||fallbackSettings[key];if(value!=null)el.textContent=value});
+  $$('[data-setting]').forEach(el=>{const key=el.dataset.setting;const langKey=lang==='en'?`${key}_en`:key;const value=siteSettings[langKey]||siteSettings[key]||fallbackSettings[langKey]||fallbackSettings[key];if(value!=null)el.textContent=value});
   translateDom(document,lang);
 }
 
