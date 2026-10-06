@@ -301,6 +301,7 @@
   text-decoration:none;
 }
 .site-footer .footer-links a:hover{color:#73d8d0}
+.site-footer .footer-company-id{color:#8496a4;font-size:11px;line-height:1.45}
 .site-footer .footer-links [data-whatsapp]::before{
   content:"";
   display:inline-block;
