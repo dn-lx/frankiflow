@@ -346,7 +346,7 @@
 
 /* Persistent shell geometry — controlled by Admin/Supabase values. */
 :root{
-  --ff-header-logo-width:90px;
+  --ff-header-logo-width:135px;
   --ff-header-height:100px;
 }
 .site-header{
