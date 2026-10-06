@@ -210,11 +210,27 @@ async function renderHomepageGallery(){
   applySectionVisibility();
 }
 
+function refreshManagedHomepage(){
+  return Promise.allSettled([loadEnhancementSettings(),renderHomepageGallery()]);
+}
+let managedRefreshTimer=null;
+function queueManagedHomepageRefresh(){
+  clearTimeout(managedRefreshTimer);
+  managedRefreshTimer=setTimeout(()=>{void refreshManagedHomepage()},120);
+}
+
 installFavicon();
 removeLegacyHomepageSections();
 ensureAboutSection();
 setupServiceCards();
 const quote=$('#quoteForm');if(quote)quote.addEventListener('submit',sendEnquiry,true);
 window.addEventListener('frankiflow:language',()=>setTimeout(()=>{applyManagedHomepage();replaceExactCopy(document)},0));
-await Promise.allSettled([loadEnhancementSettings(),renderHomepageGallery()]);
+window.addEventListener('focus',queueManagedHomepageRefresh);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')queueManagedHomepageRefresh()});
+supabase.channel('frankiflow-homepage-admin-sync')
+  .on('postgres_changes',{event:'*',schema:'public',table:'frankiflow_site_settings'},queueManagedHomepageRefresh)
+  .on('postgres_changes',{event:'*',schema:'public',table:'frankiflow_gallery'},queueManagedHomepageRefresh)
+  .on('postgres_changes',{event:'*',schema:'public',table:'frankiflow_copy'},queueManagedHomepageRefresh)
+  .subscribe();
+await refreshManagedHomepage();
 applyManagedHomepage();
