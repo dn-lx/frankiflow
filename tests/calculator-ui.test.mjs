@@ -261,3 +261,24 @@ test('Calculator numeric inputs default to zero',()=>{
   assert.doesNotMatch(html,/id="areaSqm"[^>]*value="80"/);
   assert.doesNotMatch(html,/id="windowSqm"[^>]*value="10"/);
 });
+
+
+test('current HWK Betriebsnummer is used in public legal and generated documents',()=>{
+  const app=read('public/assets/calculator-app-v3.js');
+  const legacy=read('public/assets/calculator.js');
+  const footer=read('public/assets/shared-site-header.js');
+  const legal=read('public/impressum/index.html');
+  for(const src of [app,legacy,footer,legal])assert.match(src,/4323852/);
+  assert.doesNotMatch(app,/69471447/);
+  assert.doesNotMatch(legacy,/69471447/);
+});
+
+test('PostHog and Firecrawl workflows are available to FrankiFlow agents',()=>{
+  const index=read('.agents/SKILL-INDEX.md');
+  const posthog=read('.agents/skills/posthog-analytics/SKILL.md');
+  const firecrawl=read('.agents/skills/firecrawl-research/SKILL.md');
+  assert.match(index,/posthog-analytics/);
+  assert.match(index,/firecrawl-research/);
+  assert.match(posthog,/enquiry_submitted/);
+  assert.match(firecrawl,/\/calculator\//);
+});
