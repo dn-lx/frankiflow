@@ -175,7 +175,6 @@ async function sendEnquiry(e){
   const {error}=await supabase.from('frankiflow_quote_requests').insert(payload);
   if(btn){btn.disabled=false;btn.innerHTML=old||tr('Anfrage senden','Send Enquiry')}
   if(error){notice.innerHTML=tr(`Die Online-Anfrage konnte nicht gesendet werden. Schreiben Sie uns bitte direkt an <a href="mailto:${FRANKIFLOW_CONFIG.defaultEmail}">${FRANKIFLOW_CONFIG.defaultEmail}</a>.`,`The Online Enquiry could not be sent. Please email us directly at <a href="mailto:${FRANKIFLOW_CONFIG.defaultEmail}">${FRANKIFLOW_CONFIG.defaultEmail}</a>.`);notice.className='notice error';return}
-  form.reset();notice.textContent=tr('Vielen Dank! Ihre Anfrage ist eingegangen. Eine Bestätigung wurde per E-Mail gesendet. Wir melden uns so schnell wie möglich persönlich bei Ihnen.','Thank You! We received your Enquiry. A Confirmation was sent by Email and we will contact you personally as soon as possible.');notice.className='notice';
   try{
     const endpoint=`${FRANKIFLOW_CONFIG.supabaseUrl}/functions/v1/frankiflow-email`;
     const headers={'Content-Type':'application/json','apikey':FRANKIFLOW_CONFIG.supabasePublishableKey};
@@ -184,11 +183,23 @@ async function sendEnquiry(e){
       fetch(endpoint,{method:'POST',headers,body:JSON.stringify({event_type:'admin_enquiry',source:'website',...common})}),
       fetch(endpoint,{method:'POST',headers,body:JSON.stringify({event_type:'enquiry_received',source:'website',...common})})
     ]);
-    for(const result of results){
-      if(result.status==='rejected')console.warn('FrankiFlow enquiry email failed',result.reason);
-      else if(!result.value.ok)console.warn('FrankiFlow enquiry email failed',await result.value.text());
+    const admin=results[0],customer=results[1];
+    const adminFailed=admin.status==='rejected'||!admin.value?.ok;
+    if(adminFailed){
+      const detail=admin.status==='rejected'?String(admin.reason||''):await admin.value.text();
+      console.error('FrankiFlow admin enquiry email failed',detail);
+      notice.textContent=tr('Ihre Anfrage wurde gespeichert, aber die E-Mail an FrankiFlow konnte nicht versendet werden. Bitte schreiben Sie uns zusätzlich an info@frankiflow.de.','Your enquiry was saved, but the notification email to FrankiFlow could not be sent. Please also email info@frankiflow.de.');
+      notice.className='notice error';
+      return;
     }
-  }catch(err){console.warn('FrankiFlow enquiry email failed',err)}
+    if(customer.status==='rejected'||!customer.value?.ok)console.warn('Customer confirmation email failed',customer.status==='rejected'?customer.reason:await customer.value.text());
+    window.frankiflowAnalytics?.capture('enquiry_submitted',{source:'homepage',service_key:payload.service_key,language:getLanguage()});
+    form.reset();notice.textContent=tr('Vielen Dank! Ihre Anfrage ist eingegangen. Eine Bestätigung wurde per E-Mail gesendet. Wir melden uns so schnell wie möglich persönlich bei Ihnen.','Thank You! We received your Enquiry. A Confirmation was sent by Email and we will contact you personally as soon as possible.');notice.className='notice';
+  }catch(err){
+    console.error('FrankiFlow enquiry email failed',err);
+    notice.textContent=tr('Ihre Anfrage wurde gespeichert, aber die E-Mail an FrankiFlow konnte nicht versendet werden. Bitte schreiben Sie uns zusätzlich an info@frankiflow.de.','Your enquiry was saved, but the notification email to FrankiFlow could not be sent. Please also email info@frankiflow.de.');
+    notice.className='notice error';
+  }
 }
 
 async function renderHomepageGallery(){
