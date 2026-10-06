@@ -473,10 +473,15 @@ function bind(){
 }
 
 cfg=clone(FALLBACK);renderServices();renderSelects();updateDynamicLabels();syncMobilePriceBarLanguage();applyLanguage();bind();await detectAdmin();recalculate();updateChecklistUi();
-supabase.channel('frankiflow-calculator-pricing')
-  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'pricing_config'},payload=>{
-    if(applyPricingRow(payload?.new))refreshPricingUi();
-  })
+let remoteRefreshTimer=null;
+function queueRemoteRefresh(){
+  clearTimeout(remoteRefreshTimer);
+  remoteRefreshTimer=setTimeout(()=>{void loadRemote()},120);
+}
+supabase.channel('frankiflow-calculator-admin-sync')
+  .on('postgres_changes',{event:'*',schema:'public',table:'pricing_config'},queueRemoteRefresh)
+  .on('postgres_changes',{event:'*',schema:'public',table:'frankiflow_checklists'},queueRemoteRefresh)
   .subscribe();
 window.addEventListener('focus',()=>{void loadRemote()});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')void loadRemote()});
 void loadRemote();

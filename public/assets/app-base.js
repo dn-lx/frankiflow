@@ -115,13 +115,16 @@ window.addEventListener('frankiflow:language',()=>{applySiteLanguage();applyProm
 window.addEventListener('frankiflow:shell-content-mounted',()=>{applySiteLanguage();applyPromotionBindings(document)});
 window.addEventListener('focus',()=>{void loadSite()});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')void loadSite()});
-supabase.channel('frankiflow-public-pricing')
+supabase.channel('frankiflow-public-content')
   .on('postgres_changes',{event:'UPDATE',schema:'public',table:'pricing_config',filter:'key=eq.promotion_settings'},payload=>{
     if(payload?.new?.value){
       promotionSettings=normalizePromotion(payload.new.value);
       applyPromotionBindings(document);
       applySiteLanguage();
     }
+  })
+  .on('postgres_changes',{event:'*',schema:'public',table:'frankiflow_site_settings'},()=>{
+    void Promise.allSettled([loadSite(),loadAboutMain()]);
   })
   .subscribe();
 await Promise.allSettled([loadSite(),loadGallery(),loadAboutMain(),loadHeaderLogoWidth()]);applyPromotionBindings(document);applySiteLanguage();
