@@ -282,3 +282,49 @@ test('PostHog and Firecrawl workflows are available to FrankiFlow agents',()=>{
   assert.match(posthog,/enquiry_submitted/);
   assert.match(firecrawl,/\/calculator\//);
 });
+
+
+test('PostHog runtime is privacy-minimized and non-authoritative',()=>{
+  const analytics=read('public/assets/posthog.js');
+  const netlify=read('netlify.toml');
+  const privacy=read('public/datenschutz/index.html');
+  assert.match(analytics,/autocapture:false/);
+  assert.match(analytics,/disable_session_recording:true/);
+  assert.match(analytics,/persistence:'memory'/);
+  assert.match(analytics,/person_profiles:'never'/);
+  assert.match(analytics,/capture_pageview:'history_change'/);
+  assert.match(analytics,/allowedEvents=new Map/);
+  for(const forbidden of ['customer_name','customer_email','customer_phone','requestMessage','customerAddress']){
+    assert.doesNotMatch(analytics,new RegExp(forbidden));
+  }
+  assert.match(netlify,/https:\/\/us\.i\.posthog\.com/);
+  assert.match(privacy,/Nutzungsanalyse mit PostHog/);
+  assert.match(privacy,/Sitzungsaufzeichnungen sind deaktiviert/);
+});
+
+test('enquiry success requires the admin notification email',()=>{
+  const base=read('public/assets/app-base.js');
+  const enhanced=read('public/assets/app-enhancements.js');
+  const calc=read('public/assets/calculator-app-v3.js');
+  for(const src of [base,enhanced,calc]){
+    assert.match(src,/admin_enquiry/);
+    assert.match(src,/adminFailed/);
+  }
+  assert.match(base,/info@frankiflow\.de/);
+  assert.match(enhanced,/info@frankiflow\.de/);
+});
+
+test('custom analytics events carry only allowlisted non-PII context',()=>{
+  const analytics=read('public/assets/posthog.js');
+  const base=read('public/assets/app-base.js');
+  const calc=read('public/assets/calculator-app-v3.js');
+  for(const event of ['enquiry_submitted','estimate_pdf_downloaded','estimate_print_started','estimate_request_opened']){
+    assert.match(analytics,new RegExp(event));
+  }
+  assert.match(base,/enquiry_submitted/);
+  assert.match(calc,/estimate_pdf_downloaded/);
+  assert.match(calc,/estimate_print_started/);
+  assert.match(calc,/estimate_request_opened/);
+  assert.doesNotMatch(base,/frankiflowAnalytics\?\.capture\([^\n]*customer_email/);
+  assert.doesNotMatch(calc,/frankiflowAnalytics\?\.capture\([^\n]*requestEmail/);
+});
