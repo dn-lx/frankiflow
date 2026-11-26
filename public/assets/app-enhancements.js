@@ -201,10 +201,12 @@ const quote=$('#quoteForm');if(quote)quote.addEventListener('submit',sendEnquiry
 window.addEventListener('frankiflow:language',()=>setTimeout(()=>{applyManagedHomepage();replaceExactCopy(document)},0));
 window.addEventListener('focus',queueManagedHomepageRefresh);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')queueManagedHomepageRefresh()});
-supabase.channel('frankiflow-homepage-admin-sync')
-  .on('postgres_changes',{event:'*',schema:'public',table:'frankiflow_site_settings'},queueManagedHomepageRefresh)
-  .on('postgres_changes',{event:'*',schema:'public',table:'frankiflow_gallery'},queueManagedHomepageRefresh)
-  .on('postgres_changes',{event:'*',schema:'public',table:'frankiflow_copy'},queueManagedHomepageRefresh)
-  .subscribe();
+try {
+  supabase.channel('frankiflow-homepage-admin-sync')
+    .on('postgres_changes',{event:'*',schema:'public',table:'frankiflow_site_settings'},queueManagedHomepageRefresh)
+    .on('postgres_changes',{event:'*',schema:'public',table:'frankiflow_gallery'},queueManagedHomepageRefresh)
+    .on('postgres_changes',{event:'*',schema:'public',table:'frankiflow_copy'},queueManagedHomepageRefresh)
+    .subscribe();
+} catch (error) { console.warn('FrankiFlow realtime unavailable', error); }
 await refreshManagedHomepage();
 applyManagedHomepage();

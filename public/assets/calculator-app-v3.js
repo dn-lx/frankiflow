@@ -478,10 +478,12 @@ function queueRemoteRefresh(){
   clearTimeout(remoteRefreshTimer);
   remoteRefreshTimer=setTimeout(()=>{void loadRemote()},120);
 }
-supabase.channel('frankiflow-calculator-pricing')
-  .on('postgres_changes',{event:'*',schema:'public',table:'pricing_config'},queueRemoteRefresh)
-  .on('postgres_changes',{event:'*',schema:'public',table:'frankiflow_checklists'},queueRemoteRefresh)
-  .subscribe();
+try {
+  supabase.channel('frankiflow-calculator-pricing')
+    .on('postgres_changes',{event:'*',schema:'public',table:'pricing_config'},queueRemoteRefresh)
+    .on('postgres_changes',{event:'*',schema:'public',table:'frankiflow_checklists'},queueRemoteRefresh)
+    .subscribe();
+} catch (error) { console.warn('FrankiFlow realtime unavailable', error); }
 window.addEventListener('focus',()=>{void loadRemote()});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')void loadRemote()});
 void loadRemote();

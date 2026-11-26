@@ -76,17 +76,19 @@ window.addEventListener('frankiflow:language',()=>{applySiteLanguage();applyProm
 window.addEventListener('frankiflow:shell-content-mounted',()=>{applySiteLanguage();applyPromotionBindings(document)});
 window.addEventListener('focus',()=>{void loadSite()});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')void loadSite()});
-supabase.channel('frankiflow-public-pricing')
-  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'pricing_config',filter:'key=eq.promotion_settings'},payload=>{
-    if(payload?.new?.value){
-      promotionSettings=normalizePromotion(payload.new.value);
-      applyPromotionBindings(document);
-      applySiteLanguage();
-    }
-  })
-  .on('postgres_changes',{event:'*',schema:'public',table:'frankiflow_site_settings'},()=>{
-    void loadSite();
-    window.dispatchEvent(new CustomEvent('frankiflow:site-settings-changed'));
-  })
-  .subscribe();
+try {
+  supabase.channel('frankiflow-public-pricing')
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'pricing_config',filter:'key=eq.promotion_settings'},payload=>{
+      if(payload?.new?.value){
+        promotionSettings=normalizePromotion(payload.new.value);
+        applyPromotionBindings(document);
+        applySiteLanguage();
+      }
+    })
+    .on('postgres_changes',{event:'*',schema:'public',table:'frankiflow_site_settings'},()=>{
+      void loadSite();
+      window.dispatchEvent(new CustomEvent('frankiflow:site-settings-changed'));
+    })
+    .subscribe();
+} catch (error) { console.warn('FrankiFlow realtime unavailable', error); }
 await Promise.allSettled([loadSite(),loadHeaderLogoWidth()]);applyPromotionBindings(document);applySiteLanguage();
