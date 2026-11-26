@@ -1,8 +1,6 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
-import { FRANKIFLOW_CONFIG } from './config.js';
+import { supabase } from './pricing.js';
 import { getLanguage } from './site-i18n.js';
 
-const supabase=createClient(FRANKIFLOW_CONFIG.supabaseUrl,FRANKIFLOW_CONFIG.supabasePublishableKey);
 const $=(s,p=document)=>p.querySelector(s);
 const $$=(s,p=document)=>[...p.querySelectorAll(s)];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -74,26 +72,9 @@ async function loadAboutAccordion(){
   renderAboutAccordion();
 }
 
-function forceCalculatorSameTab(){
-  const normalize=()=>$$('a[href]').forEach(link=>{
-    try{const url=new URL(link.href,location.href);if(url.origin===location.origin&&/^\/calculator\/?$/.test(url.pathname)){link.removeAttribute('target');link.removeAttribute('rel')}}catch{}
-  });
-  normalize();
-  document.addEventListener('click',event=>{
-    if(event.defaultPrevented)return;
-    const link=event.target.closest?.('a[href]');if(!link)return;
-    let url;try{url=new URL(link.href,location.href)}catch{return}
-    if(url.origin!==location.origin||!/^\/calculator\/?$/.test(url.pathname))return;
-    if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
-    event.preventDefault();
-    location.assign(url.href);
-  },true);
-}
-
-forceCalculatorSameTab();
 cleanAboutSectionChrome();
 syncAboutHeading();
 keepAboutSectionLink();
 keepProductLinksLast();
 loadAboutAccordion();
-window.addEventListener('frankiflow:language',()=>setTimeout(()=>{cleanAboutSectionChrome();syncAboutHeading();keepAboutSectionLink();keepProductLinksLast();renderAboutAccordion();forceCalculatorSameTab()},0));
+window.addEventListener('frankiflow:language',()=>setTimeout(()=>{cleanAboutSectionChrome();syncAboutHeading();keepAboutSectionLink();keepProductLinksLast();renderAboutAccordion()},0));
