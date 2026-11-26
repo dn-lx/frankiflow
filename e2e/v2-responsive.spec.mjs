@@ -75,7 +75,14 @@ for(const width of widths){
     expect(geometry.scrollWidth,JSON.stringify(geometry.offenders,null,2)).toBeLessThanOrEqual(geometry.clientWidth+1);
 
     const bar=page.locator('#mobilePriceBar');
-    if(width<=900){
+    if(width<=680){
+      await expect(bar).toBeHidden();
+      const island=page.locator('#mobilePriceIsland');
+      await expect(island).toBeVisible();
+      const islandBox=await island.boundingBox();
+      expect(islandBox.x).toBeGreaterThanOrEqual(0);
+      expect(islandBox.x+islandBox.width).toBeLessThanOrEqual(width+1);
+    }else if(width<=900){
       await expect(bar).toBeVisible();
       const barBox=await bar.boundingBox();
       expect(barBox.x).toBeGreaterThanOrEqual(0);
