@@ -132,7 +132,7 @@ test('shared header exposes localized product tooltips and accessible names',()=
   assert.match(shared,/setAttribute\('aria-label',label\+' — '\+tooltip\)/);
 });
 
-test('homepage binds navigation before awaiting remote content',()=>{const js=read('public/assets/app-base.js');const bind=js.lastIndexOf('initI18n();bindUI();');const wait=js.lastIndexOf('await Promise.allSettled([loadSite(),loadGallery(),loadAboutMain(),loadHeaderLogoWidth()])');assert.ok(bind>=0);assert.ok(wait>=0);assert.ok(bind<wait);});
+test('homepage binds navigation before awaiting remote content',()=>{const js=read('public/assets/app-base.js');const enhanced=read('public/assets/app-enhancements.js');const bind=js.lastIndexOf("mountLanguageSwitch($('.nav-actions'),{prepend:true});initI18n();");const wait=js.lastIndexOf('await Promise.allSettled([loadSite(),loadHeaderLogoWidth()])');assert.ok(bind>=0);assert.ok(wait>=0);assert.ok(bind<wait);assert.match(enhanced,/const quote=\$\('#quoteForm'\);if\(quote\)quote\.addEventListener\('submit',sendEnquiry\);/);});
 
 
 test('shared mobile navigation is local and loaded before page controllers',()=>{
@@ -277,12 +277,10 @@ test('Calculator numeric inputs default to zero',()=>{
 
 test('current HWK Betriebsnummer is used in public legal and generated documents',()=>{
   const app=read('public/assets/calculator-app-v3.js');
-  const legacy=read('public/assets/calculator.js');
   const footer=read('public/assets/shared-site-header.js');
   const legal=read('public/impressum/index.html');
-  for(const src of [app,legacy,footer,legal])assert.match(src,/4323852/);
+  for(const src of [app,footer,legal])assert.match(src,/4323852/);
   assert.doesNotMatch(app,/69471447/);
-  assert.doesNotMatch(legacy,/69471447/);
 });
 
 test('PostHog and Firecrawl workflows are available to FrankiFlow agents',()=>{
@@ -317,29 +315,27 @@ test('PostHog runtime is privacy-minimized and non-authoritative',()=>{
 });
 
 test('enquiry success requires the admin notification email',()=>{
-  const base=read('public/assets/app-base.js');
   const enhanced=read('public/assets/app-enhancements.js');
   const calc=read('public/assets/calculator-app-v3.js');
-  for(const src of [base,enhanced,calc]){
+  for(const src of [enhanced,calc]){
     assert.match(src,/admin_enquiry/);
     assert.match(src,/adminFailed/);
+    assert.match(src,/info@frankiflow\.de/);
   }
-  assert.match(base,/info@frankiflow\.de/);
-  assert.match(enhanced,/info@frankiflow\.de/);
 });
 
 test('custom analytics events carry only allowlisted non-PII context',()=>{
   const analytics=read('public/assets/posthog.js');
-  const base=read('public/assets/app-base.js');
+  const enhanced=read('public/assets/app-enhancements.js');
   const calc=read('public/assets/calculator-app-v3.js');
   for(const event of ['enquiry_submitted','estimate_pdf_downloaded','estimate_print_started','estimate_request_opened']){
     assert.match(analytics,new RegExp(event));
   }
-  assert.match(base,/enquiry_submitted/);
+  assert.match(enhanced,/enquiry_submitted/);
   assert.match(calc,/estimate_pdf_downloaded/);
   assert.match(calc,/estimate_print_started/);
   assert.match(calc,/estimate_request_opened/);
-  assert.match(base,/capture\('enquiry_submitted',\{source:'homepage',service_key:payload\.service_key,language:getLanguage\(\)\}\)/);
+  assert.match(enhanced,/capture\('enquiry_submitted',\{source:'homepage',service_key:payload\.service_key,language:getLanguage\(\)\}\)/);
   assert.match(calc,/capture\('enquiry_submitted',\{source:'calculator',service_key:calc\.serviceKey,language:lang\}\)/);
   assert.doesNotMatch(analytics,/customer_email|customer_phone|customer_name|message|address/i);
 });

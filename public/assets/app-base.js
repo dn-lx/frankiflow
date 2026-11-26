@@ -86,6 +86,7 @@ supabase.channel('frankiflow-public-pricing')
   })
   .on('postgres_changes',{event:'*',schema:'public',table:'frankiflow_site_settings'},()=>{
     void loadSite();
+    window.dispatchEvent(new CustomEvent('frankiflow:site-settings-changed'));
   })
   .subscribe();
 await Promise.allSettled([loadSite(),loadHeaderLogoWidth()]);applyPromotionBindings(document);applySiteLanguage();

@@ -78,3 +78,4 @@ keepAboutSectionLink();
 keepProductLinksLast();
 loadAboutAccordion();
 window.addEventListener('frankiflow:language',()=>setTimeout(()=>{cleanAboutSectionChrome();syncAboutHeading();keepAboutSectionLink();keepProductLinksLast();renderAboutAccordion()},0));
+window.addEventListener('frankiflow:site-settings-changed',()=>{void loadAboutAccordion()});
