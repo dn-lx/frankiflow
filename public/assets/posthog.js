@@ -49,16 +49,19 @@ function pageview(){void send('$pageview')}
 window.frankiflowAnalytics=Object.freeze({capture});
 pageview();
 
-const originalPush=history.pushState.bind(history);
-history.pushState=(...args)=>{
-  const value=originalPush(...args);
-  queueMicrotask(pageview);
-  return value;
-};
-const originalReplace=history.replaceState.bind(history);
-history.replaceState=(...args)=>{
-  const value=originalReplace(...args);
-  queueMicrotask(pageview);
-  return value;
-};
-window.addEventListener('popstate',()=>queueMicrotask(pageview));
+if(!window.__frankiflowAnalyticsBound){
+  window.__frankiflowAnalyticsBound=true;
+  const originalPush=history.pushState.bind(history);
+  history.pushState=(...args)=>{
+    const value=originalPush(...args);
+    queueMicrotask(pageview);
+    return value;
+  };
+  const originalReplace=history.replaceState.bind(history);
+  history.replaceState=(...args)=>{
+    const value=originalReplace(...args);
+    queueMicrotask(pageview);
+    return value;
+  };
+  window.addEventListener('popstate',()=>queueMicrotask(pageview));
+}

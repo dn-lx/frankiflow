@@ -28,32 +28,9 @@ const fallbackManaged={
   ]
 };
 
-function installFavicon(){
-  let link=$('link[rel~="icon"]');
-  if(!link){link=document.createElement('link');link.rel='icon';document.head.append(link)}
-  link.href='/assets/frankiflow-favicon-32.png?v=20260911d';
-  link.type='image/png';
-  link.sizes='32x32';
-}
-
 function removeLegacyHomepageSections(){
   $('.calculator-cta-section')?.remove();
   $('.local-seo-section')?.remove();
-}
-
-function ensureAboutSection(){
-  if($('#about'))return;
-  const services=$('.services-section');if(!services)return;
-  const section=document.createElement('section');section.id='about';section.className='section about-section';
-  section.innerHTML=`<div class="container about-grid"><div class="about-intro"><span class="eyebrow" data-home-setting="about_eyebrow">Über uns</span><h2 data-home-setting="about_title">Persönlich aufgebaut. Digital gedacht. Mit Qualitätsanspruch.</h2></div><div class="about-story"><p data-home-setting="about_body_1">${esc(fallbackManaged.about_body_1)}</p><p data-home-setting="about_body_2">${esc(fallbackManaged.about_body_2)}</p><div class="about-signature"><span>FrankiFlow</span><strong>${tr('Mehr als Reinigung.','More Than Cleaning.')}</strong></div></div></div>`;
-  services.insertAdjacentElement('afterend',section);
-  const nav=$('.nav-links');if(nav&&!nav.querySelector('a[href="#about"]')){
-    const link=document.createElement('a');link.href='#about';link.dataset.sectionLink='about';link.textContent=tr('Über uns','About Us');
-    const why=nav.querySelector('a[href="#warum"]');why?nav.insertBefore(link,why):nav.append(link);
-  }
-  const footer=$('.footer-grid .footer-links');if(footer&&!footer.querySelector('a[href="#about"]')){
-    const link=document.createElement('a');link.href='#about';link.dataset.sectionLink='about';link.textContent=tr('Über uns','About Us');footer.prepend(link);
-  }
 }
 
 function settingValue(key){const lang=getLanguage();const langKey=lang==='en'?`${key}_en`:key;return managedSettings[langKey]||managedSettings[key]||fallbackManaged[langKey]||fallbackManaged[key]||''}
@@ -91,7 +68,6 @@ function applySectionVisibility(){
 }
 
 function applyManagedHomepage(){
-  ensureAboutSection();
   applyManagedCopy();
   renderFaq();
   applySectionVisibility();
@@ -166,7 +142,7 @@ async function loadEnhancementSettings(){
 }
 
 async function sendEnquiry(e){
-  e.preventDefault();e.stopImmediatePropagation();
+  e.preventDefault();
   const form=e.currentTarget,notice=$('#quoteNotice');if(!notice)return;
   notice.className='notice hidden';const fd=new FormData(form);const quoteId=crypto.randomUUID();
   const payload={id:quoteId,service_key:fd.get('service_key')||'general',frequency_key:null,area_sqm:null,contract_months:null,window_sqm:0,equipment_by_frankiflow:false,deep_cleaning:false,estimated_monthly:null,customer_name:fd.get('customer_name'),customer_email:fd.get('customer_email'),customer_phone:fd.get('customer_phone')||'',postcode:fd.get('postcode')||'',company_name:fd.get('company_name')||'',message:fd.get('message')||'',privacy_accepted:fd.get('privacy_accepted')==='on',status:'new'};
@@ -206,7 +182,7 @@ async function renderHomepageGallery(){
   const wrap=$('#galleryGrid'),section=$('#gallerySection');if(!wrap||!section)return;
   const {data,error}=await supabase.from('frankiflow_gallery').select('*').eq('active',true).eq('category','general').order('sort_order').order('created_at',{ascending:false}).limit(8);
   if(error||!data?.length){section.classList.add('hidden');return}
-  wrap.innerHTML='';for(const item of data){const {data:url}=supabase.storage.from(FRANKIFLOW_CONFIG.mediaBucket).getPublicUrl(item.storage_path);const fig=document.createElement('figure');fig.innerHTML=`<img loading="lazy" src="${url.publicUrl}" alt="${esc(item.alt_text||item.title||'FrankiFlow Reinigung')}">${item.title?`<figcaption>${esc(item.title)}</figcaption>`:''}`;wrap.append(fig)}section.classList.remove('hidden');
+  wrap.innerHTML='';for(const item of data){const {data:url}=supabase.storage.from(FRANKIFLOW_CONFIG.mediaBucket).getPublicUrl(item.storage_path);const fig=document.createElement('figure');fig.innerHTML=`<img loading="lazy" src="${esc(url.publicUrl)}" alt="${esc(item.alt_text||item.title||'FrankiFlow Reinigung')}">${item.title?`<figcaption>${esc(item.title)}</figcaption>`:''}`;wrap.append(fig)}section.classList.remove('hidden');
   applySectionVisibility();
 }
 
@@ -219,11 +195,9 @@ function queueManagedHomepageRefresh(){
   managedRefreshTimer=setTimeout(()=>{void refreshManagedHomepage()},120);
 }
 
-installFavicon();
 removeLegacyHomepageSections();
-ensureAboutSection();
 setupServiceCards();
-const quote=$('#quoteForm');if(quote)quote.addEventListener('submit',sendEnquiry,true);
+const quote=$('#quoteForm');if(quote)quote.addEventListener('submit',sendEnquiry);
 window.addEventListener('frankiflow:language',()=>setTimeout(()=>{applyManagedHomepage();replaceExactCopy(document)},0));
 window.addEventListener('focus',queueManagedHomepageRefresh);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')queueManagedHomepageRefresh()});
