@@ -98,3 +98,7 @@
   .floating-trust{right:-2px}
   .modern-head h2,.why-copy h2,.contact-copy h2,.calculator-banner h2{font-size:32px}
 }
+
+@media(max-width:720px){
+  .page-hero h1{font-size:clamp(28px,8.6vw,42px);overflow-wrap:break-word;hyphens:auto}
+}
