@@ -1,9 +1,7 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
-import { FRANKIFLOW_CONFIG } from './config.js';
+import { supabase } from './pricing.js';
 import { tr } from './site-i18n.js';
 import { effectiveHeaderHeight, normalizeHeaderHeight, normalizeHeaderLogoWidth } from './header-logo-settings.js';
 
-const supabase=createClient(FRANKIFLOW_CONFIG.supabaseUrl,FRANKIFLOW_CONFIG.supabasePublishableKey);
 const $=(s,p=document)=>p.querySelector(s);
 
 function currentValues(){

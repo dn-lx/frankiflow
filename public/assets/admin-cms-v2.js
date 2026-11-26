@@ -1,8 +1,6 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4';
-import { FRANKIFLOW_CONFIG } from './config.js';
+import { supabase } from './pricing.js';
 import { getLanguage, tr } from './site-i18n.js';
 
-const supabase=createClient(FRANKIFLOW_CONFIG.supabaseUrl,FRANKIFLOW_CONFIG.supabasePublishableKey);
 const $=(s,p=document)=>p.querySelector(s), $$=(s,p=document)=>[...p.querySelectorAll(s)];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let cmsData=null;
@@ -19,11 +17,6 @@ const sectionMeta={
   faq:{de:'FAQ',en:'FAQ',deHelp:'Häufige Fragen und Antworten.',enHelp:'Frequently asked questions and answers.'},
   contact:{de:'Kontakt',en:'Contact',deHelp:'Kontaktformular und direkte Kontaktmöglichkeiten.',enHelp:'Enquiry form and direct contact options.'}
 };
-
-function removeLegacyCmsEditors(){
-  $('.ff-copy-card')?.remove();
-  $('#managedContentCard')?.remove();
-}
 
 function languageCard(lang,title,inner){
   return `<div class="ff-cms-language-card" data-language-card="${lang}"><div class="ff-cms-language-head"><span class="ff-language-badge">${lang==='de'?'DE':'EN'}</span><strong>${esc(title)}</strong></div>${inner}</div>`;
@@ -64,7 +57,6 @@ function faqItemTemplate(item={},index=0){
 
 function ensureCmsV2(){
   const panel=$('[data-panel-view="site"]');if(!panel||$('#homepageCmsV2'))return;
-  removeLegacyCmsEditors();
   const card=document.createElement('section');card.id='homepageCmsV2';card.className='admin-card ff-cms-v2';
   card.innerHTML=`
     <header class="ff-cms-v2-hero">
@@ -142,5 +134,5 @@ async function saveCmsV2(){
   cmsData={...cmsData,...payload};setState(tr('Gespeichert ✓','Saved ✓'));setTimeout(()=>setState(tr('Bereit','Ready')),2200);
 }
 
-removeLegacyCmsEditors();ensureCmsV2();await loadCmsV2();
+ensureCmsV2();await loadCmsV2();
 window.addEventListener('frankiflow:language',()=>{if(!cmsData)return;renderVisibility();renderAbout();renderFaq()});
