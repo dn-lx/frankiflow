@@ -1,11 +1,6 @@
 export * from './site-i18n-base.js';
 import { getLanguage, initI18n as baseInitI18n, translateDom as baseTranslateDom, translations } from './site-i18n-base.js';
 
-/* Remove legacy payment-provider copy from the active translation catalogue. */
-for(const [key,value] of Object.entries(translations)){
-  if(/stripe|zahlung|payment|checkout|paid links|bezahlte links/i.test(`${key} ${value}`)) delete translations[key];
-}
-
 /* Extra pairs cover dynamic/short labels that previously leaked untranslated keywords. */
 Object.assign(translations,{
   'Neukunde':'New-Customer',
